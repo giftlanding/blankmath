@@ -158,6 +158,13 @@ resource "cloudflare_pages_project" "frontend" {
   name              = var.cloudflare_pages_project_name
   production_branch = "main"
 
+  build_config = {
+    build_caching   = true
+    build_command   = "npm run build"
+    destination_dir = "dist"
+    root_dir        = "frontend"
+  }
+
   deployment_configs = {
     preview = {
       fail_open = true
