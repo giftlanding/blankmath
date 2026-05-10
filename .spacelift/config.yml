@@ -1,0 +1,7 @@
+version: "2"
+
+stacks:
+  blankmath:
+    project_root: terraform
+    terraform_workflow_tool: OPEN_TOFU
+    opentofu_version: "1.11.6"
