@@ -1,0 +1,7 @@
+.terraform/
+pdf_generator.zip
+*.tfplan
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log

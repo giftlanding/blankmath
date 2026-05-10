@@ -1,0 +1,213 @@
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
+}
+
+resource "random_password" "internal_api_token" {
+  length  = 48
+  special = false
+}
+
+resource "aws_s3_bucket" "generated_pdfs" {
+  bucket = "${local.name_prefix}-generated-pdfs-${random_id.bucket_suffix.hex}"
+
+  tags = local.common_tags
+}
+
+resource "aws_s3_bucket_public_access_block" "generated_pdfs" {
+  bucket = aws_s3_bucket.generated_pdfs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "generated_pdfs" {
+  bucket = aws_s3_bucket.generated_pdfs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "generated_pdfs" {
+  bucket = aws_s3_bucket.generated_pdfs.id
+
+  rule {
+    id     = "expire-generated-pdfs"
+    status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
+
+    expiration {
+      days = var.pdf_retention_days
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_group" "pdf_generator" {
+  name              = "/aws/lambda/${local.name_prefix}-pdf-generator"
+  retention_in_days = 14
+
+  tags = local.common_tags
+}
+
+data "aws_iam_policy_document" "lambda_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "pdf_generator" {
+  name               = "${local.name_prefix}-pdf-generator"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+
+  tags = local.common_tags
+}
+
+data "aws_iam_policy_document" "pdf_generator" {
+  statement {
+    sid = "WriteGeneratedPdfs"
+
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+    ]
+
+    resources = ["${aws_s3_bucket.generated_pdfs.arn}/*"]
+  }
+
+  statement {
+    sid = "WriteLogs"
+
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+
+    resources = ["${aws_cloudwatch_log_group.pdf_generator.arn}:*"]
+  }
+}
+
+resource "aws_iam_role_policy" "pdf_generator" {
+  name   = "${local.name_prefix}-pdf-generator"
+  role   = aws_iam_role.pdf_generator.id
+  policy = data.aws_iam_policy_document.pdf_generator.json
+}
+
+data "archive_file" "pdf_generator" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/pdf_generator"
+  output_path = "${path.module}/pdf_generator.zip"
+}
+
+resource "aws_lambda_function" "pdf_generator" {
+  function_name = "${local.name_prefix}-pdf-generator"
+  role          = aws_iam_role.pdf_generator.arn
+  handler       = "handler.handler"
+  runtime       = "python3.12"
+
+  filename         = data.archive_file.pdf_generator.output_path
+  source_code_hash = data.archive_file.pdf_generator.output_base64sha256
+
+  memory_size = 256
+  timeout     = 30
+
+  reserved_concurrent_executions = var.lambda_reserved_concurrency
+
+  environment {
+    variables = {
+      GENERATED_PDFS_BUCKET = aws_s3_bucket.generated_pdfs.bucket
+      INTERNAL_API_TOKEN    = random_password.internal_api_token.result
+    }
+  }
+
+  depends_on = [
+    aws_cloudwatch_log_group.pdf_generator,
+    aws_iam_role_policy.pdf_generator,
+  ]
+
+  tags = local.common_tags
+}
+
+resource "aws_lambda_function_url" "pdf_generator" {
+  function_name      = aws_lambda_function.pdf_generator.function_name
+  authorization_type = "NONE"
+
+  cors {
+    allow_credentials = false
+    allow_headers     = ["content-type"]
+    allow_methods     = ["POST"]
+    allow_origins     = ["https://${var.domain_name}", "https://www.${var.domain_name}"]
+    max_age           = 300
+  }
+}
+
+resource "cloudflare_pages_project" "frontend" {
+  account_id        = var.cloudflare_account_id
+  name              = var.cloudflare_pages_project_name
+  production_branch = "main"
+
+  deployment_configs = {
+    production = {
+      env_vars = {
+        LAMBDA_FUNCTION_URL = {
+          type  = "plain_text"
+          value = aws_lambda_function_url.pdf_generator.function_url
+        }
+        INTERNAL_API_TOKEN = {
+          type  = "secret_text"
+          value = random_password.internal_api_token.result
+        }
+      }
+    }
+  }
+}
+
+resource "cloudflare_pages_domain" "apex" {
+  account_id   = var.cloudflare_account_id
+  project_name = cloudflare_pages_project.frontend.name
+  name         = var.domain_name
+}
+
+resource "cloudflare_pages_domain" "www" {
+  account_id   = var.cloudflare_account_id
+  project_name = cloudflare_pages_project.frontend.name
+  name         = "www.${var.domain_name}"
+}
+
+resource "cloudflare_dns_record" "apex" {
+  zone_id = var.cloudflare_zone_id
+  name    = var.domain_name
+  type    = "CNAME"
+  content = cloudflare_pages_project.frontend.subdomain
+  ttl     = 1
+  proxied = true
+
+  comment = "Managed by OpenTofu for Cloudflare Pages."
+
+  depends_on = [cloudflare_pages_domain.apex]
+}
+
+resource "cloudflare_dns_record" "www" {
+  zone_id = var.cloudflare_zone_id
+  name    = "www.${var.domain_name}"
+  type    = "CNAME"
+  content = cloudflare_pages_project.frontend.subdomain
+  ttl     = 1
+  proxied = true
+
+  comment = "Managed by OpenTofu for Cloudflare Pages."
+
+  depends_on = [cloudflare_pages_domain.www]
+}
