@@ -165,19 +165,6 @@ resource "cloudflare_pages_project" "frontend" {
     root_dir        = "frontend"
   }
 
-  source = {
-    type = "github"
-    config = {
-      owner                          = "giftlanding"
-      repo_name                      = "blankmath"
-      production_branch              = "main"
-      production_deployments_enabled = true
-      preview_deployment_setting     = "none"
-      pr_comments_enabled            = false
-      path_includes                  = ["frontend/**"]
-    }
-  }
-
   deployment_configs = {
     preview = {
       fail_open = true
