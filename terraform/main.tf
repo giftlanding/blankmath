@@ -159,7 +159,13 @@ resource "cloudflare_pages_project" "frontend" {
   production_branch = "main"
 
   deployment_configs = {
+    preview = {
+      fail_open = true
+    }
+
     production = {
+      fail_open = true
+
       env_vars = {
         LAMBDA_FUNCTION_URL = {
           type  = "plain_text"
