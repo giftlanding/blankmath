@@ -107,7 +107,7 @@ resource "aws_iam_role_policy" "pdf_generator" {
 
 data "archive_file" "pdf_generator" {
   type        = "zip"
-  source_dir  = "${path.module}/lambda/pdf_generator"
+  source_dir  = "${path.module}/../backend/pdf_generator"
   output_path = "${path.module}/pdf_generator.zip"
 }
 
