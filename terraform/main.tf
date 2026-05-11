@@ -107,7 +107,7 @@ resource "aws_iam_role_policy" "pdf_generator" {
 
 data "archive_file" "pdf_generator" {
   type        = "zip"
-  source_dir  = "${path.module}/../backend/pdf_generator"
+  source_dir  = "${path.module}/bootstrap/pdf_generator"
   output_path = "${path.module}/pdf_generator.zip"
 }
 
@@ -136,6 +136,17 @@ resource "aws_lambda_function" "pdf_generator" {
     aws_cloudwatch_log_group.pdf_generator,
     aws_iam_role_policy.pdf_generator,
   ]
+
+  lifecycle {
+    ignore_changes = [
+      filename,
+      source_code_hash,
+      last_modified,
+      qualified_arn,
+      qualified_invoke_arn,
+      version,
+    ]
+  }
 
   tags = local.common_tags
 }

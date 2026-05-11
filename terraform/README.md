@@ -44,8 +44,7 @@ code.
 
 - Terraform creates infrastructure only. Application builds and deployments should
   be handled by Cloudflare Pages and backend deployment workflows.
-- The Cloudflare Pages project is created now, but the GitHub source integration is
-  intentionally left for the frontend scaffold phase so Cloudflare does not try to
-  build a missing `frontend/` directory.
+- The Lambda is created from a small Terraform-owned bootstrap package. Real backend
+  code is deployed by `.github/workflows/deploy-backend.yml`.
 - Generated PDFs are private S3 objects and should be returned to users through
   presigned URLs.

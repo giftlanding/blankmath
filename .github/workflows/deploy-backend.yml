@@ -1,0 +1,60 @@
+name: Deploy backend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-backend.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  LAMBDA_FUNCTION_NAME: blankmath-prod-pdf-generator
+  PACKAGE_PATH: /tmp/blankmath-pdf-generator.zip
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          rm -rf /tmp/blankmath-package
+          mkdir -p /tmp/blankmath-package
+          python -m pip install \
+            --requirement backend/requirements.txt \
+            --target /tmp/blankmath-package
+
+      - name: Build Lambda package
+        run: |
+          cp -R backend/pdf_generator/. /tmp/blankmath-package/
+          cd /tmp/blankmath-package
+          zip -qr "$PACKAGE_PATH" .
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy Lambda code
+        run: |
+          aws lambda update-function-code \
+            --function-name "$LAMBDA_FUNCTION_NAME" \
+            --zip-file "fileb://$PACKAGE_PATH"

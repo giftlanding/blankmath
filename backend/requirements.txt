@@ -1,0 +1,5 @@
+# Runtime dependencies for the PDF generator Lambda.
+#
+# ReportLab will be used by the worksheet renderer. Keeping it here now lets the
+# deployment workflow own Lambda packaging instead of Terraform.
+reportlab==4.4.6
