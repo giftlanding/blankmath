@@ -1,6 +1,10 @@
 import html
 import re
 
+NUMBER_FONT_SIZE = 8
+PROBLEM_FONT_SIZE = 18
+BLANK_WIDTH = 10
+
 
 def problem_markup(problem_number: int, prompt: str, layout: str) -> str:
     number = problem_number_markup(problem_number)
@@ -9,11 +13,11 @@ def problem_markup(problem_number: int, prompt: str, layout: str) -> str:
         if vertical_markup:
             return f"{number}<br/>{vertical_markup}"
 
-    return f"{number}&nbsp;{horizontal_problem_markup(prompt)}"
+    return f"{number}&nbsp;<font size=\"{PROBLEM_FONT_SIZE}\">{horizontal_problem_markup(prompt)}</font>"
 
 
 def problem_number_markup(problem_number: int) -> str:
-    return f'<font size="8" color="#5f6b7a">{problem_number}.</font>'
+    return f'<font size="{NUMBER_FONT_SIZE}" color="#5f6b7a">{problem_number}.</font>'
 
 
 def vertical_problem_markup(prompt: str) -> str | None:
@@ -23,7 +27,11 @@ def vertical_problem_markup(prompt: str) -> str | None:
 
     left, operator, right = match.groups()
     operator_markup = operator_markup_for(operator)
-    return f"{html.escape(left)}<br/>{operator_markup} {html.escape(right)}<br/>{answer_blank_markup()}"
+    return (
+        f"<font size=\"{PROBLEM_FONT_SIZE}\">{html.escape(left)}</font>"
+        f"<br/><font size=\"{PROBLEM_FONT_SIZE}\">{operator_markup} {html.escape(right)}</font>"
+        f"<br/><font size=\"{PROBLEM_FONT_SIZE}\">{answer_blank_markup()}</font>"
+    )
 
 
 def horizontal_problem_markup(prompt: str) -> str:
@@ -34,7 +42,7 @@ def horizontal_problem_markup(prompt: str) -> str:
 
 
 def answer_blank_markup() -> str:
-    return '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>'
+    return "<u>" + "&nbsp;" * BLANK_WIDTH + "</u>"
 
 
 def operator_markup_for(operator: str) -> str:

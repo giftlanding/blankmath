@@ -27,6 +27,9 @@ def render_pdf(
         bottomMargin=0.45 * inch,
     )
     styles = getSampleStyleSheet()
+    worksheet_style = styles["Normal"].clone("WorksheetProblem")
+    worksheet_style.fontSize = 18
+    worksheet_style.leading = 22
     story = []
 
     for page_number, start in enumerate(range(0, len(problems), count_per_page), start=1):
@@ -36,7 +39,7 @@ def render_pdf(
         story.append(Paragraph("BlankMath.com", styles["Title"]))
         story.append(Paragraph(title, styles["Heading2"]))
         story.append(Spacer(1, 0.16 * inch))
-        story.append(_problem_table(page_problems, styles["Normal"], layout))
+        story.append(_problem_table(page_problems, worksheet_style, layout))
 
     if include_answer_key:
         story.append(PageBreak())
@@ -69,13 +72,13 @@ def _problem_table(problems: list[Problem], style, layout: str) -> Table:
 
     table = Table(rows, colWidths=[7.4 * inch / columns] * columns)
     table.setStyle(TableStyle([
-        ("BOX", (0, 0), (-1, -1), 0.4, colors.HexColor("#d9dee8")),
-        ("INNERGRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#d9dee8")),
+        ("BOX", (0, 0), (-1, -1), 0.2, colors.HexColor("#d9dee8")),
+        ("INNERGRID", (0, 0), (-1, -1), 0.15, colors.HexColor("#d9dee8")),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 10),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
-        ("TOPPADDING", (0, 0), (-1, -1), 12),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+        ("LEFTPADDING", (0, 0), (-1, -1), 14),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 14),
+        ("TOPPADDING", (0, 0), (-1, -1), 16),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 16),
     ]))
     return table
 
