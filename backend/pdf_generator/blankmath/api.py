@@ -20,15 +20,15 @@ def handle_event(event: dict[str, Any]) -> dict[str, Any]:
         return response(400, {"error": "invalid_json"})
     except ValidationError as error:
         return response(400, {"error": "invalid_request", "message": str(error)})
+    except Exception:
+        return response(400, {"error": "invalid_request", "message": "Request could not be parsed."})
 
-    return response(
-        501,
-        {
-            "error": "not_implemented",
-            "message": "Blankmath PDF generation is not implemented yet.",
-            "worksheetType": request["worksheetType"],
-        },
-    )
+    try:
+        url = generate_worksheet_pdf(request)
+    except Exception as error:
+        return response(500, {"error": "generation_failed", "message": str(error)})
+
+    return response(201, {"url": url})
 
 
 def response(status_code: int, body: dict[str, Any]) -> dict[str, Any]:
@@ -39,3 +39,9 @@ def response(status_code: int, body: dict[str, Any]) -> dict[str, Any]:
         },
         "body": json.dumps(body),
     }
+
+
+def generate_worksheet_pdf(request: dict[str, Any]) -> str:
+    from blankmath.service import generate_worksheet_pdf as generate
+
+    return generate(request)

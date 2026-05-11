@@ -1,0 +1,40 @@
+from typing import Any
+
+from blankmath.generators import generate_problems
+from blankmath.renderer import render_pdf
+from blankmath.storage import upload_pdf
+
+
+WORKSHEET_TITLES = {
+    "addition": "Addition",
+    "minus": "Subtraction",
+    "mixed_add_minus": "Mixed Addition and Subtraction",
+    "additionmn": "Addition Missing Number",
+    "minusmn": "Subtraction Missing Number",
+    "mixed_add_minus_mn": "Mixed Addition and Subtraction Missing Number",
+    "add_three_numbers": "Add Three Numbers",
+    "add_minus_three_numbers": "Add and Subtract Three Numbers",
+    "add_three_numbers_mn": "Add Three Numbers Missing Number",
+    "multiplication": "Multiplication",
+    "division": "Division",
+    "mixed_times_divide": "Mixed Multiplication and Division",
+    "multiplicationmn": "Multiplication Missing Number",
+    "division_mn": "Division Missing Number",
+    "mixed_times_divide_mn": "Mixed Multiplication and Division Missing Number",
+    "greater_than_less_than": "Greater Than or Less Than",
+}
+
+
+def generate_worksheet_pdf(request: dict[str, Any]) -> str:
+    worksheet_type = request["worksheetType"]
+    options = request["options"]
+    count_per_page = int(options.get("problemCount", 20))
+    include_answer_key = bool(options.get("includeAnswerKey", False))
+    problems = generate_problems(worksheet_type, options)
+    pdf = render_pdf(
+        title=WORKSHEET_TITLES[worksheet_type],
+        problems=problems,
+        count_per_page=count_per_page,
+        include_answer_key=include_answer_key,
+    )
+    return upload_pdf(pdf)

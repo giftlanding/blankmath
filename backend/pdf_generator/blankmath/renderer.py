@@ -1,0 +1,101 @@
+from io import BytesIO
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+from blankmath.generators import Problem
+
+
+def render_pdf(
+    title: str,
+    problems: list[Problem],
+    count_per_page: int,
+    include_answer_key: bool,
+) -> bytes:
+    buffer = BytesIO()
+    document = SimpleDocTemplate(
+        buffer,
+        pagesize=letter,
+        rightMargin=0.45 * inch,
+        leftMargin=0.45 * inch,
+        topMargin=0.45 * inch,
+        bottomMargin=0.45 * inch,
+    )
+    styles = getSampleStyleSheet()
+    story = []
+
+    for page_number, start in enumerate(range(0, len(problems), count_per_page), start=1):
+        page_problems = problems[start:start + count_per_page]
+        if page_number > 1:
+            story.append(PageBreak())
+        story.append(Paragraph("BlankMath.com", styles["Title"]))
+        story.append(Paragraph(title, styles["Heading2"]))
+        story.append(Spacer(1, 0.16 * inch))
+        story.append(_problem_table(page_problems, styles["Normal"]))
+
+    if include_answer_key:
+        story.append(PageBreak())
+        story.append(Paragraph("Answer Key", styles["Title"]))
+        story.append(Spacer(1, 0.16 * inch))
+        story.append(_answer_table(problems, styles["Normal"]))
+
+    document.build(story)
+    return buffer.getvalue()
+
+
+def _problem_table(problems: list[Problem], style) -> Table:
+    columns = 2 if len(problems) <= 20 else 3
+    rows = []
+    for index in range(0, len(problems), columns):
+        row = []
+        for offset in range(columns):
+            problem_index = index + offset
+            if problem_index < len(problems):
+                problem = problems[problem_index]
+                text = f"{problem_index + 1}. {problem.prompt}"
+            else:
+                text = ""
+            row.append(Paragraph(text, style))
+        rows.append(row)
+
+    table = Table(rows, colWidths=[7.4 * inch / columns] * columns)
+    table.setStyle(TableStyle([
+        ("BOX", (0, 0), (-1, -1), 0.4, colors.HexColor("#d9dee8")),
+        ("INNERGRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#d9dee8")),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+        ("TOPPADDING", (0, 0), (-1, -1), 12),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+    ]))
+    return table
+
+
+def _answer_table(problems: list[Problem], style) -> Table:
+    columns = 4
+    rows = []
+    for index in range(0, len(problems), columns):
+        row = []
+        for offset in range(columns):
+            problem_index = index + offset
+            if problem_index < len(problems):
+                problem = problems[problem_index]
+                text = f"{problem_index + 1}. {problem.answer}"
+            else:
+                text = ""
+            row.append(Paragraph(text, style))
+        rows.append(row)
+
+    table = Table(rows, colWidths=[7.4 * inch / columns] * columns)
+    table.setStyle(TableStyle([
+        ("INNERGRID", (0, 0), (-1, -1), 0.2, colors.HexColor("#d9dee8")),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 8),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+    ]))
+    return table
