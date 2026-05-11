@@ -14,6 +14,16 @@ output "lambda_function_url" {
   sensitive   = true
 }
 
+output "github_action_iam_user_name" {
+  description = "IAM user for the GitHub Actions backend deployment credentials."
+  value       = aws_iam_user.github_action.name
+}
+
+output "github_action_iam_user_arn" {
+  description = "IAM user ARN for the GitHub Actions backend deployment credentials."
+  value       = aws_iam_user.github_action.arn
+}
+
 output "cloudflare_pages_project_name" {
   description = "Cloudflare Pages project name."
   value       = cloudflare_pages_project.frontend.name

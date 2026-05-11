@@ -23,6 +23,21 @@ Optional:
 
 - `TF_VAR_aws_region`, defaults to `us-east-1`
 
+## GitHub Actions AWS Credentials
+
+The backend deployment workflow uses GitHub Actions secrets named
+`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. Those credentials should belong
+to the Terraform-managed IAM user `blankmath_github_action_user`.
+
+That IAM user is only allowed to update the code package for the production PDF
+generator Lambda function. It is separate from the AWS credentials used by
+Spacelift to manage infrastructure.
+
+Create an access key for `blankmath_github_action_user` in AWS IAM, then store
+that key pair in the GitHub repository secrets used by
+`.github/workflows/deploy-backend.yml`. Do not reuse the broader Spacelift AWS
+credentials for GitHub Actions.
+
 ## Current Architecture
 
 The initial production architecture is intentionally small and scale-to-zero:

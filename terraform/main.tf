@@ -105,6 +105,30 @@ resource "aws_iam_role_policy" "pdf_generator" {
   policy = data.aws_iam_policy_document.pdf_generator.json
 }
 
+resource "aws_iam_user" "github_action" {
+  name = "blankmath_github_action_user"
+
+  tags = local.common_tags
+}
+
+data "aws_iam_policy_document" "github_action_lambda_deploy" {
+  statement {
+    sid = "DeployPdfGeneratorLambdaCode"
+
+    actions = [
+      "lambda:UpdateFunctionCode",
+    ]
+
+    resources = [aws_lambda_function.pdf_generator.arn]
+  }
+}
+
+resource "aws_iam_user_policy" "github_action_lambda_deploy" {
+  name   = "${local.name_prefix}-github-action-lambda-deploy"
+  user   = aws_iam_user.github_action.name
+  policy = data.aws_iam_policy_document.github_action_lambda_deploy.json
+}
+
 data "archive_file" "pdf_generator" {
   type        = "zip"
   source_dir  = "${path.module}/bootstrap/pdf_generator"
