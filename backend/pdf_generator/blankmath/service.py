@@ -30,11 +30,13 @@ def generate_worksheet_pdf(request: dict[str, Any]) -> str:
     options = request["options"]
     count_per_page = int(options.get("problemCount", 20))
     include_answer_key = bool(options.get("includeAnswerKey", False))
+    layout = str(options.get("layout", "horizontal"))
     problems = generate_problems(worksheet_type, options)
     pdf = render_pdf(
         title=WORKSHEET_TITLES[worksheet_type],
         problems=problems,
         count_per_page=count_per_page,
         include_answer_key=include_answer_key,
+        layout=layout,
     )
     return upload_pdf(pdf)

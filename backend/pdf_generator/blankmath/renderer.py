@@ -7,6 +7,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from blankmath.generators import Problem
+from blankmath.problem_formatting import problem_markup
 
 
 def render_pdf(
@@ -14,6 +15,7 @@ def render_pdf(
     problems: list[Problem],
     count_per_page: int,
     include_answer_key: bool,
+    layout: str = "horizontal",
 ) -> bytes:
     buffer = BytesIO()
     document = SimpleDocTemplate(
@@ -34,7 +36,7 @@ def render_pdf(
         story.append(Paragraph("BlankMath.com", styles["Title"]))
         story.append(Paragraph(title, styles["Heading2"]))
         story.append(Spacer(1, 0.16 * inch))
-        story.append(_problem_table(page_problems, styles["Normal"]))
+        story.append(_problem_table(page_problems, styles["Normal"], layout))
 
     if include_answer_key:
         story.append(PageBreak())
@@ -46,8 +48,12 @@ def render_pdf(
     return buffer.getvalue()
 
 
-def _problem_table(problems: list[Problem], style) -> Table:
-    columns = 2 if len(problems) <= 20 else 3
+def _problem_table(problems: list[Problem], style, layout: str) -> Table:
+    if layout == "vertical":
+        columns = 4 if len(problems) <= 20 else 5
+    else:
+        columns = 2 if len(problems) <= 20 else 3
+
     rows = []
     for index in range(0, len(problems), columns):
         row = []
@@ -55,7 +61,7 @@ def _problem_table(problems: list[Problem], style) -> Table:
             problem_index = index + offset
             if problem_index < len(problems):
                 problem = problems[problem_index]
-                text = f"{problem_index + 1}. {problem.prompt}"
+                text = problem_markup(problem_index + 1, problem.prompt, layout)
             else:
                 text = ""
             row.append(Paragraph(text, style))
