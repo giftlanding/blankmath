@@ -10,16 +10,31 @@ from blankmath.problem_formatting import horizontal_problem_markup, problem_mark
 
 class ProblemFormattingTest(unittest.TestCase):
     def test_horizontal_markup_uses_math_symbols(self):
-        self.assertEqual(horizontal_problem_markup("8 x 9 = ?"), "8 &times; 9 = ?")
-        self.assertEqual(horizontal_problem_markup("8 / 2 = ?"), "8 &divide; 2 = ?")
+        self.assertEqual(
+            horizontal_problem_markup("8 x 9 = ?"),
+            "8 &times; 9 = <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>",
+        )
+        self.assertEqual(
+            horizontal_problem_markup("8 / 2 = ?"),
+            "8 &divide; 2 = <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>",
+        )
 
     def test_vertical_markup_formats_standard_binary_problem(self):
-        self.assertEqual(vertical_problem_markup("12 + 9 = ?"), "12<br/>+ 9<br/>____")
-        self.assertEqual(vertical_problem_markup("8 x 9 = ?"), "8<br/>&times; 9<br/>____")
+        self.assertEqual(
+            vertical_problem_markup("12 + 9 = ?"),
+            "12<br/>+ 9<br/><u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>",
+        )
+        self.assertEqual(
+            vertical_problem_markup("8 x 9 = ?"),
+            "8<br/>&times; 9<br/><u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>",
+        )
 
     def test_vertical_markup_falls_back_for_missing_number_problem(self):
         self.assertIsNone(vertical_problem_markup("8 x ____ = 72"))
-        self.assertEqual(problem_markup(1, "8 x ____ = 72", "vertical"), "1. 8 &times; ____ = 72")
+        self.assertEqual(
+            problem_markup(1, "8 x ____ = 72", "vertical"),
+            '<font size="8" color="#5f6b7a">1.</font>&nbsp;8 &times; ____ = 72',
+        )
 
 
 if __name__ == "__main__":
