@@ -28,6 +28,73 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 400)
 
+    def test_requires_range_options_for_range_worksheets(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "addition",
+                "options": {
+                    "problemCount": 20,
+                    "sheetCount": 1,
+                },
+            }),
+        })
+
+        body = json.loads(result["body"])
+        self.assertEqual(result["statusCode"], 400)
+        self.assertEqual(body["error"], "invalid_request")
+
+    def test_rejects_unknown_options(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "multiplication",
+                "options": {
+                    "problemCount": 20,
+                    "sheetCount": 1,
+                    "digits": "1d",
+                    "layout": "vertical",
+                    "from": 0,
+                    "to": 20,
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
+    def test_rejects_invalid_choice_options(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "multiplication",
+                "options": {
+                    "problemCount": 20,
+                    "sheetCount": 1,
+                    "digits": "4d",
+                    "layout": "diagonal",
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
+    def test_rejects_non_boolean_flags(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "addition",
+                "options": {
+                    "problemCount": 20,
+                    "sheetCount": 1,
+                    "from": 0,
+                    "to": 20,
+                    "smallOperandLessThan10": "true",
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
     def test_accepts_known_worksheet_request(self):
         with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
             result = handle_event({
