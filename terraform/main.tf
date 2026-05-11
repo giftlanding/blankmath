@@ -141,10 +141,6 @@ resource "aws_lambda_function" "pdf_generator" {
     ignore_changes = [
       filename,
       source_code_hash,
-      last_modified,
-      qualified_arn,
-      qualified_invoke_arn,
-      version,
     ]
   }
 
