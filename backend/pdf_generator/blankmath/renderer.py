@@ -1,16 +1,18 @@
 from io import BytesIO
+from pathlib import Path
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
-from reportlab.platypus import Flowable, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import Flowable, Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from blankmath.generators import Problem
 from blankmath.problem_formatting import VerticalProblemParts, parse_vertical_problem, problem_markup
 
 WORKSHEET_FONT = "Helvetica"
 VERTICAL_FONT = "Courier"
+HEADER_IMAGE_PATH = Path(__file__).resolve().parent / "assets" / "logo.jpg"
 
 
 def render_pdf(
@@ -40,9 +42,8 @@ def render_pdf(
         page_problems = problems[start:start + page_problem_count]
         if page_number > 1:
             story.append(PageBreak())
-        story.append(Paragraph("BlankMath.com", styles["Title"]))
-        story.append(Paragraph(title, styles["Heading2"]))
-        story.append(Spacer(1, 0.16 * inch))
+        story.append(_header_image())
+        story.append(Spacer(1, 0.12 * inch))
         story.append(_problem_table(page_problems, worksheet_style, layout, start_number=start + 1))
 
     if include_answer_key:
@@ -53,6 +54,10 @@ def render_pdf(
 
     document.build(story)
     return buffer.getvalue()
+
+
+def _header_image() -> Image:
+    return Image(str(HEADER_IMAGE_PATH), width=7.6 * inch, height=0.894 * inch)
 
 
 def _page_problem_count(count_per_page: int, layout: str) -> int:
