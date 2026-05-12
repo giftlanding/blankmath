@@ -8,6 +8,13 @@ NUMBER_FONT = "Helvetica"
 OPERAND_FONT = "Courier"
 NUMBER_FONT_SIZE = 8
 OPERAND_FONT_SIZE = 20
+PANEL_WIDTH = 1.55 * inch
+PANEL_HEIGHT = 1.76 * inch
+
+LINE_Y = 1.03 * inch
+SECOND_OPERAND_Y = 1.18 * inch
+FIRST_OPERAND_Y = 1.45 * inch
+WORK_LINE_YS = (0.76 * inch, 0.51 * inch, 0.26 * inch)
 
 
 class VerticalArithmeticPanel(Flowable):
@@ -15,8 +22,8 @@ class VerticalArithmeticPanel(Flowable):
         super().__init__()
         self.problem_number = problem_number
         self.problem = problem
-        self.width = 1.55 * inch
-        self.height = 0.98 * inch
+        self.width = PANEL_WIDTH
+        self.height = PANEL_HEIGHT
 
     def wrap(self, available_width, available_height):
         self.width = available_width
@@ -24,15 +31,12 @@ class VerticalArithmeticPanel(Flowable):
 
     def draw(self):
         canvas = self.canv
-        line_y = 0.25 * inch
-        second_y = 0.48 * inch
-        first_y = 0.72 * inch
         operand_right = self.width - 0.12 * inch
 
         canvas.saveState()
         canvas.setFillColor(colors.HexColor("#5f6b7a"))
         canvas.setFont(NUMBER_FONT, NUMBER_FONT_SIZE)
-        canvas.drawString(0, first_y + 0.08 * inch, f"{self.problem_number}.")
+        canvas.drawString(0, FIRST_OPERAND_Y + 0.08 * inch, f"{self.problem_number}.")
 
         canvas.setFillColor(colors.black)
         canvas.setFont(OPERAND_FONT, OPERAND_FONT_SIZE)
@@ -42,11 +46,15 @@ class VerticalArithmeticPanel(Flowable):
         )
         operator_x = max(0.32 * inch, operand_right - operand_width - 0.28 * inch)
 
-        canvas.drawRightString(operand_right, first_y, self.problem.left)
-        canvas.drawString(operator_x, second_y, operator_text(self.problem.operator))
-        canvas.drawRightString(operand_right, second_y, self.problem.right)
+        canvas.drawRightString(operand_right, FIRST_OPERAND_Y, self.problem.left)
+        canvas.drawString(operator_x, SECOND_OPERAND_Y, operator_text(self.problem.operator))
+        canvas.drawRightString(operand_right, SECOND_OPERAND_Y, self.problem.right)
         canvas.setLineWidth(1.2)
-        canvas.line(operator_x, line_y, operand_right, line_y)
+        canvas.line(operator_x, LINE_Y, operand_right, LINE_Y)
+        canvas.setStrokeColor(colors.HexColor("#d8dde6"))
+        canvas.setLineWidth(0.6)
+        for work_line_y in WORK_LINE_YS:
+            canvas.line(operator_x, work_line_y, operand_right, work_line_y)
         canvas.restoreState()
 
 

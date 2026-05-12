@@ -20,8 +20,8 @@ class PanelGrid:
 def panel_grid(layout: str, problem_count: int) -> PanelGrid:
     if layout == "vertical":
         return PanelGrid(
-            columns=4 if problem_count <= 20 else 5,
-            row_height=1.16 * inch,
+            columns=4,
+            row_height=2.0 * inch,
             left_padding=10,
             right_padding=10,
             top_padding=8,
@@ -40,7 +40,7 @@ def panel_grid(layout: str, problem_count: int) -> PanelGrid:
 
 def page_problem_count(count_per_page: int, layout: str) -> int:
     if layout == "vertical":
-        return min(count_per_page, 20)
+        return min(count_per_page, 16)
     return count_per_page
 
 
