@@ -183,8 +183,7 @@ h2 {
 }
 
 .primary-action,
-.generate-button,
-.result-link {
+.generate-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -289,12 +288,6 @@ h2 {
 .generate-button:disabled {
   background: #9aa7b7;
   cursor: not-allowed;
-}
-
-.result-link {
-  width: 100%;
-  margin-top: 12px;
-  background: #345995;
 }
 
 .form-error {
