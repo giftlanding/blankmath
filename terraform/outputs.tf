@@ -1,6 +1,6 @@
 output "generated_pdfs_bucket_name" {
-  description = "Private S3 bucket for temporary generated PDFs."
-  value       = aws_s3_bucket.generated_pdfs.bucket
+  description = "Public S3 bucket for temporary generated PDFs."
+  value       = aws_s3_bucket.generated_pdfs_public.bucket
 }
 
 output "generated_pdfs_public_url" {
