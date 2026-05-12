@@ -22,6 +22,12 @@ variable "domain_name" {
   default     = "blankmath.com"
 }
 
+variable "generated_pdfs_domain_name" {
+  description = "Public custom domain for generated PDF objects."
+  type        = string
+  default     = "r.blankmath.com"
+}
+
 variable "cloudflare_account_id" {
   description = "Cloudflare account ID."
   type        = string

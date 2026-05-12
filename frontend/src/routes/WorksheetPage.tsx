@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useParams } from "@tanstack/react-router";
-import { ArrowLeft, ExternalLink, FileDown } from "lucide-react";
+import { ArrowLeft, FileDown } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { generateWorksheet } from "../api";
@@ -38,7 +38,7 @@ export function WorksheetPage() {
     mutationFn: generateWorksheet,
     onSuccess: (result) => {
       if (result.url) {
-        window.open(result.url, "_blank", "noopener,noreferrer");
+        window.location.assign(result.url);
       }
     },
   });
@@ -88,12 +88,6 @@ export function WorksheetPage() {
               </>
             )}
           </button>
-
-          {mutation.data?.url && (
-            <a className="result-link" href={mutation.data.url} target="_blank" rel="noreferrer">
-              Open PDF <ExternalLink size={16} />
-            </a>
-          )}
         </form>
       </div>
     </section>

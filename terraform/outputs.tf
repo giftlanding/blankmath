@@ -3,6 +3,11 @@ output "generated_pdfs_bucket_name" {
   value       = aws_s3_bucket.generated_pdfs.bucket
 }
 
+output "generated_pdfs_public_url" {
+  description = "Public custom-domain base URL for generated PDFs."
+  value       = "https://${var.generated_pdfs_domain_name}"
+}
+
 output "lambda_function_name" {
   description = "PDF generator Lambda function name."
   value       = aws_lambda_function.pdf_generator.function_name

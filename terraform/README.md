@@ -46,7 +46,8 @@ The initial production architecture is intentionally small and scale-to-zero:
 - Cloudflare custom domains for `blankmath.com` and `www.blankmath.com`.
 - AWS Lambda placeholder for PDF generation.
 - Lambda Function URL for the backend endpoint.
-- Private S3 bucket for generated PDFs.
+- Public S3 bucket for generated PDFs at `https://r.blankmath.com`.
+- Cloudflare DNS for the generated PDF domain.
 - S3 lifecycle expiration for generated PDFs.
 - Random internal API token shared by Cloudflare Pages Functions and Lambda.
 
@@ -61,5 +62,5 @@ code.
   be handled by Cloudflare Pages and backend deployment workflows.
 - The Lambda is created from a small Terraform-owned bootstrap package. Real backend
   code is deployed by `.github/workflows/deploy-backend.yml`.
-- Generated PDFs are private S3 objects and should be returned to users through
-  presigned URLs.
+- Generated PDFs are public S3 objects returned through `https://r.blankmath.com`.
+  They are temporary and expire through the S3 lifecycle policy.
