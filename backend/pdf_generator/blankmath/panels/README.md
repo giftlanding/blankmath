@@ -30,3 +30,48 @@ Current panels:
 The next panel types should be added as separate modules in this package, such
 as `horizontal_arithmetic.py` or `comparison.py`, rather than adding drawing
 logic back into `renderer.py`.
+
+## AI Visual Checks
+
+Panel layout changes should be checked visually before they are committed. The
+goal is to inspect the fixed-size panel itself, not only the full worksheet page.
+
+Generate preview images:
+
+```sh
+PYTHONPATH=/tmp/blankmath-backend-deps python3 backend/tools/render_panel_previews.py
+```
+
+The script writes PNG files to:
+
+```text
+/tmp/blankmath-panel-previews/
+```
+
+Current preview samples:
+
+- `vertical-23x25.png`
+- `vertical-120-div-12.png`
+
+After generating previews, use the AI image-reading tool to open each PNG and
+check:
+
+- the problem number is visually separate from the math problem;
+- operands are aligned by place value;
+- the operator is clearly separated from the operands;
+- the main answer line is easy to see;
+- there is enough blank vertical space for a child to work;
+- multi-step problems such as `23 x 25` have at least three handwriting-sized
+  work rows below the main answer line;
+- no text, operator, or line overlaps;
+- the panel still looks balanced inside its fixed-size box.
+
+If a preview fails visual inspection, adjust the panel renderer or dimensions,
+regenerate the PNGs, and inspect again before committing.
+
+Also run the backend tests and a PDF smoke render:
+
+```sh
+python3 -m unittest discover -s backend/tests
+PYTHONPATH=/tmp/blankmath-backend-deps:backend/pdf_generator python3 -c 'from blankmath.generators import Problem; from blankmath.renderer import render_pdf; problems=[Problem("23 x 25 = ?", "575") for _ in range(16)]; pdf=render_pdf("Multiplication", problems, 20, False, "vertical"); print(pdf[:5], len(pdf))'
+```
