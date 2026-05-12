@@ -271,7 +271,6 @@ resource "cloudflare_pages_project" "frontend" {
       production_deployments_enabled = true
       preview_deployment_setting     = "none"
       pr_comments_enabled            = false
-      path_includes                  = ["frontend/**"]
     }
   }
 
