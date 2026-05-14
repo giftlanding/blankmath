@@ -1,8 +1,8 @@
 :root {
-  color: #17212f;
-  background: #f4f6f8;
+  color: #0a0b0d;
+  background: #ffffff;
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    "Coinbase Sans", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -36,16 +36,21 @@ p {
 h1 {
   margin-bottom: 12px;
   max-width: 760px;
-  font-size: clamp(2.2rem, 7vw, 4.35rem);
-  line-height: 0.96;
+  font-family:
+    "Coinbase Display", "Coinbase Sans", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  font-size: clamp(2.45rem, 7vw, 5rem);
+  font-weight: 400;
+  line-height: 1;
   letter-spacing: 0;
 }
 
 h2 {
   margin-bottom: 8px;
-  color: #17212f;
-  font-size: 1.05rem;
-  line-height: 1.25;
+  color: #0a0b0d;
+  font-size: 1.12rem;
+  font-weight: 600;
+  line-height: 1.33;
   letter-spacing: 0;
 }
 
@@ -54,7 +59,7 @@ h2 {
 }
 
 .site-header {
-  border-bottom: 1px solid #d8dee7;
+  border-bottom: 1px solid #eef0f3;
   background: #ffffff;
 }
 
@@ -88,9 +93,9 @@ h2 {
   width: 40px;
   height: 40px;
   place-items: center;
-  border-radius: 8px;
+  border-radius: 9999px;
   color: #ffffff;
-  background: #1c6b57;
+  background: #0052ff;
 }
 
 .brand strong,
@@ -99,13 +104,14 @@ h2 {
 }
 
 .brand strong {
-  color: #111827;
+  color: #0a0b0d;
   font-size: 1.08rem;
+  font-weight: 600;
 }
 
 .brand small,
 .worksheet-count {
-  color: #657287;
+  color: #5b616e;
   font-size: 0.9rem;
 }
 
@@ -114,10 +120,10 @@ h2 {
 }
 
 .worksheet-count {
-  padding: 8px 10px;
-  border: 1px solid #d8dee7;
-  border-radius: 8px;
-  background: #f8fafc;
+  padding: 8px 12px;
+  border: 1px solid #dee1e6;
+  border-radius: 9999px;
+  background: #ffffff;
   white-space: nowrap;
 }
 
@@ -126,8 +132,8 @@ h2 {
 .narrow-page {
   max-width: 1180px;
   margin: 0 auto;
-  padding-top: 36px;
-  padding-bottom: 56px;
+  padding-top: 48px;
+  padding-bottom: 72px;
 }
 
 .catalog-header {
@@ -141,10 +147,10 @@ h2 {
 .panel-label {
   display: block;
   margin-bottom: 10px;
-  color: #7f4b16;
+  color: #0052ff;
   font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -152,18 +158,18 @@ h2 {
 .worksheet-summary p {
   max-width: 650px;
   margin-bottom: 0;
-  color: #566274;
-  font-size: 1.04rem;
-  line-height: 1.65;
+  color: #5b616e;
+  font-size: 1.05rem;
+  line-height: 1.5;
 }
 
 .catalog-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   overflow: hidden;
-  border: 1px solid #d8dee7;
-  border-radius: 8px;
-  background: #ffffff;
+  border: 1px solid #eef0f3;
+  border-radius: 16px;
+  background: #f7f7f7;
 }
 
 .catalog-stats span {
@@ -172,9 +178,9 @@ h2 {
   min-height: 92px;
   padding: 16px;
   align-content: center;
-  color: #667386;
+  color: #5b616e;
   font-size: 0.82rem;
-  border-left: 1px solid #e5e9ef;
+  border-left: 1px solid #dee1e6;
 }
 
 .catalog-stats span:first-child {
@@ -182,8 +188,9 @@ h2 {
 }
 
 .catalog-stats strong {
-  color: #17212f;
+  color: #0a0b0d;
   font-size: 1.55rem;
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -201,10 +208,10 @@ h2 {
   gap: 10px;
   min-height: 44px;
   padding: 0 12px;
-  border: 1px solid #cbd4e1;
-  border-radius: 8px;
+  border: 1px solid #dee1e6;
+  border-radius: 9999px;
   background: #ffffff;
-  color: #667386;
+  color: #7c828a;
 }
 
 .search-box input {
@@ -212,7 +219,7 @@ h2 {
   min-width: 0;
   border: 0;
   outline: 0;
-  color: #17212f;
+  color: #0a0b0d;
   background: transparent;
 }
 
@@ -225,18 +232,19 @@ h2 {
 
 .tabs button {
   min-height: 38px;
-  padding: 0 13px;
-  border: 1px solid #cbd4e1;
-  border-radius: 8px;
+  padding: 0 14px;
+  border: 1px solid #dee1e6;
+  border-radius: 9999px;
   background: #ffffff;
-  color: #304056;
+  color: #0a0b0d;
   cursor: pointer;
+  font-weight: 500;
 }
 
 .tabs button.active {
-  border-color: #223b63;
+  border-color: #0052ff;
   color: #ffffff;
-  background: #223b63;
+  background: #0052ff;
 }
 
 .result-summary {
@@ -244,7 +252,7 @@ h2 {
   align-items: center;
   gap: 8px;
   margin-bottom: 18px;
-  color: #667386;
+  color: #5b616e;
   font-size: 0.92rem;
 }
 
@@ -260,24 +268,24 @@ h2 {
   flex-direction: column;
   justify-content: space-between;
   gap: 18px;
-  padding: 18px;
-  border: 1px solid #d8dee7;
-  border-radius: 8px;
+  padding: 24px;
+  border: 1px solid #eef0f3;
+  border-radius: 16px;
   background: #ffffff;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
+  box-shadow: none;
 }
 
 .category-label {
   display: inline-flex;
-  min-height: 26px;
+  min-height: 28px;
   align-items: center;
   margin-bottom: 12px;
   padding: 0 9px;
   border-radius: 999px;
-  color: #1c6b57;
-  background: #e8f3ef;
+  color: #0052ff;
+  background: #eef3ff;
   font-size: 0.76rem;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .card-examples {
@@ -289,11 +297,11 @@ h2 {
 .card-examples code,
 .examples code {
   display: block;
-  border: 1px solid #dce2ea;
-  border-radius: 8px;
-  background: #f9fafb;
-  color: #1d2939;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  border: 1px solid #eef0f3;
+  border-radius: 12px;
+  background: #f7f7f7;
+  color: #0a0b0d;
+  font-family: "Coinbase Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   letter-spacing: 0;
 }
 
@@ -308,7 +316,7 @@ h2 {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: #667386;
+  color: #5b616e;
   font-size: 0.9rem;
 }
 
@@ -318,20 +326,26 @@ h2 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 42px;
-  padding: 0 16px;
+  min-height: 44px;
+  padding: 0 20px;
   border: 0;
-  border-radius: 8px;
-  background: #1c6b57;
+  border-radius: 9999px;
+  background: #0052ff;
   color: #ffffff;
-  font-weight: 800;
+  font-weight: 600;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .primary-action {
-  padding-inline: 14px;
+  padding-inline: 18px;
+}
+
+.primary-action:hover,
+.generate-button:hover:not(:disabled),
+.tabs button.active:hover {
+  background: #003ecc;
 }
 
 .back-link {
@@ -339,7 +353,7 @@ h2 {
   align-items: center;
   gap: 6px;
   margin-bottom: 24px;
-  color: #4f5d72;
+  color: #5b616e;
   text-decoration: none;
 }
 
@@ -356,7 +370,7 @@ h2 {
 }
 
 .worksheet-summary h1 {
-  font-size: clamp(2rem, 6vw, 3.65rem);
+  font-size: clamp(2.2rem, 6vw, 4rem);
 }
 
 .worksheet-facts {
@@ -372,10 +386,10 @@ h2 {
   align-items: center;
   gap: 8px;
   padding: 0 11px;
-  border: 1px solid #d8dee7;
-  border-radius: 8px;
+  border: 1px solid #dee1e6;
+  border-radius: 9999px;
   background: #ffffff;
-  color: #415066;
+  color: #5b616e;
   font-size: 0.92rem;
 }
 
@@ -390,11 +404,11 @@ h2 {
 }
 
 .worksheet-form {
-  padding: 22px;
-  border: 1px solid #d8dee7;
-  border-radius: 8px;
+  padding: 28px;
+  border: 1px solid #eef0f3;
+  border-radius: 16px;
   background: #ffffff;
-  box-shadow: 0 8px 24px rgb(15 23 42 / 0.06);
+  box-shadow: none;
 }
 
 .form-heading {
@@ -404,22 +418,23 @@ h2 {
   gap: 16px;
   margin-bottom: 20px;
   padding-bottom: 18px;
-  border-bottom: 1px solid #e5e9ef;
+  border-bottom: 1px solid #eef0f3;
 }
 
 .form-heading h2 {
   margin-bottom: 0;
   font-size: 1.45rem;
+  font-weight: 400;
 }
 
 .request-badge {
   max-width: 180px;
   overflow: hidden;
   padding: 7px 9px;
-  border: 1px solid #d8dee7;
-  border-radius: 8px;
-  color: #4f5d72;
-  background: #f8fafc;
+  border: 1px solid #dee1e6;
+  border-radius: 9999px;
+  color: #5b616e;
+  background: #ffffff;
   font-size: 0.82rem;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -435,26 +450,26 @@ h2 {
 .checkbox-field {
   display: grid;
   gap: 8px;
-  color: #334155;
-  font-weight: 800;
+  color: #0a0b0d;
+  font-weight: 600;
 }
 
 .field input,
 .field select {
   width: 100%;
   min-height: 44px;
-  padding: 0 11px;
-  border: 1px solid #cbd4e1;
-  border-radius: 8px;
+  padding: 0 14px;
+  border: 1px solid #dee1e6;
+  border-radius: 12px;
   background: #ffffff;
-  color: #17212f;
+  color: #0a0b0d;
 }
 
 .field input:focus,
 .field select:focus,
 .search-box:focus-within {
-  border-color: #223b63;
-  outline: 3px solid #d9e4f7;
+  border-color: #0052ff;
+  outline: 3px solid #e5edff;
 }
 
 .checkbox-field {
@@ -467,7 +482,7 @@ h2 {
 .checkbox-field input {
   width: 18px;
   height: 18px;
-  accent-color: #1c6b57;
+  accent-color: #0052ff;
 }
 
 .generate-button {
@@ -476,7 +491,7 @@ h2 {
 }
 
 .generate-button:disabled {
-  background: #9aa7b7;
+  background: #a8b8cc;
   cursor: not-allowed;
 }
 
