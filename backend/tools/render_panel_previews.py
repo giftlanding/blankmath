@@ -13,7 +13,7 @@ from blankmath.panels.problem import problem_panel
 
 SAMPLES = [
     ("vertical-23x25.png", 1, "23 x 25 = ?", "vertical"),
-    ("vertical-120-div-12.png", 2, "120 / 12 = ?", "vertical"),
+    ("long-division-120-div-12.png", 2, "120 / 12 = ?", "long_division"),
 ]
 
 

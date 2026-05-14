@@ -28,6 +28,10 @@ class ProblemFormattingTest(unittest.TestCase):
             problem_markup(1, "8 / 2 = ?", "horizontal"),
             '<font size="8" color="#5f6b7a">1.</font>&nbsp;<font size="18">8 &divide; 2 = <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u></font>',
         )
+        self.assertEqual(
+            problem_markup(1, "8 / 2 = ?", "equation"),
+            '<font size="8" color="#5f6b7a">1.</font>&nbsp;<font size="18">8 &divide; 2 = <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u></font>',
+        )
 
     def test_vertical_markup_formats_standard_binary_problem(self):
         self.assertEqual(

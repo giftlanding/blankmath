@@ -144,7 +144,7 @@ function ControlField({
       <select {...register(control.id)}>
         {control.options.map((option) => (
           <option value={option} key={option}>
-            {option}
+            {control.optionLabels?.[String(option)] ?? option}
           </option>
         ))}
       </select>

@@ -17,13 +17,15 @@ The panel package owns problem-level rendering:
 - standalone panel preview rendering
 
 This keeps visual problem design separate from worksheet generation and page
-pagination. A vertical arithmetic panel can be rendered by itself for inspection
-before it is placed into the worksheet grid.
+pagination. A panel can be rendered by itself for inspection before it is
+placed into the worksheet grid.
 
 Current panels:
 
 - `VerticalArithmeticPanel`: right-aligns operands, places the operator beside
   the second operand, and draws a horizontal answer line.
+- `LongDivisionPanel`: lays out the divisor, dividend, quotient line, and
+  handwriting-sized work rows for standard division problems.
 - fallback paragraph panel: used for horizontal problems and unsupported vertical
   prompt shapes.
 
@@ -51,7 +53,7 @@ The script writes PNG files to:
 Current preview samples:
 
 - `vertical-23x25.png`
-- `vertical-120-div-12.png`
+- `long-division-120-div-12.png`
 
 After generating previews, use the AI image-reading tool to open each PNG and
 check:

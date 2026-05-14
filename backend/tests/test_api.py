@@ -78,6 +78,39 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 400)
 
+    def test_accepts_long_division_layout_for_division(self):
+        with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
+            result = handle_event({
+                "headers": {"x-blankmath-internal-token": "test-token"},
+                "body": json.dumps({
+                    "worksheetType": "division",
+                    "options": {
+                        "problemCount": 10,
+                        "sheetCount": 1,
+                        "digits": "2d",
+                        "layout": "long_division",
+                    },
+                }),
+            })
+
+        self.assertEqual(result["statusCode"], 201)
+
+    def test_rejects_long_division_layout_for_non_division(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "multiplication",
+                "options": {
+                    "problemCount": 10,
+                    "sheetCount": 1,
+                    "digits": "2d",
+                    "layout": "long_division",
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
     def test_rejects_non_boolean_flags(self):
         result = handle_event({
             "headers": {"x-blankmath-internal-token": "test-token"},

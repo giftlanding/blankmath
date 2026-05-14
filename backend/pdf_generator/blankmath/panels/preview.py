@@ -4,6 +4,15 @@ from pathlib import Path
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate
 
+from blankmath.panels.long_division import (
+    DIVIDEND_Y as LONG_DIVISION_DIVIDEND_Y,
+    OPERAND_FONT_SIZE as LONG_DIVISION_OPERAND_FONT_SIZE,
+    PANEL_HEIGHT as LONG_DIVISION_PANEL_HEIGHT,
+    PANEL_WIDTH as LONG_DIVISION_PANEL_WIDTH,
+    QUOTIENT_LINE_Y,
+    WORK_LINE_YS as LONG_DIVISION_WORK_LINE_YS,
+    LongDivisionPanel,
+)
 from blankmath.panels.vertical_arithmetic import (
     FIRST_OPERAND_Y,
     LINE_Y,
@@ -32,6 +41,9 @@ def render_panel_pdf(panel, width: float = 2 * inch, height: float = 2 * inch) -
 
 
 def render_panel_png(panel, path: str | Path, scale: int = 4) -> None:
+    if isinstance(panel, LongDivisionPanel):
+        _render_long_division_panel_png(panel, path, scale)
+        return
     if isinstance(panel, VerticalArithmeticPanel):
         _render_vertical_arithmetic_panel_png(panel, path, scale)
         return
@@ -89,6 +101,60 @@ def _render_vertical_arithmetic_panel_png(panel: VerticalArithmeticPanel, path: 
     for work_line_y in WORK_LINE_YS:
         draw.line(
             (operator_x, _to_image_y(work_line_y, height, scale), operand_right, _to_image_y(work_line_y, height, scale)),
+            fill="#d8dde6",
+            width=max(1, int(0.6 * scale)),
+        )
+
+    image.save(path)
+
+
+def _render_long_division_panel_png(panel: LongDivisionPanel, path: str | Path, scale: int) -> None:
+    from PIL import Image, ImageDraw
+
+    width = int(LONG_DIVISION_PANEL_WIDTH * scale)
+    height = int(LONG_DIVISION_PANEL_HEIGHT * scale)
+    image = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(image)
+    operand_font = _font("DejaVuSansMono.ttf", LONG_DIVISION_OPERAND_FONT_SIZE * scale)
+    number_font = _font("DejaVuSans.ttf", 8 * scale)
+
+    bracket_x = int(1.0 * inch * scale)
+    dividend_x = bracket_x + int(0.22 * inch * scale)
+    dividend_right = min(width - int(0.18 * inch * scale), dividend_x + int(1.45 * inch * scale))
+    divisor_right = bracket_x - int(0.08 * inch * scale)
+
+    draw.text((0, int(0.08 * inch * scale)), f"{panel.problem_number}.", fill="#5f6b7a", font=number_font)
+    _draw_right_text(
+        draw,
+        (divisor_right, _baseline_to_image_top(LONG_DIVISION_DIVIDEND_Y, height, scale, operand_font)),
+        panel.problem.right,
+        operand_font,
+    )
+    draw.text(
+        (bracket_x, _baseline_to_image_top(LONG_DIVISION_DIVIDEND_Y, height, scale, operand_font)),
+        ")",
+        fill="black",
+        font=operand_font,
+    )
+    draw.text(
+        (dividend_x, _baseline_to_image_top(LONG_DIVISION_DIVIDEND_Y, height, scale, operand_font)),
+        panel.problem.left,
+        fill="black",
+        font=operand_font,
+    )
+    draw.line(
+        (
+            dividend_x - int(0.02 * inch * scale),
+            _to_image_y(QUOTIENT_LINE_Y, height, scale),
+            dividend_right,
+            _to_image_y(QUOTIENT_LINE_Y, height, scale),
+        ),
+        fill="black",
+        width=max(1, int(1.2 * scale)),
+    )
+    for work_line_y in LONG_DIVISION_WORK_LINE_YS:
+        draw.line(
+            (dividend_x, _to_image_y(work_line_y, height, scale), dividend_right, _to_image_y(work_line_y, height, scale)),
             fill="#d8dde6",
             width=max(1, int(0.6 * scale)),
         )

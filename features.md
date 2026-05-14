@@ -50,6 +50,9 @@ The app currently exposes these worksheet routes:
   - `l12`: number less than 12;
   - `l20`: number less than 20.
 - Layout options, where exposed, are `horizontal` and `vertical`.
+- Standard division exposes division-specific layout labels:
+  - `equation`: inline division facts, for example `12 ÷ 2 = ____`;
+  - `long_division`: long-division panels with a quotient line and work rows.
 - Clicking `Create` posts generated equations to the configured PDF generator endpoint and opens the returned PDF URL in a new window.
 
 ## Default Settings
@@ -67,7 +70,8 @@ The app currently exposes these worksheet routes:
 - Multiplication, division, mixed multiplication/division, and their missing-number versions default to:
   - `20` problems;
   - `1d`;
-  - `horizontal` layout for division and mixed multiplication/division;
+  - `equation` layout for standard division;
+  - `horizontal` layout for mixed multiplication/division and missing-number division;
   - `vertical` layout for standard multiplication;
   - `1` sheet.
 - Three-number worksheets default to:

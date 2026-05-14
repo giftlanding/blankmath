@@ -35,7 +35,8 @@ SHEET_COUNT_MAX = 50
 RANGE_MIN = 0
 RANGE_MAX = 10000
 DIGIT_OPTIONS = {"1d", "2d", "3d", "l12", "l20"}
-LAYOUT_OPTIONS = {"horizontal", "vertical"}
+LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division"}
+DIVISION_LAYOUT_OPTIONS = {"horizontal", "equation", "long_division"}
 
 RANGE_WORKSHEET_TYPES = {
     "addition",
@@ -136,7 +137,11 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
 
     layout = normalized.get("layout")
     if layout is not None and layout not in LAYOUT_OPTIONS:
-        raise ValidationError("Layout must be horizontal or vertical.")
+        raise ValidationError("Layout must be horizontal, vertical, equation, or long_division.")
+    if worksheet_type == "division" and layout is not None and layout not in DIVISION_LAYOUT_OPTIONS:
+        raise ValidationError("Division layout must be equation or long division.")
+    if worksheet_type != "division" and layout == "long_division":
+        raise ValidationError("Long division layout is only supported for division worksheets.")
 
     bool_option(normalized, "smallOperandLessThan10")
     bool_option(normalized, "includeAnswerKey")

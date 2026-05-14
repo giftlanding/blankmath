@@ -16,6 +16,9 @@ class VerticalProblemParts:
 
 def problem_markup(problem_number: int, prompt: str, layout: str) -> str:
     number = problem_number_markup(problem_number)
+    if layout == "equation":
+        layout = "horizontal"
+
     if layout == "vertical":
         vertical_markup = vertical_problem_markup(prompt)
         if vertical_markup:

@@ -4,6 +4,7 @@ export const problemCountOptions = [10, 20, 30, 50] as const;
 export const sheetCountOptions = Array.from({ length: 50 }, (_, index) => index + 1);
 export const digitOptions = ["1d", "2d", "3d", "l12", "l20"] as const;
 export const layoutOptions = ["horizontal", "vertical"] as const;
+export const divisionLayoutOptions = ["equation", "long_division"] as const;
 
 type SelectControl = {
   id: string;
@@ -11,6 +12,7 @@ type SelectControl = {
   type: "select";
   options: readonly (string | number)[];
   defaultValue: string | number;
+  optionLabels?: Record<string, string>;
 };
 
 type CheckboxControl = {
@@ -64,6 +66,18 @@ const layout = (defaultValue: "horizontal" | "vertical"): SelectControl => ({
   defaultValue,
 });
 
+const divisionLayout = (): SelectControl => ({
+  id: "layout",
+  label: "Layout",
+  type: "select",
+  options: divisionLayoutOptions,
+  defaultValue: "equation",
+  optionLabels: {
+    equation: "Equation",
+    long_division: "Long division",
+  },
+});
+
 const digits = (defaultValue = "1d"): SelectControl => ({
   id: "digits",
   label: "Numbers",
@@ -109,6 +123,13 @@ const digitWorksheetControls = (defaultLayout: "horizontal" | "vertical"): Works
   sheetCount(),
   digits(),
   layout(defaultLayout),
+];
+
+const divisionWorksheetControls = (): WorksheetControl[] => [
+  problemCount(),
+  sheetCount(),
+  digits(),
+  divisionLayout(),
 ];
 
 export const worksheets: WorksheetDefinition[] = [
@@ -198,7 +219,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Division",
     category: "Multiplication & Division",
     examples: ["8 / 2 = ?"],
-    controls: digitWorksheetControls("horizontal"),
+    controls: divisionWorksheetControls(),
   },
   {
     id: "mixed_times_divide",
