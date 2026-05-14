@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useParams } from "@tanstack/react-router";
-import { ArrowLeft, FileDown } from "lucide-react";
+import { ArrowLeft, FileDown, Layers, ListChecks } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { generateWorksheet } from "../api";
@@ -59,7 +59,19 @@ export function WorksheetPage() {
         <div className="worksheet-summary">
           <span className="category-label">{worksheet.category}</span>
           <h1>{worksheet.title}</h1>
+          <p>Printable practice with adjustable format, count, and number settings.</p>
+          <div className="worksheet-facts" aria-label="Worksheet configuration facts">
+            <span>
+              <Layers aria-hidden="true" size={17} />
+              {worksheet.examples.length} example{worksheet.examples.length === 1 ? "" : "s"}
+            </span>
+            <span>
+              <ListChecks aria-hidden="true" size={17} />
+              {worksheet.controls.length} controls
+            </span>
+          </div>
           <div className="examples">
+            <span className="panel-label">Examples</span>
             {worksheet.examples.map((example) => (
               <code key={example}>{example}</code>
             ))}
@@ -67,6 +79,13 @@ export function WorksheetPage() {
         </div>
 
         <form className="worksheet-form" onSubmit={submit}>
+          <div className="form-heading">
+            <div>
+              <span className="section-kicker">Worksheet options</span>
+              <h2>Generate a PDF</h2>
+            </div>
+            <span className="request-badge">{worksheet.id}</span>
+          </div>
           <div className="form-grid">
             {worksheet.controls.map((control) => (
               <ControlField key={control.id} control={control} register={form.register} />

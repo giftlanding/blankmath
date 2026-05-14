@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { ArrowRight, Search, SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { worksheets } from "../worksheetDefinitions";
 
@@ -13,14 +13,35 @@ export function CatalogPage() {
     const haystack = `${worksheet.title} ${worksheet.category} ${worksheet.examples.join(" ")}`.toLowerCase();
     return matchesCategory && haystack.includes(query.trim().toLowerCase());
   });
+  const totalControls = worksheets.reduce((sum, worksheet) => sum + worksheet.controls.length, 0);
 
   return (
     <section className="catalog">
       <div className="catalog-header">
         <div>
-          <h1>Worksheet Generator</h1>
-          <p>Choose a worksheet type and configure printable practice sheets.</p>
+          <span className="section-kicker">Printable worksheet catalog</span>
+          <h1>Build printable math practice sheets.</h1>
+          <p>
+            Addition, subtraction, multiplication, division, and comparison practice in one place.
+          </p>
         </div>
+        <div className="catalog-stats" aria-label="Catalog summary">
+          <span>
+            <strong>{worksheets.length}</strong>
+            Worksheet types
+          </span>
+          <span>
+            <strong>{categories.length - 1}</strong>
+            Categories
+          </span>
+          <span>
+            <strong>{totalControls}</strong>
+            Options
+          </span>
+        </div>
+      </div>
+
+      <div className="catalog-toolbar">
         <label className="search-box">
           <Search aria-hidden="true" size={18} />
           <input
@@ -30,19 +51,23 @@ export function CatalogPage() {
             type="search"
           />
         </label>
+        <div className="tabs" role="tablist" aria-label="Worksheet categories">
+          {categories.map((item) => (
+            <button
+              key={item}
+              className={item === category ? "active" : ""}
+              onClick={() => setCategory(item)}
+              type="button"
+            >
+              {item}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="tabs" role="tablist" aria-label="Worksheet categories">
-        {categories.map((item) => (
-          <button
-            key={item}
-            className={item === category ? "active" : ""}
-            onClick={() => setCategory(item)}
-            type="button"
-          >
-            {item}
-          </button>
-        ))}
+      <div className="result-summary">
+        <SlidersHorizontal aria-hidden="true" size={17} />
+        <span>{filteredWorksheets.length} matching worksheet types</span>
       </div>
 
       <div className="worksheet-grid">
@@ -51,11 +76,18 @@ export function CatalogPage() {
             <div>
               <span className="category-label">{worksheet.category}</span>
               <h2>{worksheet.title}</h2>
-              <p>{worksheet.examples.join("   ")}</p>
+              <div className="card-examples" aria-label={`${worksheet.title} examples`}>
+                {worksheet.examples.map((example) => (
+                  <code key={example}>{example}</code>
+                ))}
+              </div>
             </div>
-            <Link to="/$worksheetId" params={{ worksheetId: worksheet.id }} className="primary-action">
-              Generate
-            </Link>
+            <div className="card-footer">
+              <span>{worksheet.controls.length} options</span>
+              <Link to="/$worksheetId" params={{ worksheetId: worksheet.id }} className="primary-action">
+                Configure <ArrowRight aria-hidden="true" size={16} />
+              </Link>
+            </div>
           </article>
         ))}
       </div>
