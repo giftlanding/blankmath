@@ -347,3 +347,25 @@ resource "cloudflare_dns_record" "generated_pdfs" {
 
   comment = "Managed by OpenTofu for public generated PDFs."
 }
+
+resource "cloudflare_email_routing_dns" "primary" {
+  zone_id = var.cloudflare_zone_id
+  name    = var.domain_name
+}
+
+resource "cloudflare_email_routing_catch_all" "primary" {
+  zone_id = var.cloudflare_zone_id
+  name    = "Forward all blankmath.com mail to yefuwang@gmail.com"
+  enabled = true
+
+  matchers = [{
+    type = "all"
+  }]
+
+  actions = [{
+    type  = "forward"
+    value = ["yefuwang@gmail.com"]
+  }]
+
+  depends_on = [cloudflare_email_routing_dns.primary]
+}
