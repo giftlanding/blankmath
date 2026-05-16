@@ -27,7 +27,14 @@ def generate_problems(worksheet_type: str, options: dict[str, Any]) -> list[Prob
         attempts += 1
         if attempts > total * 100:
             raise ValueError("Unable to generate enough unique problems.")
-        problem = generator(options)
+        problem_options = options
+        if worksheet_type == "breaking_parentheses":
+            problem_options = {
+                **options,
+                "__groupPosition": ("beginning", "middle", "end")[len(problems) % 3],
+                "__groupPrefix": ("+", "-")[(len(problems) // 3) % 2],
+            }
+        problem = generator(problem_options)
         if problem.prompt in seen:
             continue
         seen.add(problem.prompt)
@@ -55,6 +62,7 @@ def _generator_for(worksheet_type: str):
         "mixed_times_divide_mn": _mixed_multiply_divide_missing_number,
         "greater_than_less_than": _comparison,
         "distributive_property_near_numbers": _distributive_property_near_numbers,
+        "breaking_parentheses": _breaking_parentheses,
     }[worksheet_type]
 
 
@@ -267,6 +275,64 @@ def _distributive_factor(options: dict[str, Any]) -> int:
     if difficulty == "two_digit":
         return random.randint(10, 99)
     return random.choice([20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900])
+
+
+def _breaking_parentheses(options: dict[str, Any]) -> Problem:
+    total_numbers = random.randint(3, 7)
+    group_size = random.randint(2, min(4, total_numbers - 1))
+    group_start = _breaking_parentheses_group_start(total_numbers, group_size, str(options.get("__groupPosition", "mixed")))
+    numbers = [random.randint(1, 50) for _ in range(total_numbers)]
+    signs = [random.choice(["+", "-"]) for _ in range(total_numbers - 1)]
+
+    if group_start > 0:
+        signs[group_start - 1] = str(options.get("__groupPrefix", random.choice(["+", "-"])))
+
+    prompt = _parenthesized_expression(numbers, signs, group_start, group_size)
+    answer = _break_parentheses_answer(numbers, signs, group_start, group_size)
+    return Problem(prompt, answer)
+
+
+def _breaking_parentheses_group_start(total_numbers: int, group_size: int, position: str) -> int:
+    last_start = total_numbers - group_size
+    if position == "beginning":
+        return 0
+    if position == "end":
+        return last_start
+    if position == "middle" and last_start >= 2:
+        return random.randint(1, last_start - 1)
+    return random.randint(0, last_start)
+
+
+def _parenthesized_expression(numbers: list[int], signs: list[str], group_start: int, group_size: int) -> str:
+    parts: list[str] = []
+    group_end = group_start + group_size
+
+    if group_start == 0:
+        parts.append("(")
+    parts.append(str(numbers[0]))
+
+    for index, sign in enumerate(signs):
+        next_number_index = index + 1
+        parts.append(f" {sign} ")
+        if next_number_index == group_start:
+            parts.append("(")
+        parts.append(str(numbers[next_number_index]))
+        if next_number_index == group_end - 1:
+            parts.append(")")
+
+    return "".join(parts)
+
+
+def _break_parentheses_answer(numbers: list[int], signs: list[str], group_start: int, group_size: int) -> str:
+    effective_signs = signs[:]
+    if group_start > 0 and signs[group_start - 1] == "-":
+        for index in range(group_start, group_start + group_size - 1):
+            effective_signs[index] = "+" if signs[index] == "-" else "-"
+
+    parts = [str(numbers[0])]
+    for sign, number in zip(effective_signs, numbers[1:]):
+        parts.append(f" {sign} {number}")
+    return "".join(parts)
 
 
 def _force_small_operand(left: int, right: int) -> tuple[int, int]:

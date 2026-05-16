@@ -1,5 +1,6 @@
 import sys
 import unittest
+import re
 from pathlib import Path
 
 
@@ -48,6 +49,31 @@ class GeneratorTest(unittest.TestCase):
             self.assertEqual(parsed.operation, "-")
             self.assertEqual(parsed.base % 100, 0)
             self.assertEqual(problem.answer, str(parsed.answer))
+
+    def test_generates_breaking_parentheses_problems(self):
+        problems = generate_problems("breaking_parentheses", {
+            "problemCount": 20,
+            "sheetCount": 1,
+            "layout": "breaking_parentheses",
+        })
+
+        self.assertEqual(len(problems), 20)
+        for problem in problems:
+            self.assertEqual(problem.prompt.count("("), 1)
+            self.assertEqual(problem.prompt.count(")"), 1)
+            self.assertNotIn("(", problem.answer)
+            self.assertNotIn(")", problem.answer)
+
+            numbers = [int(value) for value in re.findall(r"\d+", problem.prompt)]
+            parenthesized = re.search(r"\(([^)]+)\)", problem.prompt)
+            self.assertIsNotNone(parenthesized)
+            group_numbers = re.findall(r"\d+", parenthesized.group(1))
+
+            self.assertGreaterEqual(len(numbers), 3)
+            self.assertLessEqual(len(numbers), 7)
+            self.assertTrue(all(1 <= value <= 50 for value in numbers))
+            self.assertGreaterEqual(len(group_numbers), 2)
+            self.assertLessEqual(len(group_numbers), 4)
 
 
 if __name__ == "__main__":

@@ -4,6 +4,15 @@ from pathlib import Path
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate
 
+from blankmath.panels.breaking_parentheses import (
+    FONT as BREAKING_PARENTHESES_FONT,
+    FONT_SIZE as BREAKING_PARENTHESES_FONT_SIZE,
+    LEFT_PADDING as BREAKING_PARENTHESES_LEFT_PADDING,
+    MIN_BLANK_WIDTH as BREAKING_PARENTHESES_MIN_BLANK_WIDTH,
+    PANEL_HEIGHT as BREAKING_PARENTHESES_PANEL_HEIGHT,
+    PANEL_WIDTH as BREAKING_PARENTHESES_PANEL_WIDTH,
+    BreakingParenthesesPanel,
+)
 from blankmath.panels.distributive_property import (
     DistributivePropertyPanel,
     EXPRESSION_FONT_SIZE as DISTRIBUTIVE_EXPRESSION_FONT_SIZE,
@@ -52,6 +61,9 @@ def render_panel_pdf(panel, width: float = 2 * inch, height: float = 2 * inch) -
 
 
 def render_panel_png(panel, path: str | Path, scale: int = 4) -> None:
+    if isinstance(panel, BreakingParenthesesPanel):
+        _render_breaking_parentheses_panel_png(panel, path, scale)
+        return
     if isinstance(panel, DistributivePropertyPanel):
         _render_distributive_property_panel_png(panel, path, scale)
         return
@@ -62,6 +74,35 @@ def render_panel_png(panel, path: str | Path, scale: int = 4) -> None:
         _render_vertical_arithmetic_panel_png(panel, path, scale)
         return
     raise TypeError(f"PNG preview is not implemented for {type(panel).__name__}.")
+
+
+def _render_breaking_parentheses_panel_png(panel: BreakingParenthesesPanel, path: str | Path, scale: int) -> None:
+    from PIL import Image, ImageDraw
+
+    width = int(BREAKING_PARENTHESES_PANEL_WIDTH * scale)
+    height = int(BREAKING_PARENTHESES_PANEL_HEIGHT * scale)
+    image = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(image)
+    font = _font("DejaVuSans.ttf", BREAKING_PARENTHESES_FONT_SIZE * scale)
+    text = f"{panel.prompt} ="
+    left = int(BREAKING_PARENTHESES_LEFT_PADDING * scale)
+    baseline_y = int(0.22 * inch * scale)
+    text_top = _baseline_to_image_top(baseline_y / scale, height, scale, font)
+    text_width = draw.textlength(text, font=font)
+    line_start = left + int(text_width) + int(0.12 * inch * scale)
+    line_end = width - int(0.08 * inch * scale)
+    min_blank = int(BREAKING_PARENTHESES_MIN_BLANK_WIDTH * scale)
+
+    if line_end - line_start < min_blank:
+        line_start = max(line_start, width - min_blank)
+
+    draw.text((left, text_top), text, fill="black", font=font)
+    draw.line(
+        (line_start, height - baseline_y + int(0.03 * inch * scale), line_end, height - baseline_y + int(0.03 * inch * scale)),
+        fill="#5f6b7a",
+        width=max(1, scale),
+    )
+    image.save(path)
 
 
 def _render_vertical_arithmetic_panel_png(panel: VerticalArithmeticPanel, path: str | Path, scale: int) -> None:

@@ -37,6 +37,13 @@ def render_pdf(
     worksheet_style = styles["Normal"].clone("WorksheetProblem")
     worksheet_style.fontSize = 18
     worksheet_style.leading = 22
+    title_style = styles["Title"].clone("WorksheetTitle")
+    title_style.fontSize = 20
+    title_style.leading = 24
+    instruction_style = styles["Normal"].clone("WorksheetInstruction")
+    instruction_style.fontSize = 12
+    instruction_style.leading = 15
+    instruction_style.textColor = colors.HexColor("#394150")
     story = []
     problems_per_page = page_problem_count(count_per_page, layout)
 
@@ -44,6 +51,10 @@ def render_pdf(
         page_problems = problems[start:start + problems_per_page]
         if page_number > 1:
             story.append(PageBreak())
+        if layout == "breaking_parentheses":
+            story.append(Paragraph(title, title_style))
+            story.append(Paragraph("Rewrite each expression without parentheses. Do not solve.", instruction_style))
+            story.append(Spacer(1, 0.14 * inch))
         story.append(_problem_table(page_problems, worksheet_style, layout, start_number=start + 1))
 
     if include_answer_key:
@@ -85,15 +96,20 @@ def _problem_table(problems: list[Problem], style, layout: str, start_number: in
         rows.append(row)
 
     table = Table(rows, colWidths=[7.4 * inch / grid.columns] * grid.columns, rowHeights=grid.row_height)
-    table.setStyle(TableStyle([
-        ("BOX", (0, 0), (-1, -1), 0.2, colors.HexColor("#d9dee8")),
-        ("INNERGRID", (0, 0), (-1, -1), 0.15, colors.HexColor("#d9dee8")),
+    table_style_commands = [
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("LEFTPADDING", (0, 0), (-1, -1), grid.left_padding),
         ("RIGHTPADDING", (0, 0), (-1, -1), grid.right_padding),
         ("TOPPADDING", (0, 0), (-1, -1), grid.top_padding),
         ("BOTTOMPADDING", (0, 0), (-1, -1), grid.bottom_padding),
-    ]))
+    ]
+    if layout != "breaking_parentheses":
+        table_style_commands = [
+            ("BOX", (0, 0), (-1, -1), 0.2, colors.HexColor("#d9dee8")),
+            ("INNERGRID", (0, 0), (-1, -1), 0.15, colors.HexColor("#d9dee8")),
+            *table_style_commands,
+        ]
+    table.setStyle(TableStyle(table_style_commands))
     return table
 
 

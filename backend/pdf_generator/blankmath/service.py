@@ -23,6 +23,7 @@ WORKSHEET_TITLES = {
     "mixed_times_divide_mn": "Mixed Multiplication and Division Missing Number",
     "greater_than_less_than": "Greater Than or Less Than",
     "distributive_property_near_numbers": "Distributive Property",
+    "breaking_parentheses": "Breaking Parentheses Practice",
 }
 
 
@@ -31,7 +32,7 @@ def generate_worksheet_pdf(request: dict[str, Any]) -> str:
     options = request["options"]
     count_per_page = int(options.get("problemCount", 20))
     include_answer_key = bool(options.get("includeAnswerKey", False))
-    layout = str(options.get("layout", "distributive_property" if worksheet_type == "distributive_property_near_numbers" else "horizontal"))
+    layout = str(options.get("layout", default_layout_for(worksheet_type)))
     problems = generate_problems(worksheet_type, options)
     pdf = render_pdf(
         title=WORKSHEET_TITLES[worksheet_type],
@@ -41,3 +42,11 @@ def generate_worksheet_pdf(request: dict[str, Any]) -> str:
         layout=layout,
     )
     return upload_pdf(pdf)
+
+
+def default_layout_for(worksheet_type: str) -> str:
+    if worksheet_type == "distributive_property_near_numbers":
+        return "distributive_property"
+    if worksheet_type == "breaking_parentheses":
+        return "breaking_parentheses"
+    return "horizontal"

@@ -114,6 +114,22 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 201)
 
+    def test_accepts_breaking_parentheses_request(self):
+        with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
+            result = handle_event({
+                "headers": {"x-blankmath-internal-token": "test-token"},
+                "body": json.dumps({
+                    "worksheetType": "breaking_parentheses",
+                    "options": {
+                        "problemCount": 10,
+                        "sheetCount": 1,
+                        "layout": "breaking_parentheses",
+                    },
+                }),
+            })
+
+        self.assertEqual(result["statusCode"], 201)
+
     def test_rejects_large_distributive_property_problem_count(self):
         result = handle_event({
             "headers": {"x-blankmath-internal-token": "test-token"},

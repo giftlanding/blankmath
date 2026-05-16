@@ -19,6 +19,7 @@ const existingWorksheetIds = [
   "mixed_times_divide_mn",
   "greater_than_less_than",
   "distributive_property_near_numbers",
+  "breaking_parentheses",
 ];
 
 describe("worksheet definitions", () => {

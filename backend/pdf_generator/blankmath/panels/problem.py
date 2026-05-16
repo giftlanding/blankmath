@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from reportlab.lib.units import inch
 from reportlab.platypus import Paragraph
 
+from blankmath.panels.breaking_parentheses import BreakingParenthesesPanel
 from blankmath.panels.distributive_property import (
     DistributivePropertyPanel,
     parse_distributive_property_problem,
@@ -23,6 +24,16 @@ class PanelGrid:
 
 
 def panel_grid(layout: str, problem_count: int) -> PanelGrid:
+    if layout == "breaking_parentheses":
+        return PanelGrid(
+            columns=1,
+            row_height=0.62 * inch,
+            left_padding=10,
+            right_padding=10,
+            top_padding=2,
+            bottom_padding=2,
+        )
+
     if layout == "distributive_property":
         return PanelGrid(
             columns=1,
@@ -64,6 +75,8 @@ def panel_grid(layout: str, problem_count: int) -> PanelGrid:
 
 
 def page_problem_count(count_per_page: int, layout: str) -> int:
+    if layout == "breaking_parentheses":
+        return min(count_per_page, 12)
     if layout == "distributive_property":
         return min(count_per_page, 3)
     if layout == "long_division":
@@ -74,6 +87,9 @@ def page_problem_count(count_per_page: int, layout: str) -> int:
 
 
 def problem_panel(problem_number: int, prompt: str, style, layout: str):
+    if layout == "breaking_parentheses":
+        return BreakingParenthesesPanel(prompt)
+
     if layout == "distributive_property":
         property_problem = parse_distributive_property_problem(prompt)
         if property_problem:

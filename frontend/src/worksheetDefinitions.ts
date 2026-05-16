@@ -203,6 +203,33 @@ const distributivePropertyControls = (): WorksheetControl[] => [
   },
 ];
 
+const breakingParenthesesControls = (): WorksheetControl[] => [
+  {
+    id: "problemCount",
+    label: "Problems",
+    type: "select",
+    options: [10, 15, 20],
+    defaultValue: 10,
+  },
+  {
+    id: "sheetCount",
+    label: "Sheets",
+    type: "select",
+    options: sheetCountOptions.slice(0, 10),
+    defaultValue: 1,
+  },
+  {
+    id: "layout",
+    label: "Layout",
+    type: "select",
+    options: ["breaking_parentheses"],
+    defaultValue: "breaking_parentheses",
+    optionLabels: {
+      breaking_parentheses: "Rewrite lines",
+    },
+  },
+];
+
 export const worksheets: WorksheetDefinition[] = [
   {
     id: "addition",
@@ -339,6 +366,14 @@ export const worksheets: WorksheetDefinition[] = [
     category: "Math Properties",
     examples: ["600 x 99", "7 x 101"],
     controls: distributivePropertyControls(),
+  },
+  {
+    id: "breaking_parentheses",
+    path: "/breaking_parentheses",
+    title: "Breaking Parentheses Practice",
+    category: "Math Properties",
+    examples: ["21 - (8 + 9)", "39 - (8 - 13)", "(8 + 6) - 5 + 11"],
+    controls: breakingParenthesesControls(),
   },
 ];
 

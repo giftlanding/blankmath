@@ -11,10 +11,12 @@ except ModuleNotFoundError:
     getSampleStyleSheet = None
 
 try:
+    from blankmath.panels.breaking_parentheses import BreakingParenthesesPanel
     from blankmath.panels.distributive_property import DistributivePropertyPanel
     from blankmath.panels.long_division import LongDivisionPanel
     from blankmath.panels.problem import page_problem_count, problem_panel
 except ModuleNotFoundError:
+    BreakingParenthesesPanel = None
     DistributivePropertyPanel = None
     LongDivisionPanel = None
     page_problem_count = None
@@ -39,6 +41,15 @@ class PanelsTest(unittest.TestCase):
 
         self.assertIsInstance(panel, DistributivePropertyPanel)
         self.assertEqual(page_problem_count(20, "distributive_property"), 3)
+
+    @unittest.skipIf(getSampleStyleSheet is None, "ReportLab is not installed")
+    def test_breaking_parentheses_layout_uses_dedicated_panel(self):
+        style = getSampleStyleSheet()["Normal"]
+
+        panel = problem_panel(1, "21 - (8 + 9)", style, "breaking_parentheses")
+
+        self.assertIsInstance(panel, BreakingParenthesesPanel)
+        self.assertEqual(page_problem_count(20, "breaking_parentheses"), 12)
 
 
 if __name__ == "__main__":
