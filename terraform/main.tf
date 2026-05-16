@@ -209,7 +209,7 @@ resource "aws_lambda_function" "pdf_generator" {
   filename         = data.archive_file.pdf_generator.output_path
   source_code_hash = data.archive_file.pdf_generator.output_base64sha256
 
-  memory_size = 256
+  memory_size = 512
   timeout     = 30
 
   reserved_concurrent_executions = var.lambda_reserved_concurrency
