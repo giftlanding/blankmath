@@ -31,6 +31,7 @@ The app currently exposes these worksheet routes:
 - `/division_mn`: division missing-number problems, for example `8 / ? = 2` and `? / 4 = 3`.
 - `/mixed_times_divide_mn`: mixed multiplication/division missing-number problems.
 - `/greater_than_less_than`: comparison problems, labeled `Comparision`, for choosing greater-than or less-than.
+- `/distributive_property_near_numbers`: distributive property practice for near-number multiplication, for example `600 x 99 = 600 x (100 - 1)`.
 
 ## Shared Worksheet Controls
 
@@ -53,6 +54,12 @@ The app currently exposes these worksheet routes:
 - Standard division exposes division-specific layout labels:
   - `equation`: inline division facts, for example `12 ÷ 2 = ____`;
   - `long_division`: long-division panels with a quotient line and work rows.
+- Distributive property near-number worksheets expose:
+  - `base`: `near_10`, `near_100`, or `mixed`;
+  - `direction`: `addition`, `subtraction`, or `mixed`;
+  - `difficulty`: `one_digit`, `two_digit`, `multiples_of_10`, or `mixed`;
+  - `layout`: fixed to `distributive_property`.
+  - sheet count is limited to `1` through `10`.
 - Clicking `Create` posts generated equations to the configured PDF generator endpoint and opens the returned PDF URL in a new window.
 
 ## Default Settings
@@ -81,6 +88,13 @@ The app currently exposes these worksheet routes:
 - Greater-than/less-than defaults to:
   - `10` problems;
   - `l20`;
+  - `1` sheet.
+- Distributive property near-number worksheets default to:
+  - `10` problems;
+  - `near_100`;
+  - subtraction direction;
+  - multiples-of-10 factors;
+  - guided-step layout;
   - `1` sheet.
 
 ## Problem Generation Rules
@@ -136,6 +150,10 @@ The app currently exposes these worksheet routes:
 - Greater-than/less-than:
   - Generates pairs as `aob`, where `o` marks the blank comparison operator.
   - Numbers are generated in the selected digit/range mode.
+- Distributive property near numbers:
+  - Generates near-base multiplication problems, such as `600 x 99 = 600 x (100 - 1)`.
+  - The near number is generated as a base plus or minus a small offset.
+  - The answer is the final product after applying the distributive property.
 
 ## PDF Generation
 
@@ -158,6 +176,10 @@ The app currently exposes these worksheet routes:
   - stack equation tokens vertically;
   - render `*` as `×` and `/` as `÷`;
   - use an underline/blank for the answer position.
+- Distributive property PDFs:
+  - use a dedicated guided-step panel;
+  - show the original multiplication and rewritten distributive expression;
+  - provide blanks for each partial product and final combination.
 - The backend selects a layout based on template and problem count:
   - horizontal layouts for approximately 30 or 52 problems;
   - vertical layouts for approximately 30, 49, or 56 problems;
@@ -208,3 +230,17 @@ The app currently exposes these worksheet routes:
 - Greater-than/less-than maps `sheetNumber` from `addThreeNumbersData` instead of its own reducer state.
 - Backend support for `vertical_div` is stubbed and not exposed by the current frontend.
 - The PDF backend has an API documentation link in `backend/README.md` pointing to SwaggerHub.
+
+## Planned Features
+
+### Additional Math Properties
+
+Math-property worksheets should teach arithmetic strategies, not only ask
+students to compute an isolated expression. The first implemented worksheet is
+distributive property near-number multiplication. Future math-property
+worksheets could include:
+
+- distributive property by splitting one factor, such as `7 x 23 = 7 x (20 + 3)`;
+- factoring out a common factor, such as `6 x 8 + 6 x 2 = 6 x (8 + 2)`;
+- commutative and associative property practice, if they can be made useful
+  rather than purely definitional.

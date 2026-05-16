@@ -9,6 +9,10 @@ class Problem:
     answer: str
 
 
+NEAR_10_BASES = (10, 20, 30, 40, 50, 60, 70, 80, 90)
+NEAR_100_BASES = (100, 200, 300, 400, 500, 600, 700, 800, 900)
+
+
 def generate_problems(worksheet_type: str, options: dict[str, Any]) -> list[Problem]:
     count = int(options.get("problemCount", 20))
     sheets = int(options.get("sheetCount", 1))
@@ -50,6 +54,7 @@ def _generator_for(worksheet_type: str):
         "division_mn": _division_missing_number,
         "mixed_times_divide_mn": _mixed_multiply_divide_missing_number,
         "greater_than_less_than": _comparison,
+        "distributive_property_near_numbers": _distributive_property_near_numbers,
     }[worksheet_type]
 
 
@@ -214,6 +219,54 @@ def _comparison(options: dict[str, Any]) -> Problem:
     else:
         answer = "="
     return Problem(f"{left} ____ {right}", answer)
+
+
+def _distributive_property_near_numbers(options: dict[str, Any]) -> Problem:
+    base = _distributive_base(options)
+    operation = _distributive_operation(options)
+    offset = _distributive_offset(base)
+    target = base + offset if operation == "+" else base - offset
+    factor = _distributive_factor(options)
+    first_partial = factor * base
+    second_partial = factor * offset
+    answer = first_partial + second_partial if operation == "+" else first_partial - second_partial
+    return Problem(
+        f"{factor} x {target} = {factor} x ({base} {operation} {offset})",
+        str(answer),
+    )
+
+
+def _distributive_base(options: dict[str, Any]) -> int:
+    mode = str(options.get("base", "near_100"))
+    if mode == "mixed":
+        mode = random.choice(["near_10", "near_100"])
+    if mode == "near_10":
+        return random.choice(NEAR_10_BASES)
+    return random.choice(NEAR_100_BASES)
+
+
+def _distributive_operation(options: dict[str, Any]) -> str:
+    direction = str(options.get("direction", "subtraction"))
+    if direction == "mixed":
+        direction = random.choice(["addition", "subtraction"])
+    return "+" if direction == "addition" else "-"
+
+
+def _distributive_offset(base: int) -> int:
+    if base < 100:
+        return random.randint(1, 3)
+    return random.randint(1, 5)
+
+
+def _distributive_factor(options: dict[str, Any]) -> int:
+    difficulty = str(options.get("difficulty", "multiples_of_10"))
+    if difficulty == "mixed":
+        difficulty = random.choice(["one_digit", "two_digit", "multiples_of_10"])
+    if difficulty == "one_digit":
+        return random.randint(2, 9)
+    if difficulty == "two_digit":
+        return random.randint(10, 99)
+    return random.choice([20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900])
 
 
 def _force_small_operand(left: int, right: int) -> tuple[int, int]:

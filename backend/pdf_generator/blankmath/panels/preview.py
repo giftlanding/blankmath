@@ -4,6 +4,13 @@ from pathlib import Path
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate
 
+from blankmath.panels.distributive_property import (
+    DistributivePropertyPanel,
+    EXPRESSION_FONT_SIZE as DISTRIBUTIVE_EXPRESSION_FONT_SIZE,
+    PANEL_HEIGHT as DISTRIBUTIVE_PANEL_HEIGHT,
+    PANEL_WIDTH as DISTRIBUTIVE_PANEL_WIDTH,
+    STEP_FONT_SIZE as DISTRIBUTIVE_STEP_FONT_SIZE,
+)
 from blankmath.panels.long_division import (
     BRACKET_BOTTOM_Y,
     BRACKET_X,
@@ -45,6 +52,9 @@ def render_panel_pdf(panel, width: float = 2 * inch, height: float = 2 * inch) -
 
 
 def render_panel_png(panel, path: str | Path, scale: int = 4) -> None:
+    if isinstance(panel, DistributivePropertyPanel):
+        _render_distributive_property_panel_png(panel, path, scale)
+        return
     if isinstance(panel, LongDivisionPanel):
         _render_long_division_panel_png(panel, path, scale)
         return
@@ -110,6 +120,51 @@ def _render_vertical_arithmetic_panel_png(panel: VerticalArithmeticPanel, path: 
         )
 
     image.save(path)
+
+
+def _render_distributive_property_panel_png(panel: DistributivePropertyPanel, path: str | Path, scale: int) -> None:
+    from PIL import Image, ImageDraw
+
+    width = int(DISTRIBUTIVE_PANEL_WIDTH * scale)
+    height = int(DISTRIBUTIVE_PANEL_HEIGHT * scale)
+    image = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(image)
+    number_font = _font("DejaVuSans.ttf", 8 * scale)
+    expression_font = _font("DejaVuSans.ttf", DISTRIBUTIVE_EXPRESSION_FONT_SIZE * scale)
+    step_font = _font("DejaVuSansMono.ttf", DISTRIBUTIVE_STEP_FONT_SIZE * scale)
+
+    left = int(0.08 * inch * scale)
+    content_left = int(0.36 * inch * scale)
+    expression_y = height - int((DISTRIBUTIVE_PANEL_HEIGHT - 0.34 * inch) * scale)
+    step_1_y = height - int((DISTRIBUTIVE_PANEL_HEIGHT - 0.86 * inch) * scale)
+    step_2_y = height - int((DISTRIBUTIVE_PANEL_HEIGHT - 1.26 * inch) * scale)
+    combine_y = height - int((DISTRIBUTIVE_PANEL_HEIGHT - 1.78 * inch) * scale)
+
+    draw.text((left, expression_y - int(0.18 * inch * scale)), f"{panel.problem_number}.", fill="#5f6b7a", font=number_font)
+    expression = (
+        f"{panel.problem.factor} x {panel.problem.target} = "
+        f"{panel.problem.factor} x ({panel.problem.base} {panel.problem.sign} {panel.problem.offset})"
+    )
+    draw.text((content_left, expression_y - int(0.24 * inch * scale)), expression, fill="black", font=expression_font)
+
+    draw.text((content_left + int(0.18 * inch * scale), step_1_y - int(0.18 * inch * scale)), f"{panel.problem.factor} x {panel.problem.base} =", fill="black", font=step_font)
+    _draw_image_blank(draw, content_left + int(2.0 * inch * scale), step_1_y, int(1.12 * inch * scale), scale)
+
+    draw.text((content_left + int(0.18 * inch * scale), step_2_y - int(0.18 * inch * scale)), f"{panel.problem.factor} x {panel.problem.offset} =", fill="black", font=step_font)
+    _draw_image_blank(draw, content_left + int(2.0 * inch * scale), step_2_y, int(1.12 * inch * scale), scale)
+
+    draw.text((content_left + int(0.18 * inch * scale), combine_y - int(0.18 * inch * scale)), "Then:", fill="black", font=step_font)
+    _draw_image_blank(draw, content_left + int(1.08 * inch * scale), combine_y, int(0.9 * inch * scale), scale)
+    draw.text((content_left + int(2.08 * inch * scale), combine_y - int(0.18 * inch * scale)), panel.problem.sign, fill="black", font=step_font)
+    _draw_image_blank(draw, content_left + int(2.36 * inch * scale), combine_y, int(0.9 * inch * scale), scale)
+    draw.text((content_left + int(3.38 * inch * scale), combine_y - int(0.18 * inch * scale)), "=", fill="black", font=step_font)
+    _draw_image_blank(draw, content_left + int(3.72 * inch * scale), combine_y, int(1.08 * inch * scale), scale)
+
+    image.save(path)
+
+
+def _draw_image_blank(draw, x: int, y: int, width: int, scale: int) -> None:
+    draw.line((x, y, x + width, y), fill="#8b96a8", width=max(1, int(scale)))
 
 
 def _render_long_division_panel_png(panel: LongDivisionPanel, path: str | Path, scale: int) -> None:

@@ -14,6 +14,7 @@ from blankmath.panels.problem import problem_panel
 SAMPLES = [
     ("vertical-23x25.png", 1, "23 x 25 = ?", "vertical"),
     ("long-division-120-div-12.png", 2, "120 / 12 = ?", "long_division"),
+    ("distributive-property-600x99.png", 3, "600 x 99 = 600 x (100 - 1)", "distributive_property"),
 ]
 
 

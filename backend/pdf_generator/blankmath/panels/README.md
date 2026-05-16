@@ -26,6 +26,8 @@ Current panels:
   the second operand, and draws a horizontal answer line.
 - `LongDivisionPanel`: lays out the divisor, dividend, quotient line, and
   handwriting-sized work rows for standard division problems.
+- `DistributivePropertyPanel`: lays out a rewritten multiplication expression
+  plus guided partial-product and final-combination blanks.
 - fallback paragraph panel: used for horizontal problems and unsupported vertical
   prompt shapes.
 
@@ -54,6 +56,7 @@ Current preview samples:
 
 - `vertical-23x25.png`
 - `long-division-120-div-12.png`
+- `distributive-property-600x99.png`
 
 After generating previews, use the AI image-reading tool to open each PNG and
 check:

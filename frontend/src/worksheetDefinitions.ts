@@ -5,6 +5,9 @@ export const sheetCountOptions = Array.from({ length: 50 }, (_, index) => index 
 export const digitOptions = ["1d", "2d", "3d", "l12", "l20"] as const;
 export const layoutOptions = ["horizontal", "vertical"] as const;
 export const divisionLayoutOptions = ["equation", "long_division"] as const;
+export const distributiveBaseOptions = ["near_10", "near_100", "mixed"] as const;
+export const distributiveDirectionOptions = ["subtraction", "addition", "mixed"] as const;
+export const distributiveDifficultyOptions = ["multiples_of_10", "one_digit", "two_digit", "mixed"] as const;
 
 type SelectControl = {
   id: string;
@@ -37,7 +40,7 @@ export type WorksheetDefinition = {
   id: string;
   path: string;
   title: string;
-  category: "Addition & Subtraction" | "Multiplication & Division" | "Comparison";
+  category: "Addition & Subtraction" | "Multiplication & Division" | "Comparison" | "Math Properties";
   examples: string[];
   controls: WorksheetControl[];
 };
@@ -50,11 +53,27 @@ const problemCount = (defaultValue = 20): SelectControl => ({
   defaultValue,
 });
 
+const propertyProblemCount = (): SelectControl => ({
+  id: "problemCount",
+  label: "Problems",
+  type: "select",
+  options: [10, 20],
+  defaultValue: 10,
+});
+
 const sheetCount = (): SelectControl => ({
   id: "sheetCount",
   label: "Sheets",
   type: "select",
   options: sheetCountOptions,
+  defaultValue: 1,
+});
+
+const propertySheetCount = (): SelectControl => ({
+  id: "sheetCount",
+  label: "Sheets",
+  type: "select",
+  options: sheetCountOptions.slice(0, 10),
   defaultValue: 1,
 });
 
@@ -130,6 +149,58 @@ const divisionWorksheetControls = (): WorksheetControl[] => [
   sheetCount(),
   digits(),
   divisionLayout(),
+];
+
+const distributivePropertyControls = (): WorksheetControl[] => [
+  propertyProblemCount(),
+  propertySheetCount(),
+  {
+    id: "base",
+    label: "Near",
+    type: "select",
+    options: distributiveBaseOptions,
+    defaultValue: "near_100",
+    optionLabels: {
+      near_10: "10s",
+      near_100: "100s",
+      mixed: "Mixed",
+    },
+  },
+  {
+    id: "direction",
+    label: "Direction",
+    type: "select",
+    options: distributiveDirectionOptions,
+    defaultValue: "subtraction",
+    optionLabels: {
+      subtraction: "Below base",
+      addition: "Above base",
+      mixed: "Mixed",
+    },
+  },
+  {
+    id: "difficulty",
+    label: "Factor",
+    type: "select",
+    options: distributiveDifficultyOptions,
+    defaultValue: "multiples_of_10",
+    optionLabels: {
+      multiples_of_10: "Multiples of 10",
+      one_digit: "1 digit",
+      two_digit: "2 digit",
+      mixed: "Mixed",
+    },
+  },
+  {
+    id: "layout",
+    label: "Layout",
+    type: "select",
+    options: ["distributive_property"],
+    defaultValue: "distributive_property",
+    optionLabels: {
+      distributive_property: "Guided steps",
+    },
+  },
 ];
 
 export const worksheets: WorksheetDefinition[] = [
@@ -260,6 +331,14 @@ export const worksheets: WorksheetDefinition[] = [
     category: "Comparison",
     examples: ["12 __ 9"],
     controls: [problemCount(10), sheetCount(), digits("l20")],
+  },
+  {
+    id: "distributive_property_near_numbers",
+    path: "/distributive_property_near_numbers",
+    title: "Distributive Property",
+    category: "Math Properties",
+    examples: ["600 x 99", "7 x 101"],
+    controls: distributivePropertyControls(),
   },
 ];
 

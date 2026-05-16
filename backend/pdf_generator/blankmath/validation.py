@@ -27,16 +27,22 @@ WORKSHEET_TYPES = {
     "division_mn",
     "mixed_times_divide_mn",
     "greater_than_less_than",
+    "distributive_property_near_numbers",
 }
 
 PROBLEM_COUNTS = {10, 20, 30, 50}
+PROPERTY_PROBLEM_COUNTS = {10, 20}
 SHEET_COUNT_MIN = 1
 SHEET_COUNT_MAX = 50
+PROPERTY_SHEET_COUNT_MAX = 10
 RANGE_MIN = 0
 RANGE_MAX = 10000
 DIGIT_OPTIONS = {"1d", "2d", "3d", "l12", "l20"}
-LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division"}
+LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property"}
 DIVISION_LAYOUT_OPTIONS = {"horizontal", "equation", "long_division"}
+DISTRIBUTIVE_BASE_OPTIONS = {"near_10", "near_100", "mixed"}
+DISTRIBUTIVE_DIRECTION_OPTIONS = {"addition", "subtraction", "mixed"}
+DISTRIBUTIVE_DIFFICULTY_OPTIONS = {"one_digit", "two_digit", "multiples_of_10", "mixed"}
 
 RANGE_WORKSHEET_TYPES = {
     "addition",
@@ -75,10 +81,15 @@ LAYOUT_WORKSHEET_TYPES = {
     "mixed_times_divide_mn",
 }
 
+DISTRIBUTIVE_PROPERTY_WORKSHEET_TYPES = {
+    "distributive_property_near_numbers",
+}
+
 COMMON_OPTIONS = {"problemCount", "sheetCount", "includeAnswerKey"}
 RANGE_OPTIONS = {"from", "to", "smallOperandLessThan10"}
 DIGIT_OPTIONS_KEYS = {"digits"}
 LAYOUT_OPTIONS_KEYS = {"layout"}
+DISTRIBUTIVE_PROPERTY_OPTIONS = {"base", "direction", "difficulty"}
 
 
 def parse_generate_request(payload: Any) -> GenerateRequest:
@@ -114,12 +125,25 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
         normalized[key] = value
 
     problem_count = int_option(normalized, "problemCount")
-    if problem_count is not None and problem_count not in PROBLEM_COUNTS:
+    allowed_problem_counts = (
+        PROPERTY_PROBLEM_COUNTS
+        if worksheet_type in DISTRIBUTIVE_PROPERTY_WORKSHEET_TYPES
+        else PROBLEM_COUNTS
+    )
+    if problem_count is not None and problem_count not in allowed_problem_counts:
+        if worksheet_type in DISTRIBUTIVE_PROPERTY_WORKSHEET_TYPES:
+            raise ValidationError("Problem count must be 10 or 20.")
         raise ValidationError("Problem count must be 10, 20, 30, or 50.")
 
     sheet_count = int_option(normalized, "sheetCount")
     if sheet_count is not None and not SHEET_COUNT_MIN <= sheet_count <= SHEET_COUNT_MAX:
         raise ValidationError("Sheet count must be between 1 and 50.")
+    if (
+        worksheet_type in DISTRIBUTIVE_PROPERTY_WORKSHEET_TYPES
+        and sheet_count is not None
+        and sheet_count > PROPERTY_SHEET_COUNT_MAX
+    ):
+        raise ValidationError("Sheet count must be between 1 and 10 for distributive property worksheets.")
 
     from_value = int_option(normalized, "from")
     to_value = int_option(normalized, "to")
@@ -137,11 +161,25 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
 
     layout = normalized.get("layout")
     if layout is not None and layout not in LAYOUT_OPTIONS:
-        raise ValidationError("Layout must be horizontal, vertical, equation, or long_division.")
+        raise ValidationError("Layout must be horizontal, vertical, equation, long_division, or distributive_property.")
     if worksheet_type == "division" and layout is not None and layout not in DIVISION_LAYOUT_OPTIONS:
         raise ValidationError("Division layout must be equation or long division.")
     if worksheet_type != "division" and layout == "long_division":
         raise ValidationError("Long division layout is only supported for division worksheets.")
+    if worksheet_type != "distributive_property_near_numbers" and layout == "distributive_property":
+        raise ValidationError("Distributive property layout is only supported for distributive property worksheets.")
+
+    base = normalized.get("base")
+    if base is not None and base not in DISTRIBUTIVE_BASE_OPTIONS:
+        raise ValidationError("Base must be near_10, near_100, or mixed.")
+
+    direction = normalized.get("direction")
+    if direction is not None and direction not in DISTRIBUTIVE_DIRECTION_OPTIONS:
+        raise ValidationError("Direction must be addition, subtraction, or mixed.")
+
+    difficulty = normalized.get("difficulty")
+    if difficulty is not None and difficulty not in DISTRIBUTIVE_DIFFICULTY_OPTIONS:
+        raise ValidationError("Difficulty must be one_digit, two_digit, multiples_of_10, or mixed.")
 
     bool_option(normalized, "smallOperandLessThan10")
     bool_option(normalized, "includeAnswerKey")
@@ -157,6 +195,9 @@ def allowed_options_for(worksheet_type: str) -> set[str]:
         options.update(DIGIT_OPTIONS_KEYS)
     if worksheet_type in LAYOUT_WORKSHEET_TYPES:
         options.update(LAYOUT_OPTIONS_KEYS)
+    if worksheet_type in DISTRIBUTIVE_PROPERTY_WORKSHEET_TYPES:
+        options.update(LAYOUT_OPTIONS_KEYS)
+        options.update(DISTRIBUTIVE_PROPERTY_OPTIONS)
     return options
 
 

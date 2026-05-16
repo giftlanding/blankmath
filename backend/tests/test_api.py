@@ -95,6 +95,61 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 201)
 
+    def test_accepts_distributive_property_request(self):
+        with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
+            result = handle_event({
+                "headers": {"x-blankmath-internal-token": "test-token"},
+                "body": json.dumps({
+                    "worksheetType": "distributive_property_near_numbers",
+                    "options": {
+                        "problemCount": 10,
+                        "sheetCount": 1,
+                        "base": "near_100",
+                        "direction": "subtraction",
+                        "difficulty": "multiples_of_10",
+                        "layout": "distributive_property",
+                    },
+                }),
+            })
+
+        self.assertEqual(result["statusCode"], 201)
+
+    def test_rejects_large_distributive_property_problem_count(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "distributive_property_near_numbers",
+                "options": {
+                    "problemCount": 30,
+                    "sheetCount": 1,
+                    "base": "near_100",
+                    "direction": "subtraction",
+                    "difficulty": "multiples_of_10",
+                    "layout": "distributive_property",
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
+    def test_rejects_large_distributive_property_sheet_count(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "distributive_property_near_numbers",
+                "options": {
+                    "problemCount": 20,
+                    "sheetCount": 11,
+                    "base": "near_100",
+                    "direction": "subtraction",
+                    "difficulty": "multiples_of_10",
+                    "layout": "distributive_property",
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
     def test_rejects_long_division_layout_for_non_division(self):
         result = handle_event({
             "headers": {"x-blankmath-internal-token": "test-token"},
