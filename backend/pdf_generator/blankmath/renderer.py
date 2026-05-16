@@ -5,12 +5,16 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
-from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from blankmath.generators import Problem
 from blankmath.panels import page_problem_count, panel_grid, problem_panel
 
 HEADER_IMAGE_PATH = Path(__file__).resolve().parent / "assets" / "logo.jpg"
+PAGE_WIDTH, PAGE_HEIGHT = letter
+HEADER_WIDTH = PAGE_WIDTH
+HEADER_HEIGHT = 1.0 * inch
+BODY_TOP_GAP = 0.12 * inch
 
 
 def render_pdf(
@@ -26,7 +30,7 @@ def render_pdf(
         pagesize=letter,
         rightMargin=0.45 * inch,
         leftMargin=0.45 * inch,
-        topMargin=0.45 * inch,
+        topMargin=HEADER_HEIGHT + BODY_TOP_GAP,
         bottomMargin=0.45 * inch,
     )
     styles = getSampleStyleSheet()
@@ -40,8 +44,6 @@ def render_pdf(
         page_problems = problems[start:start + problems_per_page]
         if page_number > 1:
             story.append(PageBreak())
-        story.append(_header_image())
-        story.append(Spacer(1, 0.12 * inch))
         story.append(_problem_table(page_problems, worksheet_style, layout, start_number=start + 1))
 
     if include_answer_key:
@@ -50,12 +52,20 @@ def render_pdf(
         story.append(Spacer(1, 0.16 * inch))
         story.append(_answer_table(problems, styles["Normal"]))
 
-    document.build(story)
+    document.build(story, onFirstPage=_draw_page_header, onLaterPages=_draw_page_header)
     return buffer.getvalue()
 
 
-def _header_image() -> Image:
-    return Image(str(HEADER_IMAGE_PATH), width=7.6 * inch, height=0.894 * inch)
+def _draw_page_header(canvas, document) -> None:
+    canvas.drawImage(
+        str(HEADER_IMAGE_PATH),
+        0,
+        PAGE_HEIGHT - HEADER_HEIGHT,
+        width=HEADER_WIDTH,
+        height=HEADER_HEIGHT,
+        preserveAspectRatio=False,
+        mask="auto",
+    )
 
 
 def _problem_table(problems: list[Problem], style, layout: str, start_number: int = 1) -> Table:
