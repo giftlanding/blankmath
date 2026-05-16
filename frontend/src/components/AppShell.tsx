@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Calculator } from "lucide-react";
+import { Calculator, MailPlus } from "lucide-react";
 import { ReactNode } from "react";
 import { worksheets } from "../worksheetDefinitions";
 
@@ -21,7 +21,16 @@ export function AppShell({ children }: AppShellProps) {
               <small>Printable math practice</small>
             </span>
           </Link>
-          <span className="worksheet-count">{worksheets.length} worksheet types</span>
+          <div className="header-actions">
+            <a
+              className="suggest-link"
+              href="mailto:suggestions@blankmath.com?subject=Worksheet%20suggestion&body=Worksheet%20idea%3A%0A%0AGrade%20level%3A%0A%0AExample%20problem%3A"
+            >
+              <MailPlus aria-hidden="true" size={17} />
+              Suggest a worksheet
+            </a>
+            <span className="worksheet-count">{worksheets.length} worksheet types</span>
+          </div>
         </div>
       </header>
       <main>{children}</main>
