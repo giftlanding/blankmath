@@ -1,6 +1,9 @@
 export type GenerateWorksheetRequest = {
   worksheetType: string;
   options: Record<string, string | number | boolean>;
+  analytics?: {
+    gaClientId?: string;
+  };
 };
 
 export type GenerateWorksheetResponse = {
@@ -23,6 +26,27 @@ export async function generateWorksheet(request: GenerateWorksheetRequest): Prom
   }
 
   return payload;
+}
+
+export function getGoogleAnalyticsClientId(): string | undefined {
+  if (typeof document === "undefined") {
+    return undefined;
+  }
+
+  const cookie = document.cookie
+    .split("; ")
+    .find((entry) => entry.startsWith("_ga="));
+  const value = cookie?.split("=")[1];
+  if (!value) {
+    return undefined;
+  }
+
+  const parts = decodeURIComponent(value).split(".");
+  if (parts.length < 4) {
+    return undefined;
+  }
+
+  return `${parts[parts.length - 2]}.${parts[parts.length - 1]}`;
 }
 
 async function parseGenerateResponse(response: Response): Promise<GenerateWorksheetResponse> {

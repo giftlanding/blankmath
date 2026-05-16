@@ -184,11 +184,15 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(result["statusCode"], 400)
 
     def test_accepts_known_worksheet_request(self):
-        with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
+        with (
+            patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"),
+            patch("blankmath.api.record_pdf_generated") as record_pdf_generated,
+        ):
             result = handle_event({
                 "headers": {"x-blankmath-internal-token": "test-token"},
                 "body": json.dumps({
                     "worksheetType": "addition",
+                    "analytics": {"gaClientId": "1234567890.9876543210"},
                     "options": {
                         "problemCount": 20,
                         "sheetCount": 1,
@@ -201,6 +205,33 @@ class ApiTest(unittest.TestCase):
         body = json.loads(result["body"])
         self.assertEqual(result["statusCode"], 201)
         self.assertEqual(body["url"], "https://example.com/worksheet.pdf")
+        record_pdf_generated.assert_called_once_with({
+            "worksheetType": "addition",
+            "analytics": {"gaClientId": "1234567890.9876543210"},
+            "options": {
+                "problemCount": 20,
+                "sheetCount": 1,
+                "from": 0,
+                "to": 20,
+            },
+        })
+
+    def test_rejects_unknown_analytics_fields(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "addition",
+                "analytics": {"unknown": "value"},
+                "options": {
+                    "problemCount": 20,
+                    "sheetCount": 1,
+                    "from": 0,
+                    "to": 20,
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
 
 
 if __name__ == "__main__":

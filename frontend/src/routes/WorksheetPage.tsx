@@ -3,7 +3,7 @@ import { Link, useParams } from "@tanstack/react-router";
 import { ArrowLeft, FileDown, Layers, ListChecks } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { generateWorksheet } from "../api";
+import { generateWorksheet, getGoogleAnalyticsClientId } from "../api";
 import {
   defaultsForWorksheet,
   schemaForWorksheet,
@@ -44,9 +44,11 @@ export function WorksheetPage() {
   });
 
   const submit = form.handleSubmit((options) => {
+    const gaClientId = getGoogleAnalyticsClientId();
     mutation.mutate({
       worksheetType: worksheet.id,
       options: options as Record<string, string | number | boolean>,
+      ...(gaClientId ? { analytics: { gaClientId } } : {}),
     });
   });
 

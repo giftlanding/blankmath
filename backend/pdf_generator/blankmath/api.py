@@ -2,6 +2,7 @@ import json
 import os
 from typing import Any
 
+from blankmath.analytics import record_pdf_generated
 from blankmath.validation import ValidationError, parse_generate_request
 
 
@@ -28,6 +29,7 @@ def handle_event(event: dict[str, Any]) -> dict[str, Any]:
     except Exception as error:
         return response(500, {"error": "generation_failed", "message": str(error)})
 
+    record_pdf_generated(request)
     return response(201, {"url": url})
 
 

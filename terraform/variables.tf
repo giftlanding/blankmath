@@ -67,3 +67,15 @@ variable "cloudflare_pages_project_name" {
   type        = string
   default     = "blankmath"
 }
+
+variable "ga4_measurement_id" {
+  description = "Google Analytics 4 measurement ID for server-side PDF generation events."
+  type        = string
+  default     = "G-00CW0SF6G9"
+}
+
+variable "google_analytics_api_secret" {
+  description = "Google Analytics 4 Measurement Protocol API secret."
+  type        = string
+  sensitive   = true
+}

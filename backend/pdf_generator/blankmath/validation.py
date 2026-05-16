@@ -4,6 +4,7 @@ from typing import Any, TypedDict
 class GenerateRequest(TypedDict):
     worksheetType: str
     options: dict[str, str | int | float | bool]
+    analytics: dict[str, str]
 
 
 class ValidationError(ValueError):
@@ -105,10 +106,39 @@ def parse_generate_request(payload: Any) -> GenerateRequest:
         raise ValidationError("Options must be an object.")
 
     normalized_options = normalize_options(worksheet_type, options)
+    analytics = normalize_analytics(payload.get("analytics"))
     return {
         "worksheetType": worksheet_type,
         "options": normalized_options,
+        "analytics": analytics,
     }
+
+
+def normalize_analytics(value: Any) -> dict[str, str]:
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise ValidationError("Analytics must be an object.")
+
+    normalized: dict[str, str] = {}
+    for key in value:
+        if key != "gaClientId":
+            raise ValidationError(f"Unsupported analytics field {key}.")
+
+    ga_client_id = value.get("gaClientId")
+    if ga_client_id is None:
+        return normalized
+    if not isinstance(ga_client_id, str):
+        raise ValidationError("GA client id must be a string.")
+
+    stripped = ga_client_id.strip()
+    if not stripped:
+        return normalized
+    if len(stripped) > 128:
+        raise ValidationError("GA client id is too long.")
+
+    normalized["gaClientId"] = stripped
+    return normalized
 
 
 def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str, str | int | float | bool]:

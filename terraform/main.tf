@@ -218,6 +218,8 @@ resource "aws_lambda_function" "pdf_generator" {
     variables = {
       GENERATED_PDFS_BUCKET          = aws_s3_bucket.generated_pdfs_public.bucket
       GENERATED_PDFS_PUBLIC_BASE_URL = "https://${var.generated_pdfs_domain_name}"
+      GA4_API_SECRET                 = var.google_analytics_api_secret
+      GA4_MEASUREMENT_ID             = var.ga4_measurement_id
       INTERNAL_API_TOKEN             = random_password.internal_api_token.result
     }
   }
