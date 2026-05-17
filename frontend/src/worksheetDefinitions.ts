@@ -8,6 +8,7 @@ export const divisionLayoutOptions = ["equation", "long_division"] as const;
 export const distributiveBaseOptions = ["near_10", "near_100", "mixed"] as const;
 export const distributiveDirectionOptions = ["subtraction", "addition", "mixed"] as const;
 export const distributiveDifficultyOptions = ["multiples_of_10", "one_digit", "two_digit", "mixed"] as const;
+export const numberSizeOptions = ["small", "big"] as const;
 
 type SelectControl = {
   id: string;
@@ -40,7 +41,7 @@ export type WorksheetDefinition = {
   id: string;
   path: string;
   title: string;
-  category: "Addition & Subtraction" | "Multiplication & Division" | "Comparison" | "Math Properties";
+  category: "Addition & Subtraction" | "Multiplication & Division" | "Comparison" | "Math Properties" | "Word Problems";
   examples: string[];
   controls: WorksheetControl[];
 };
@@ -230,6 +231,45 @@ const breakingParenthesesControls = (): WorksheetControl[] => [
   },
 ];
 
+const chickenRabbitControls = (): WorksheetControl[] => [
+  {
+    id: "problemCount",
+    label: "Problems",
+    type: "select",
+    options: [4, 6, 8, 10],
+    defaultValue: 6,
+  },
+  {
+    id: "sheetCount",
+    label: "Sheets",
+    type: "select",
+    options: sheetCountOptions.slice(0, 10),
+    defaultValue: 1,
+  },
+  {
+    id: "numberSize",
+    label: "Number size",
+    type: "select",
+    options: numberSizeOptions,
+    defaultValue: "small",
+    optionLabels: {
+      small: "Small numbers",
+      big: "Big numbers",
+    },
+  },
+  {
+    id: "layout",
+    label: "Layout",
+    type: "select",
+    options: ["chicken_rabbit"],
+    defaultValue: "chicken_rabbit",
+    optionLabels: {
+      chicken_rabbit: "Word problem",
+    },
+  },
+  answerKeyControl(),
+];
+
 export const worksheets: WorksheetDefinition[] = [
   {
     id: "addition",
@@ -374,6 +414,18 @@ export const worksheets: WorksheetDefinition[] = [
     category: "Math Properties",
     examples: ["21 - (8 + 9)", "39 - (8 - 13)", "(8 + 6) - 5 + 11"],
     controls: breakingParenthesesControls(),
+  },
+  {
+    id: "chicken_rabbit",
+    path: "/chicken_rabbit",
+    title: "Chicken-Rabbit Word Problems",
+    category: "Word Problems",
+    examples: [
+      "Chickens and rabbits have 26 legs",
+      "$5 bills and $2 bills total $41",
+      "Spiders and dragonflies have 68 legs",
+    ],
+    controls: chickenRabbitControls(),
   },
 ];
 

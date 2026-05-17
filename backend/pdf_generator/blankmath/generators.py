@@ -2,6 +2,8 @@ import random
 from dataclasses import dataclass
 from typing import Any
 
+from blankmath.worksheets.chicken_rabbit import generate_chicken_rabbit_problem
+
 
 @dataclass(frozen=True)
 class Problem:
@@ -63,6 +65,7 @@ def _generator_for(worksheet_type: str):
         "greater_than_less_than": _comparison,
         "distributive_property_near_numbers": _distributive_property_near_numbers,
         "breaking_parentheses": _breaking_parentheses,
+        "chicken_rabbit": generate_chicken_rabbit_problem,
     }[worksheet_type]
 
 

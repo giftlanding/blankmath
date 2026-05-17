@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pdf_generator"))
 
 from blankmath.generators import generate_problems
-from blankmath.panels.distributive_property import parse_distributive_property_problem
+from blankmath.worksheets.chicken_rabbit import ChickenRabbitProblem, VALID_SCENARIOS
 
 
 class GeneratorTest(unittest.TestCase):
@@ -44,11 +44,11 @@ class GeneratorTest(unittest.TestCase):
 
         self.assertEqual(len(problems), 10)
         for problem in problems:
-            parsed = parse_distributive_property_problem(problem.prompt)
+            parsed = re.fullmatch(r"(\d+) x (\d+) = \1 x \((\d+) - (\d+)\)", problem.prompt)
             self.assertIsNotNone(parsed)
-            self.assertEqual(parsed.operation, "-")
-            self.assertEqual(parsed.base % 100, 0)
-            self.assertEqual(problem.answer, str(parsed.answer))
+            factor, _target, base, offset = (int(value) for value in parsed.groups())
+            self.assertEqual(base % 100, 0)
+            self.assertEqual(problem.answer, str(factor * (base - offset)))
 
     def test_generates_breaking_parentheses_problems(self):
         problems = generate_problems("breaking_parentheses", {
@@ -74,6 +74,25 @@ class GeneratorTest(unittest.TestCase):
             self.assertTrue(all(1 <= value <= 50 for value in numbers))
             self.assertGreaterEqual(len(group_numbers), 2)
             self.assertLessEqual(len(group_numbers), 4)
+
+    def test_generates_chicken_rabbit_word_problems(self):
+        problems = generate_problems("chicken_rabbit", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "numberSize": "small",
+            "layout": "chicken_rabbit",
+        })
+
+        self.assertEqual(len(problems), 10)
+        self.assertTrue(all(isinstance(problem, ChickenRabbitProblem) for problem in problems))
+        self.assertTrue(all(problem.answer_a >= 1 and problem.answer_b >= 1 for problem in problems))
+        self.assertTrue(all(problem.count_total <= 24 for problem in problems))
+        self.assertTrue(all(problem.value_total > 0 for problem in problems))
+        for problem in problems:
+            self.assertEqual(problem.answer_a + problem.answer_b, problem.count_total)
+
+    def test_chicken_rabbit_has_many_scenario_templates(self):
+        self.assertGreaterEqual(len(VALID_SCENARIOS), 20)
 
 
 if __name__ == "__main__":

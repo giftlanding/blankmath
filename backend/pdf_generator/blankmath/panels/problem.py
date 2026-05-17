@@ -4,6 +4,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import Paragraph
 
 from blankmath.panels.breaking_parentheses import BreakingParenthesesPanel
+from blankmath.panels.chicken_rabbit import ChickenRabbitPanel
 from blankmath.panels.distributive_property import (
     DistributivePropertyPanel,
     parse_distributive_property_problem,
@@ -24,6 +25,16 @@ class PanelGrid:
 
 
 def panel_grid(layout: str, problem_count: int) -> PanelGrid:
+    if layout == "chicken_rabbit":
+        return PanelGrid(
+            columns=1,
+            row_height=2.55 * inch,
+            left_padding=8,
+            right_padding=8,
+            top_padding=6,
+            bottom_padding=6,
+        )
+
     if layout == "breaking_parentheses":
         return PanelGrid(
             columns=1,
@@ -75,6 +86,8 @@ def panel_grid(layout: str, problem_count: int) -> PanelGrid:
 
 
 def page_problem_count(count_per_page: int, layout: str) -> int:
+    if layout == "chicken_rabbit":
+        return min(count_per_page, 3)
     if layout == "breaking_parentheses":
         return min(count_per_page, 12)
     if layout == "distributive_property":
@@ -86,7 +99,12 @@ def page_problem_count(count_per_page: int, layout: str) -> int:
     return count_per_page
 
 
-def problem_panel(problem_number: int, prompt: str, style, layout: str):
+def problem_panel(problem_number: int, problem, style, layout: str):
+    prompt = getattr(problem, "prompt", problem)
+
+    if layout == "chicken_rabbit":
+        return ChickenRabbitPanel(problem)
+
     if layout == "breaking_parentheses":
         return BreakingParenthesesPanel(prompt)
 

@@ -20,6 +20,7 @@ const existingWorksheetIds = [
   "greater_than_less_than",
   "distributive_property_near_numbers",
   "breaking_parentheses",
+  "chicken_rabbit",
 ];
 
 describe("worksheet definitions", () => {

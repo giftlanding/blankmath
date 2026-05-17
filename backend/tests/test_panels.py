@@ -12,15 +12,19 @@ except ModuleNotFoundError:
 
 try:
     from blankmath.panels.breaking_parentheses import BreakingParenthesesPanel
+    from blankmath.panels.chicken_rabbit import ChickenRabbitPanel
     from blankmath.panels.distributive_property import DistributivePropertyPanel
     from blankmath.panels.long_division import LongDivisionPanel
     from blankmath.panels.problem import page_problem_count, problem_panel
+    from blankmath.worksheets.chicken_rabbit import generate_chicken_rabbit_problem
 except ModuleNotFoundError:
     BreakingParenthesesPanel = None
+    ChickenRabbitPanel = None
     DistributivePropertyPanel = None
     LongDivisionPanel = None
     page_problem_count = None
     problem_panel = None
+    generate_chicken_rabbit_problem = None
 
 
 class PanelsTest(unittest.TestCase):
@@ -50,6 +54,16 @@ class PanelsTest(unittest.TestCase):
 
         self.assertIsInstance(panel, BreakingParenthesesPanel)
         self.assertEqual(page_problem_count(20, "breaking_parentheses"), 12)
+
+    @unittest.skipIf(getSampleStyleSheet is None, "ReportLab is not installed")
+    def test_chicken_rabbit_layout_uses_dedicated_panel(self):
+        style = getSampleStyleSheet()["Normal"]
+        problem = generate_chicken_rabbit_problem({"numberSize": "small"})
+
+        panel = problem_panel(1, problem, style, "chicken_rabbit")
+
+        self.assertIsInstance(panel, ChickenRabbitPanel)
+        self.assertEqual(page_problem_count(10, "chicken_rabbit"), 3)
 
 
 if __name__ == "__main__":

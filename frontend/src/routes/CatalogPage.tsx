@@ -22,7 +22,7 @@ export function CatalogPage() {
           <span className="section-kicker">Printable worksheet catalog</span>
           <h1>Build printable math practice sheets.</h1>
           <p>
-            Addition, subtraction, multiplication, division, and comparison practice in one place.
+            Arithmetic, comparison, math properties, and word-problem practice in one place.
           </p>
         </div>
         <div className="catalog-stats" aria-label="Catalog summary">

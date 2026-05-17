@@ -130,6 +130,39 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 201)
 
+    def test_accepts_chicken_rabbit_request(self):
+        with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
+            result = handle_event({
+                "headers": {"x-blankmath-internal-token": "test-token"},
+                "body": json.dumps({
+                    "worksheetType": "chicken_rabbit",
+                    "options": {
+                        "problemCount": 6,
+                        "sheetCount": 1,
+                        "numberSize": "small",
+                        "layout": "chicken_rabbit",
+                    },
+                }),
+            })
+
+        self.assertEqual(result["statusCode"], 201)
+
+    def test_rejects_invalid_chicken_rabbit_number_size(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "chicken_rabbit",
+                "options": {
+                    "problemCount": 6,
+                    "sheetCount": 1,
+                    "numberSize": "medium",
+                    "layout": "chicken_rabbit",
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
     def test_rejects_large_distributive_property_problem_count(self):
         result = handle_event({
             "headers": {"x-blankmath-internal-token": "test-token"},

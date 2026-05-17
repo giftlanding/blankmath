@@ -8,7 +8,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from blankmath.generators import Problem
-from blankmath.panels import page_problem_count, panel_grid, problem_panel
+from blankmath.panels.problem import page_problem_count, panel_grid, problem_panel
 
 HEADER_IMAGE_PATH = Path(__file__).resolve().parent / "assets" / "logo.jpg"
 PAGE_WIDTH, PAGE_HEIGHT = letter
@@ -55,6 +55,10 @@ def render_pdf(
             story.append(Paragraph(title, title_style))
             story.append(Paragraph("Rewrite each expression without parentheses. Do not solve.", instruction_style))
             story.append(Spacer(1, 0.14 * inch))
+        if layout == "chicken_rabbit":
+            story.append(Paragraph(title, title_style))
+            story.append(Paragraph("Use drawing, guess-and-check, or equations. Show your work.", instruction_style))
+            story.append(Spacer(1, 0.12 * inch))
         story.append(_problem_table(page_problems, worksheet_style, layout, start_number=start + 1))
 
     if include_answer_key:
@@ -89,7 +93,7 @@ def _problem_table(problems: list[Problem], style, layout: str, start_number: in
             problem_index = index + offset
             if problem_index < len(problems):
                 problem = problems[problem_index]
-                cell = problem_panel(start_number + problem_index, problem.prompt, style, layout)
+                cell = problem_panel(start_number + problem_index, problem, style, layout)
             else:
                 cell = ""
             row.append(cell)
@@ -103,7 +107,7 @@ def _problem_table(problems: list[Problem], style, layout: str, start_number: in
         ("TOPPADDING", (0, 0), (-1, -1), grid.top_padding),
         ("BOTTOMPADDING", (0, 0), (-1, -1), grid.bottom_padding),
     ]
-    if layout != "breaking_parentheses":
+    if layout not in {"breaking_parentheses", "chicken_rabbit"}:
         table_style_commands = [
             ("BOX", (0, 0), (-1, -1), 0.2, colors.HexColor("#d9dee8")),
             ("INNERGRID", (0, 0), (-1, -1), 0.15, colors.HexColor("#d9dee8")),

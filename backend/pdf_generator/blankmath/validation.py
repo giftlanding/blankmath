@@ -1,5 +1,7 @@
 from typing import Any, TypedDict
 
+from blankmath.worksheet_registry import WORKSHEETS, worksheet_definition
+
 
 class GenerateRequest(TypedDict):
     worksheetType: str
@@ -11,26 +13,7 @@ class ValidationError(ValueError):
     pass
 
 
-WORKSHEET_TYPES = {
-    "addition",
-    "minus",
-    "mixed_add_minus",
-    "additionmn",
-    "minusmn",
-    "mixed_add_minus_mn",
-    "add_three_numbers",
-    "add_minus_three_numbers",
-    "add_three_numbers_mn",
-    "multiplication",
-    "division",
-    "mixed_times_divide",
-    "multiplicationmn",
-    "division_mn",
-    "mixed_times_divide_mn",
-    "greater_than_less_than",
-    "distributive_property_near_numbers",
-    "breaking_parentheses",
-}
+WORKSHEET_TYPES = set(WORKSHEETS)
 
 PROBLEM_COUNTS = {10, 20, 30, 50}
 PROPERTY_PROBLEM_COUNTS = {10, 20}
@@ -42,11 +25,12 @@ BREAKING_PARENTHESES_SHEET_COUNT_MAX = 10
 RANGE_MIN = 0
 RANGE_MAX = 10000
 DIGIT_OPTIONS = {"1d", "2d", "3d", "l12", "l20"}
-LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses"}
+LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses", "chicken_rabbit"}
 DIVISION_LAYOUT_OPTIONS = {"horizontal", "equation", "long_division"}
 DISTRIBUTIVE_BASE_OPTIONS = {"near_10", "near_100", "mixed"}
 DISTRIBUTIVE_DIRECTION_OPTIONS = {"addition", "subtraction", "mixed"}
 DISTRIBUTIVE_DIFFICULTY_OPTIONS = {"one_digit", "two_digit", "multiples_of_10", "mixed"}
+NUMBER_SIZE_OPTIONS = {"small", "big"}
 
 RANGE_WORKSHEET_TYPES = {
     "addition",
@@ -98,6 +82,7 @@ RANGE_OPTIONS = {"from", "to", "smallOperandLessThan10"}
 DIGIT_OPTIONS_KEYS = {"digits"}
 LAYOUT_OPTIONS_KEYS = {"layout"}
 DISTRIBUTIVE_PROPERTY_OPTIONS = {"base", "direction", "difficulty"}
+CHICKEN_RABBIT_OPTIONS = {"numberSize"}
 
 
 def parse_generate_request(payload: Any) -> GenerateRequest:
@@ -150,6 +135,7 @@ def normalize_analytics(value: Any) -> dict[str, str]:
 
 def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str, str | int | float | bool]:
     normalized: dict[str, str | int | float | bool] = {}
+    definition = worksheet_definition(worksheet_type)
     allowed_options = allowed_options_for(worksheet_type)
 
     for key, value in options.items():
@@ -162,18 +148,14 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
         normalized[key] = value
 
     problem_count = int_option(normalized, "problemCount")
-    allowed_problem_counts = (
-        PROPERTY_PROBLEM_COUNTS
-        if worksheet_type in DISTRIBUTIVE_PROPERTY_WORKSHEET_TYPES
-        else BREAKING_PARENTHESES_PROBLEM_COUNTS
-        if worksheet_type in BREAKING_PARENTHESES_WORKSHEET_TYPES
-        else PROBLEM_COUNTS
-    )
+    allowed_problem_counts = set(definition.allowed_problem_counts)
     if problem_count is not None and problem_count not in allowed_problem_counts:
         if worksheet_type in DISTRIBUTIVE_PROPERTY_WORKSHEET_TYPES:
             raise ValidationError("Problem count must be 10 or 20.")
         if worksheet_type in BREAKING_PARENTHESES_WORKSHEET_TYPES:
             raise ValidationError("Problem count must be 10, 15, or 20.")
+        if worksheet_type == "chicken_rabbit":
+            raise ValidationError("Problem count must be 4, 6, 8, or 10.")
         raise ValidationError("Problem count must be 10, 20, 30, or 50.")
 
     sheet_count = int_option(normalized, "sheetCount")
@@ -188,9 +170,11 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     if (
         worksheet_type in BREAKING_PARENTHESES_WORKSHEET_TYPES
         and sheet_count is not None
-        and sheet_count > BREAKING_PARENTHESES_SHEET_COUNT_MAX
+        and sheet_count > definition.max_sheet_count
     ):
         raise ValidationError("Sheet count must be between 1 and 10 for breaking parentheses worksheets.")
+    if worksheet_type == "chicken_rabbit" and sheet_count is not None and sheet_count > definition.max_sheet_count:
+        raise ValidationError("Sheet count must be between 1 and 10 for chicken-rabbit worksheets.")
 
     from_value = int_option(normalized, "from")
     to_value = int_option(normalized, "to")
@@ -217,6 +201,8 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
         raise ValidationError("Distributive property layout is only supported for distributive property worksheets.")
     if worksheet_type != "breaking_parentheses" and layout == "breaking_parentheses":
         raise ValidationError("Breaking parentheses layout is only supported for breaking parentheses worksheets.")
+    if worksheet_type != "chicken_rabbit" and layout == "chicken_rabbit":
+        raise ValidationError("Chicken-rabbit layout is only supported for chicken-rabbit worksheets.")
 
     base = normalized.get("base")
     if base is not None and base not in DISTRIBUTIVE_BASE_OPTIONS:
@@ -230,6 +216,10 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     if difficulty is not None and difficulty not in DISTRIBUTIVE_DIFFICULTY_OPTIONS:
         raise ValidationError("Difficulty must be one_digit, two_digit, multiples_of_10, or mixed.")
 
+    number_size = normalized.get("numberSize")
+    if number_size is not None and number_size not in NUMBER_SIZE_OPTIONS:
+        raise ValidationError("Number size must be small or big.")
+
     bool_option(normalized, "smallOperandLessThan10")
     bool_option(normalized, "includeAnswerKey")
 
@@ -237,20 +227,26 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
 
 
 def allowed_options_for(worksheet_type: str) -> set[str]:
+    definition = worksheet_definition(worksheet_type)
+    profile = definition.option_profile
     options = set(COMMON_OPTIONS)
-    if worksheet_type in BREAKING_PARENTHESES_WORKSHEET_TYPES:
+    if not definition.allow_answer_key:
         options.remove("includeAnswerKey")
-    if worksheet_type in RANGE_WORKSHEET_TYPES:
+    if profile == "range_layout":
         options.update(RANGE_OPTIONS)
-    if worksheet_type in DIGIT_WORKSHEET_TYPES:
-        options.update(DIGIT_OPTIONS_KEYS)
-    if worksheet_type in LAYOUT_WORKSHEET_TYPES:
         options.update(LAYOUT_OPTIONS_KEYS)
-    if worksheet_type in DISTRIBUTIVE_PROPERTY_WORKSHEET_TYPES:
+    if profile in {"digits", "digits_layout", "division"}:
+        options.update(DIGIT_OPTIONS_KEYS)
+    if profile in {"digits_layout", "division"}:
+        options.update(LAYOUT_OPTIONS_KEYS)
+    if profile == "distributive_property":
         options.update(LAYOUT_OPTIONS_KEYS)
         options.update(DISTRIBUTIVE_PROPERTY_OPTIONS)
-    if worksheet_type in BREAKING_PARENTHESES_WORKSHEET_TYPES:
+    if profile == "breaking_parentheses":
         options.update(LAYOUT_OPTIONS_KEYS)
+    if profile == "chicken_rabbit":
+        options.update(LAYOUT_OPTIONS_KEYS)
+        options.update(CHICKEN_RABBIT_OPTIONS)
     return options
 
 
