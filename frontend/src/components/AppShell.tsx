@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Calculator, Check, Copy } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { Calculator, Check, Copy, MailPlus } from "lucide-react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { worksheets } from "../worksheetDefinitions";
 
 type AppShellProps = {
@@ -10,7 +10,34 @@ type AppShellProps = {
 const suggestionEmail = "suggestions@blankmath.com";
 
 export function AppShell({ children }: AppShellProps) {
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const [copiedSuggestionEmail, setCopiedSuggestionEmail] = useState(false);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!suggestionsOpen) {
+      return;
+    }
+
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (!suggestionsRef.current?.contains(event.target as Node)) {
+        setSuggestionsOpen(false);
+      }
+    };
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSuggestionsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [suggestionsOpen]);
 
   const copySuggestionEmail = async () => {
     if (navigator.clipboard?.writeText) {
@@ -43,22 +70,38 @@ export function AppShell({ children }: AppShellProps) {
             </span>
           </Link>
           <div className="header-actions">
-            <div className="suggest-email" aria-label="Suggest a worksheet by email">
-              <span className="suggest-email-label">Suggest a worksheet</span>
-              <span className="suggest-email-address">{suggestionEmail}</span>
+            <div className="suggest-menu" ref={suggestionsRef}>
               <button
-                className="suggest-copy-button"
+                className="suggest-button"
                 type="button"
-                onClick={copySuggestionEmail}
-                aria-label={`Copy ${suggestionEmail}`}
-                title={copiedSuggestionEmail ? "Copied" : "Copy email address"}
+                onClick={() => setSuggestionsOpen((isOpen) => !isOpen)}
+                aria-expanded={suggestionsOpen}
+                aria-haspopup="dialog"
               >
-                {copiedSuggestionEmail ? (
-                  <Check aria-hidden="true" size={17} />
-                ) : (
-                  <Copy aria-hidden="true" size={17} />
-                )}
+                <MailPlus aria-hidden="true" size={17} />
+                Suggest a worksheet
               </button>
+              {suggestionsOpen ? (
+                <div className="suggest-dropdown" role="dialog" aria-label="Suggest a worksheet by email">
+                  <span className="suggest-dropdown-label">Email suggestions to</span>
+                  <div className="suggest-email-row">
+                    <span className="suggest-email-address">{suggestionEmail}</span>
+                    <button
+                      className="suggest-copy-button"
+                      type="button"
+                      onClick={copySuggestionEmail}
+                      aria-label={`Copy ${suggestionEmail}`}
+                      title={copiedSuggestionEmail ? "Copied" : "Copy email address"}
+                    >
+                      {copiedSuggestionEmail ? (
+                        <Check aria-hidden="true" size={17} />
+                      ) : (
+                        <Copy aria-hidden="true" size={17} />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </div>
             <span className="worksheet-count">{worksheets.length} worksheet types</span>
           </div>
