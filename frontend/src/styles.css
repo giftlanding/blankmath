@@ -133,25 +133,56 @@ h2 {
   white-space: nowrap;
 }
 
-.suggest-link {
+.suggest-email {
   display: inline-flex;
   min-height: 38px;
   align-items: center;
-  gap: 8px;
-  padding: 0 12px;
+  gap: 10px;
+  padding: 0 6px 0 12px;
   border: 1px solid #dee1e6;
   border-radius: 9999px;
   color: #0a0b0d;
   background: #ffffff;
   font-size: 0.9rem;
   font-weight: 600;
-  text-decoration: none;
   white-space: nowrap;
 }
 
-.suggest-link:hover {
-  border-color: #0052ff;
+.suggest-email-label {
+  color: #343943;
+}
+
+.suggest-email-address {
   color: #0052ff;
+  font-weight: 700;
+}
+
+.suggest-copy-button {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 9999px;
+  color: #0a0b0d;
+  background: #eef2f7;
+  cursor: pointer;
+}
+
+.suggest-copy-button:hover,
+.suggest-copy-button:focus-visible {
+  color: #ffffff;
+  background: #0052ff;
+}
+
+.suggest-copy-button:focus-visible {
+  outline: 2px solid #8fb3ff;
+  outline-offset: 2px;
+}
+
+.suggest-email:hover {
+  border-color: #0052ff;
 }
 
 .catalog,
@@ -555,8 +586,18 @@ h2 {
   }
 
   .worksheet-count,
+  .suggest-email,
   .request-badge {
     width: fit-content;
+  }
+
+  .suggest-email {
+    max-width: 100%;
+  }
+
+  .suggest-email-address {
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
 
   .catalog-stats {
