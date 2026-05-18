@@ -38,6 +38,7 @@ Blankmath currently includes worksheet types in these areas:
 - Missing-number practice
 - Multi-number arithmetic
 - Comparison practice
+- Place-value practice
 - Math-property practice
 - Word problems
 
@@ -60,6 +61,12 @@ Available practice includes:
 
 Teachers can adjust number ranges and choose worksheet size. Some worksheets
 also support constraints such as keeping the smaller operand under 10.
+
+Addition and subtraction worksheets also support regrouping controls:
+
+- Addition can be generated with carrying, without carrying, or mixed.
+- Subtraction can be generated with borrowing, without borrowing, or mixed.
+- Subtraction can optionally avoid borrowing across zeros.
 
 ## Multiplication And Division
 
@@ -102,6 +109,9 @@ Current practice includes:
 - Expanded form
 - Standard form
 - Digit value
+
+These worksheets are designed as row-based writing practice. Each problem has
+one clear prompt and a long blank for the student response.
 
 ### Expanded Form
 
@@ -153,6 +163,14 @@ Expected answer:
 
 Place-value worksheets support different number sizes and optional practice
 with zeros inside numbers.
+
+Teacher-facing options include:
+
+- Number of problems
+- Number of sheets
+- Number size: 2, 3, 4, or 5 digits
+- Zero practice: avoid zeros, allow zeros, or mixed
+- Answer key
 
 ## Math Properties
 
@@ -259,22 +277,66 @@ Users can suggest new worksheet ideas from the site. The suggestion flow shows
 the email address clearly and provides a copy button so users are not required
 to have a local email client configured.
 
-## Planned Product Directions
+## Future Features
 
 Blankmath should continue growing as a worksheet library, especially in areas
 where teachers need many variations of the same skill.
 
-Potential future worksheet areas include:
+### Priority 1: High-Value Worksheet Families
 
-- More distributive property formats
-- Factoring out common factors
-- Associative and commutative property practice
-- Multi-step word problems
-- Fraction practice
-- Decimal practice
-- More place-value skills, such as rounding and place-name practice
-- Equation-solving readiness
-- More visual and drawing-friendly worksheets for younger students
+These are the strongest next additions because they are common elementary math
+needs and currently missing from Blankmath.
+
+- Fractions: equivalent fractions, reducing fractions, comparing fractions,
+  and simple fraction addition/subtraction.
+- Number lines: whole numbers first, then negative numbers, decimals, and
+  fractions.
+- Telling time: reading clocks and drawing hands on clocks at hour,
+  half-hour, quarter-hour, five-minute, and one-minute increments.
+- Hundred charts: counting, skip counting, missing numbers, and number
+  patterns.
+- More carrying and borrowing practice, including dedicated multi-digit
+  worksheet variants and borrowing-across-zero review.
+
+### Priority 2: Teacher Workflow Improvements
+
+These features would make existing worksheets more useful in classrooms.
+
+- Consistent answer-key choices across worksheet types.
+- Name/date or memo lines on printable worksheets.
+- Clearer support for generating multiple different worksheet versions from
+  the same settings.
+- Difficulty presets such as easy, medium, hard, drawing-friendly, and
+  equation-ready.
+- Exact operand or factor selection, such as practice only with 5s or numbers
+  from 1 through 5.
+- Duplicate policy controls for whether worksheets should stay unique or fill
+  the page even when repeats are needed.
+
+### Priority 3: More Visual And Applied Math
+
+These features are valuable, but should come after the core arithmetic,
+place-value, fraction, and time workflows are stronger.
+
+- Measurement worksheets, including reading a tape measure.
+- Coordinate plane practice.
+- Rounding and place-name worksheets.
+- Decimal place value and decimal comparison.
+- More word-problem families, such as age problems, comparison stories,
+  distance/rate/time, and money problems.
+- More math-property worksheets, including factoring out a common factor,
+  splitting factors with the distributive property, and associativity practice.
+
+### Longer-Term Ideas
+
+These ideas may be useful later, but should not distract from the core
+worksheet library.
+
+- Multilingual worksheet instructions.
+- Worksheet preview before generating the PDF.
+- Skill packs that combine several related worksheets into one printable set.
+- Grade-level collections for teachers and parents.
+- More visual and drawing-friendly worksheets for younger students.
 
 New worksheet types should remain focused, printable, and easy to understand.
 The goal is not to add every possible control, but to make each worksheet type

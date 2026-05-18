@@ -33,6 +33,8 @@ DISTRIBUTIVE_DIFFICULTY_OPTIONS = {"one_digit", "two_digit", "multiples_of_10", 
 NUMBER_SIZE_OPTIONS = {"small", "big"}
 PLACE_VALUE_DIGIT_OPTIONS = {"2d", "3d", "4d", "5d"}
 ZERO_MODE_OPTIONS = {"avoid", "allow", "mixed"}
+ADDITION_REGROUPING_OPTIONS = {"with_carrying", "without_carrying", "mixed"}
+SUBTRACTION_REGROUPING_OPTIONS = {"with_borrowing", "without_borrowing", "mixed"}
 
 RANGE_WORKSHEET_TYPES = {
     "addition",
@@ -86,7 +88,14 @@ PLACE_VALUE_WORKSHEET_TYPES = {
 }
 
 COMMON_OPTIONS = {"problemCount", "sheetCount", "includeAnswerKey"}
-RANGE_OPTIONS = {"from", "to", "smallOperandLessThan10"}
+RANGE_OPTIONS = {
+    "from",
+    "to",
+    "smallOperandLessThan10",
+    "additionRegrouping",
+    "subtractionRegrouping",
+    "borrowAcrossZeros",
+}
 DIGIT_OPTIONS_KEYS = {"digits"}
 LAYOUT_OPTIONS_KEYS = {"layout"}
 DISTRIBUTIVE_PROPERTY_OPTIONS = {"base", "direction", "difficulty"}
@@ -243,8 +252,17 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     if zero_mode is not None and zero_mode not in ZERO_MODE_OPTIONS:
         raise ValidationError("Zero mode must be avoid, allow, or mixed.")
 
+    addition_regrouping = normalized.get("additionRegrouping")
+    if addition_regrouping is not None and addition_regrouping not in ADDITION_REGROUPING_OPTIONS:
+        raise ValidationError("Addition regrouping must be with carrying, without carrying, or mixed.")
+
+    subtraction_regrouping = normalized.get("subtractionRegrouping")
+    if subtraction_regrouping is not None and subtraction_regrouping not in SUBTRACTION_REGROUPING_OPTIONS:
+        raise ValidationError("Subtraction regrouping must be with borrowing, without borrowing, or mixed.")
+
     bool_option(normalized, "smallOperandLessThan10")
     bool_option(normalized, "includeAnswerKey")
+    bool_option(normalized, "borrowAcrossZeros")
 
     return normalized
 

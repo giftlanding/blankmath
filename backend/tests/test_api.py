@@ -78,6 +78,23 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 400)
 
+    def test_rejects_invalid_regrouping_options(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "addition",
+                "options": {
+                    "problemCount": 20,
+                    "sheetCount": 1,
+                    "from": 0,
+                    "to": 100,
+                    "additionRegrouping": "always",
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
     def test_accepts_long_division_layout_for_division(self):
         with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
             result = handle_event({

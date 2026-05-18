@@ -7,6 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pdf_generator"))
 
 from blankmath.generators import generate_problems
+from blankmath.generators import _has_addition_carry, _has_subtraction_borrow, _has_borrow_across_zeros
 from blankmath.worksheets.chicken_rabbit import ChickenRabbitProblem, VALID_SCENARIOS
 
 
@@ -21,6 +22,72 @@ class GeneratorTest(unittest.TestCase):
 
         self.assertEqual(len(problems), 20)
         self.assertEqual(len({problem.prompt for problem in problems}), 20)
+
+    def test_generates_addition_with_carrying(self):
+        problems = generate_problems("addition", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "from": 10,
+            "to": 99,
+            "additionRegrouping": "with_carrying",
+        })
+
+        for problem in problems:
+            left, right = _binary_terms(problem.prompt, "+")
+            self.assertTrue(_has_addition_carry(left, right))
+
+    def test_generates_addition_without_carrying(self):
+        problems = generate_problems("addition", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "from": 10,
+            "to": 99,
+            "additionRegrouping": "without_carrying",
+        })
+
+        for problem in problems:
+            left, right = _binary_terms(problem.prompt, "+")
+            self.assertFalse(_has_addition_carry(left, right))
+
+    def test_generates_subtraction_with_borrowing(self):
+        problems = generate_problems("minus", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "from": 0,
+            "to": 99,
+            "subtractionRegrouping": "with_borrowing",
+        })
+
+        for problem in problems:
+            left, right = _binary_terms(problem.prompt, "-")
+            self.assertTrue(_has_subtraction_borrow(left, right))
+
+    def test_generates_subtraction_without_borrowing(self):
+        problems = generate_problems("minus", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "from": 0,
+            "to": 99,
+            "subtractionRegrouping": "without_borrowing",
+        })
+
+        for problem in problems:
+            left, right = _binary_terms(problem.prompt, "-")
+            self.assertFalse(_has_subtraction_borrow(left, right))
+
+    def test_can_avoid_borrowing_across_zeros(self):
+        problems = generate_problems("minus", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "from": 0,
+            "to": 999,
+            "subtractionRegrouping": "with_borrowing",
+            "borrowAcrossZeros": False,
+        })
+
+        for problem in problems:
+            left, right = _binary_terms(problem.prompt, "-")
+            self.assertFalse(_has_borrow_across_zeros(left, right))
 
     def test_generates_missing_number_answers(self):
         problems = generate_problems("multiplicationmn", {
@@ -131,6 +198,12 @@ class GeneratorTest(unittest.TestCase):
         for problem in problems:
             self.assertIn("what is the value of", problem.prompt)
             self.assertNotEqual(problem.answer, "0")
+
+
+def _binary_terms(prompt: str, operator: str) -> tuple[int, int]:
+    left, rest = prompt.split(f" {operator} ")
+    right = rest.split(" = ")[0]
+    return int(left), int(right)
 
 
 if __name__ == "__main__":

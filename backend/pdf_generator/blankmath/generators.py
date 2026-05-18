@@ -92,22 +92,35 @@ def _number_for_digits(options: dict[str, Any]) -> int:
 
 def _addition(options: dict[str, Any]) -> Problem:
     low, high = _range(options)
-    total = random.randint(low, high)
-    left = random.randint(0, total)
-    right = total - left
-    if options.get("smallOperandLessThan10"):
-        left, right = _force_small_operand(left, right)
+    mode = str(options.get("additionRegrouping", "mixed"))
+    for _ in range(1000):
+        total = random.randint(low, high)
+        left = random.randint(0, total)
+        right = total - left
+        if options.get("smallOperandLessThan10"):
+            left, right = _force_small_operand(left, right)
+        if _matches_addition_regrouping(left, right, mode):
+            break
+    else:
+        raise ValueError("Unable to generate an addition problem for the selected carrying option.")
     return Problem(f"{left} + {right} = ?", str(total))
 
 
 def _subtraction(options: dict[str, Any]) -> Problem:
     low, high = _range(options)
-    result = random.randint(low, high)
-    right = random.randint(0, max(0, high - result))
-    left = result + right
-    if options.get("smallOperandLessThan10") and right >= 10:
-        right = random.randint(0, 9)
+    mode = str(options.get("subtractionRegrouping", "mixed"))
+    allow_across_zeros = bool(options.get("borrowAcrossZeros", True))
+    for _ in range(1000):
+        result = random.randint(low, high)
+        right = random.randint(0, max(0, high - result))
         left = result + right
+        if options.get("smallOperandLessThan10") and right >= 10:
+            right = random.randint(0, 9)
+            left = result + right
+        if _matches_subtraction_regrouping(left, right, mode, allow_across_zeros):
+            break
+    else:
+        raise ValueError("Unable to generate a subtraction problem for the selected borrowing option.")
     return Problem(f"{left} - {right} = ?", str(result))
 
 
@@ -116,10 +129,12 @@ def _mixed_add_subtract(options: dict[str, Any]) -> Problem:
 
 
 def _addition_missing_number(options: dict[str, Any]) -> Problem:
-    low, high = _range(options)
-    total = random.randint(low, high)
-    left = random.randint(0, total)
-    right = total - left
+    base = _addition(options)
+    left_text, rest = base.prompt.split(" + ")
+    right_text = rest.split(" = ")[0]
+    left = int(left_text)
+    right = int(right_text)
+    total = int(base.answer)
     hidden = random.choice(["left", "right", "result"])
     if hidden == "left":
         return Problem(f"____ + {right} = {total}", str(left))
@@ -129,10 +144,12 @@ def _addition_missing_number(options: dict[str, Any]) -> Problem:
 
 
 def _subtraction_missing_number(options: dict[str, Any]) -> Problem:
-    low, high = _range(options)
-    result = random.randint(low, high)
-    right = random.randint(0, max(0, high - result))
-    left = result + right
+    base = _subtraction(options)
+    left_text, rest = base.prompt.split(" - ")
+    right_text = rest.split(" = ")[0]
+    left = int(left_text)
+    right = int(right_text)
+    result = int(base.answer)
     hidden = random.choice(["left", "right", "result"])
     if hidden == "left":
         return Problem(f"____ - {right} = {result}", str(left))
@@ -340,6 +357,67 @@ def _break_parentheses_answer(numbers: list[int], signs: list[str], group_start:
     for sign, number in zip(effective_signs, numbers[1:]):
         parts.append(f" {sign} {number}")
     return "".join(parts)
+
+
+def _matches_addition_regrouping(left: int, right: int, mode: str) -> bool:
+    if mode == "mixed":
+        return True
+    has_carry = _has_addition_carry(left, right)
+    return has_carry if mode == "with_carrying" else not has_carry
+
+
+def _has_addition_carry(left: int, right: int) -> bool:
+    carry = 0
+    while left > 0 or right > 0:
+        column_sum = left % 10 + right % 10 + carry
+        if column_sum >= 10:
+            return True
+        carry = 1 if column_sum >= 10 else 0
+        left //= 10
+        right //= 10
+    return False
+
+
+def _matches_subtraction_regrouping(left: int, right: int, mode: str, allow_across_zeros: bool) -> bool:
+    has_borrow = _has_subtraction_borrow(left, right)
+    if mode == "with_borrowing" and not has_borrow:
+        return False
+    if mode == "without_borrowing" and has_borrow:
+        return False
+    if not allow_across_zeros and _has_borrow_across_zeros(left, right):
+        return False
+    return True
+
+
+def _has_subtraction_borrow(left: int, right: int) -> bool:
+    borrow = 0
+    while left > 0 or right > 0:
+        top_digit = left % 10 - borrow
+        bottom_digit = right % 10
+        borrow = 1 if top_digit < bottom_digit else 0
+        if borrow:
+            return True
+        left //= 10
+        right //= 10
+    return False
+
+
+def _has_borrow_across_zeros(left: int, right: int) -> bool:
+    borrow = 0
+    left_digits = [int(digit) for digit in str(left)][::-1]
+    right_digits = [int(digit) for digit in str(right)][::-1]
+    max_digits = max(len(left_digits), len(right_digits))
+
+    for index in range(max_digits):
+        top_digit = left_digits[index] if index < len(left_digits) else 0
+        bottom_digit = right_digits[index] if index < len(right_digits) else 0
+        if top_digit - borrow < bottom_digit:
+            if index + 1 < len(left_digits) and left_digits[index + 1] == 0:
+                return True
+            borrow = 1
+        else:
+            borrow = 0
+    return False
 
 
 def _force_small_operand(left: int, right: int) -> tuple[int, int]:
