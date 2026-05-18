@@ -71,6 +71,27 @@ WORKSHEETS: dict[str, WorksheetDefinition] = {
         allowed_problem_counts=(10, 20),
         max_sheet_count=10,
     ),
+    "fraction_reduce": WorksheetDefinition(
+        "Reduce Fractions",
+        default_layout="fraction",
+        option_profile="fraction",
+        allowed_problem_counts=(10, 20),
+        max_sheet_count=10,
+    ),
+    "fraction_equivalent": WorksheetDefinition(
+        "Equivalent Fractions",
+        default_layout="fraction",
+        option_profile="fraction",
+        allowed_problem_counts=(10, 20),
+        max_sheet_count=10,
+    ),
+    "fraction_compare": WorksheetDefinition(
+        "Compare Fractions",
+        default_layout="fraction",
+        option_profile="fraction",
+        allowed_problem_counts=(10, 20),
+        max_sheet_count=10,
+    ),
 }
 
 

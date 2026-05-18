@@ -14,6 +14,7 @@ try:
     from blankmath.panels.breaking_parentheses import BreakingParenthesesPanel
     from blankmath.panels.chicken_rabbit import ChickenRabbitPanel
     from blankmath.panels.distributive_property import DistributivePropertyPanel
+    from blankmath.panels.fraction import FractionPanel
     from blankmath.panels.long_division import LongDivisionPanel
     from blankmath.panels.place_value import PlaceValuePanel
     from blankmath.panels.problem import page_problem_count, problem_panel
@@ -22,6 +23,7 @@ except ModuleNotFoundError:
     BreakingParenthesesPanel = None
     ChickenRabbitPanel = None
     DistributivePropertyPanel = None
+    FractionPanel = None
     LongDivisionPanel = None
     PlaceValuePanel = None
     page_problem_count = None
@@ -75,6 +77,15 @@ class PanelsTest(unittest.TestCase):
 
         self.assertIsInstance(panel, PlaceValuePanel)
         self.assertEqual(page_problem_count(20, "place_value"), 10)
+
+    @unittest.skipIf(getSampleStyleSheet is None, "ReportLab is not installed")
+    def test_fraction_layout_uses_dedicated_panel(self):
+        style = getSampleStyleSheet()["Normal"]
+
+        panel = problem_panel(1, "2/3 =", style, "fraction")
+
+        self.assertIsInstance(panel, FractionPanel)
+        self.assertEqual(page_problem_count(20, "fraction"), 12)
 
 
 if __name__ == "__main__":

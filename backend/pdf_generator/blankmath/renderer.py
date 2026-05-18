@@ -63,6 +63,10 @@ def render_pdf(
             story.append(Paragraph(title, title_style))
             story.append(Paragraph("Write the missing place-value form.", instruction_style))
             story.append(Spacer(1, 0.14 * inch))
+        if layout == "fraction":
+            story.append(Paragraph(title, title_style))
+            story.append(Paragraph("Write the missing fraction answer.", instruction_style))
+            story.append(Spacer(1, 0.14 * inch))
         story.append(_problem_table(page_problems, worksheet_style, layout, start_number=start + 1))
 
     if include_answer_key:
@@ -111,7 +115,7 @@ def _problem_table(problems: list[Problem], style, layout: str, start_number: in
         ("TOPPADDING", (0, 0), (-1, -1), grid.top_padding),
         ("BOTTOMPADDING", (0, 0), (-1, -1), grid.bottom_padding),
     ]
-    if layout not in {"breaking_parentheses", "chicken_rabbit", "place_value"}:
+    if layout not in {"breaking_parentheses", "chicken_rabbit", "place_value", "fraction"}:
         table_style_commands = [
             ("BOX", (0, 0), (-1, -1), 0.2, colors.HexColor("#d9dee8")),
             ("INNERGRID", (0, 0), (-1, -1), 0.15, colors.HexColor("#d9dee8")),

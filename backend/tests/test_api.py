@@ -210,6 +210,39 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 201)
 
+    def test_accepts_fraction_request(self):
+        with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
+            result = handle_event({
+                "headers": {"x-blankmath-internal-token": "test-token"},
+                "body": json.dumps({
+                    "worksheetType": "fraction_reduce",
+                    "options": {
+                        "problemCount": 10,
+                        "sheetCount": 1,
+                        "fractionDifficulty": "easy",
+                        "includeImproperFractions": False,
+                        "includeAnswerKey": True,
+                    },
+                }),
+            })
+
+        self.assertEqual(result["statusCode"], 201)
+
+    def test_rejects_invalid_fraction_options(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "fraction_compare",
+                "options": {
+                    "problemCount": 10,
+                    "sheetCount": 1,
+                    "fractionDifficulty": "extreme",
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
     def test_rejects_invalid_place_value_options(self):
         result = handle_event({
             "headers": {"x-blankmath-internal-token": "test-token"},

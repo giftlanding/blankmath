@@ -38,6 +38,7 @@ Blankmath currently includes worksheet types in these areas:
 - Missing-number practice
 - Multi-number arithmetic
 - Comparison practice
+- Fraction practice
 - Place-value practice
 - Math-property practice
 - Word problems
@@ -98,6 +99,68 @@ Example:
 ```
 
 These worksheets are useful for early number sense and place-value review.
+
+## Fractions
+
+Fraction worksheets help students practice equivalence, simplification, and
+comparison.
+
+Current practice includes:
+
+- Reducing fractions
+- Finding equivalent fractions
+- Comparing fractions
+
+### Reduce Fractions
+
+Students rewrite a fraction in lowest terms.
+
+Example:
+
+```text
+6/8 = __________
+```
+
+Expected answer:
+
+```text
+3/4
+```
+
+### Equivalent Fractions
+
+Students write a fraction equivalent to the given fraction.
+
+Example:
+
+```text
+2/3 = __________
+```
+
+One possible answer:
+
+```text
+4/6
+```
+
+### Compare Fractions
+
+Students compare two fractions using greater-than or less-than reasoning.
+
+Example:
+
+```text
+2/3 ____ 3/5
+```
+
+Expected answer:
+
+```text
+>
+```
+
+Fraction worksheets support easy, medium, and hard difficulty settings.
+Reducing-fraction worksheets can also include improper fractions.
 
 ## Place Value
 
@@ -287,8 +350,8 @@ where teachers need many variations of the same skill.
 These are the strongest next additions because they are common elementary math
 needs and currently missing from Blankmath.
 
-- Fractions: equivalent fractions, reducing fractions, comparing fractions,
-  and simple fraction addition/subtraction.
+- More fraction practice, including fraction addition/subtraction and visual
+  fraction models.
 - Number lines: whole numbers first, then negative numbers, decimals, and
   fractions.
 - Telling time: reading clocks and drawing hands on clocks at hour,

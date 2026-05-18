@@ -9,6 +9,7 @@ from blankmath.panels.distributive_property import (
     DistributivePropertyPanel,
     parse_distributive_property_problem,
 )
+from blankmath.panels.fraction import FractionPanel
 from blankmath.panels.long_division import LongDivisionPanel
 from blankmath.panels.place_value import PlaceValuePanel
 from blankmath.panels.vertical_arithmetic import VerticalArithmeticPanel
@@ -26,6 +27,16 @@ class PanelGrid:
 
 
 def panel_grid(layout: str, problem_count: int) -> PanelGrid:
+    if layout == "fraction":
+        return PanelGrid(
+            columns=2,
+            row_height=1.12 * inch,
+            left_padding=10,
+            right_padding=10,
+            top_padding=5,
+            bottom_padding=5,
+        )
+
     if layout == "place_value":
         return PanelGrid(
             columns=1,
@@ -97,6 +108,8 @@ def panel_grid(layout: str, problem_count: int) -> PanelGrid:
 
 
 def page_problem_count(count_per_page: int, layout: str) -> int:
+    if layout == "fraction":
+        return min(count_per_page, 12)
     if layout == "place_value":
         return min(count_per_page, 10)
     if layout == "chicken_rabbit":
@@ -120,6 +133,9 @@ def problem_panel(problem_number: int, problem, style, layout: str):
 
     if layout == "place_value":
         return PlaceValuePanel(prompt)
+
+    if layout == "fraction":
+        return FractionPanel(problem)
 
     if layout == "breaking_parentheses":
         return BreakingParenthesesPanel(prompt)

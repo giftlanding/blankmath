@@ -1,6 +1,7 @@
 import sys
 import unittest
 import re
+import math
 from pathlib import Path
 
 
@@ -9,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pdf_generator"))
 from blankmath.generators import generate_problems
 from blankmath.generators import _has_addition_carry, _has_subtraction_borrow, _has_borrow_across_zeros
 from blankmath.worksheets.chicken_rabbit import ChickenRabbitProblem, VALID_SCENARIOS
+from blankmath.worksheets.fractions import FractionProblem
 
 
 class GeneratorTest(unittest.TestCase):
@@ -199,11 +201,56 @@ class GeneratorTest(unittest.TestCase):
             self.assertIn("what is the value of", problem.prompt)
             self.assertNotEqual(problem.answer, "0")
 
+    def test_generates_reduce_fraction_problems(self):
+        problems = generate_problems("fraction_reduce", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "fractionDifficulty": "easy",
+        })
+
+        self.assertEqual(len(problems), 10)
+        self.assertTrue(all(isinstance(problem, FractionProblem) for problem in problems))
+        for problem in problems:
+            numerator, denominator = _fraction_terms(problem.answer)
+            self.assertEqual(math.gcd(numerator, denominator), 1)
+
+    def test_generates_equivalent_fraction_problems(self):
+        problems = generate_problems("fraction_equivalent", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "fractionDifficulty": "medium",
+        })
+
+        self.assertEqual(len(problems), 10)
+        for problem in problems:
+            self.assertEqual(
+                problem.left_numerator * problem.right_denominator,
+                problem.right_numerator * problem.left_denominator,
+            )
+
+    def test_generates_compare_fraction_problems(self):
+        problems = generate_problems("fraction_compare", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "fractionDifficulty": "hard",
+        })
+
+        self.assertEqual(len(problems), 10)
+        for problem in problems:
+            left = problem.left_numerator * problem.right_denominator
+            right = problem.right_numerator * problem.left_denominator
+            self.assertEqual(problem.answer, ">" if left > right else "<")
+
 
 def _binary_terms(prompt: str, operator: str) -> tuple[int, int]:
     left, rest = prompt.split(f" {operator} ")
     right = rest.split(" = ")[0]
     return int(left), int(right)
+
+
+def _fraction_terms(value: str) -> tuple[int, int]:
+    numerator, denominator = value.split("/")
+    return int(numerator), int(denominator)
 
 
 if __name__ == "__main__":

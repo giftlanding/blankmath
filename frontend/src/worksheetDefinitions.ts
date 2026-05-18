@@ -13,6 +13,7 @@ export const placeValueDigitOptions = ["2d", "3d", "4d", "5d"] as const;
 export const zeroModeOptions = ["avoid", "allow", "mixed"] as const;
 export const additionRegroupingOptions = ["mixed", "with_carrying", "without_carrying"] as const;
 export const subtractionRegroupingOptions = ["mixed", "with_borrowing", "without_borrowing"] as const;
+export const fractionDifficultyOptions = ["easy", "medium", "hard"] as const;
 
 type SelectControl = {
   id: string;
@@ -49,6 +50,7 @@ export type WorksheetDefinition = {
     | "Addition & Subtraction"
     | "Multiplication & Division"
     | "Comparison"
+    | "Fractions"
     | "Math Properties"
     | "Place Value"
     | "Word Problems";
@@ -341,6 +343,44 @@ const placeValueControls = (): WorksheetControl[] => [
   answerKeyControl(),
 ];
 
+const fractionControls = (includeImproper = false): WorksheetControl[] => [
+  {
+    id: "problemCount",
+    label: "Problems",
+    type: "select",
+    options: [10, 20],
+    defaultValue: 10,
+  },
+  {
+    id: "sheetCount",
+    label: "Sheets",
+    type: "select",
+    options: sheetCountOptions.slice(0, 10),
+    defaultValue: 1,
+  },
+  {
+    id: "fractionDifficulty",
+    label: "Difficulty",
+    type: "select",
+    options: fractionDifficultyOptions,
+    defaultValue: "easy",
+    optionLabels: {
+      easy: "Easy",
+      medium: "Medium",
+      hard: "Hard",
+    },
+  },
+  ...(includeImproper
+    ? [{
+        id: "includeImproperFractions",
+        label: "Include improper fractions",
+        type: "checkbox" as const,
+        defaultValue: false,
+      }]
+    : []),
+  answerKeyControl(),
+];
+
 export const worksheets: WorksheetDefinition[] = [
   {
     id: "addition",
@@ -483,6 +523,30 @@ export const worksheets: WorksheetDefinition[] = [
     category: "Comparison",
     examples: ["12 __ 9"],
     controls: [problemCount(10), sheetCount(), digits("l20")],
+  },
+  {
+    id: "fraction_reduce",
+    path: "/fraction_reduce",
+    title: "Reduce Fractions",
+    category: "Fractions",
+    examples: ["6/8 = 3/4", "12/18 = 2/3"],
+    controls: fractionControls(true),
+  },
+  {
+    id: "fraction_equivalent",
+    path: "/fraction_equivalent",
+    title: "Equivalent Fractions",
+    category: "Fractions",
+    examples: ["2/3 = 4/6", "3/5 = 6/10"],
+    controls: fractionControls(),
+  },
+  {
+    id: "fraction_compare",
+    path: "/fraction_compare",
+    title: "Compare Fractions",
+    category: "Fractions",
+    examples: ["2/3 ____ 3/5", "1/4 ____ 2/7"],
+    controls: fractionControls(),
   },
   {
     id: "place_value_expanded_form",

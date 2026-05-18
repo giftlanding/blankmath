@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from blankmath.worksheets.chicken_rabbit import generate_chicken_rabbit_problem
+from blankmath.worksheets.fractions import compare_fraction, equivalent_fraction, reduce_fraction
 from blankmath.worksheets.place_value import digit_value, expanded_form, standard_form
 
 
@@ -70,6 +71,9 @@ def _generator_for(worksheet_type: str):
         "place_value_expanded_form": expanded_form,
         "place_value_standard_form": standard_form,
         "place_value_digit_value": digit_value,
+        "fraction_reduce": reduce_fraction,
+        "fraction_equivalent": equivalent_fraction,
+        "fraction_compare": compare_fraction,
     }[worksheet_type]
 
 

@@ -25,7 +25,7 @@ BREAKING_PARENTHESES_SHEET_COUNT_MAX = 10
 RANGE_MIN = 0
 RANGE_MAX = 10000
 DIGIT_OPTIONS = {"1d", "2d", "3d", "l12", "l20"}
-LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses", "chicken_rabbit", "place_value"}
+LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses", "chicken_rabbit", "place_value", "fraction"}
 DIVISION_LAYOUT_OPTIONS = {"horizontal", "equation", "long_division"}
 DISTRIBUTIVE_BASE_OPTIONS = {"near_10", "near_100", "mixed"}
 DISTRIBUTIVE_DIRECTION_OPTIONS = {"addition", "subtraction", "mixed"}
@@ -35,6 +35,7 @@ PLACE_VALUE_DIGIT_OPTIONS = {"2d", "3d", "4d", "5d"}
 ZERO_MODE_OPTIONS = {"avoid", "allow", "mixed"}
 ADDITION_REGROUPING_OPTIONS = {"with_carrying", "without_carrying", "mixed"}
 SUBTRACTION_REGROUPING_OPTIONS = {"with_borrowing", "without_borrowing", "mixed"}
+FRACTION_DIFFICULTY_OPTIONS = {"easy", "medium", "hard"}
 
 RANGE_WORKSHEET_TYPES = {
     "addition",
@@ -87,6 +88,12 @@ PLACE_VALUE_WORKSHEET_TYPES = {
     "place_value_digit_value",
 }
 
+FRACTION_WORKSHEET_TYPES = {
+    "fraction_reduce",
+    "fraction_equivalent",
+    "fraction_compare",
+}
+
 COMMON_OPTIONS = {"problemCount", "sheetCount", "includeAnswerKey"}
 RANGE_OPTIONS = {
     "from",
@@ -101,6 +108,7 @@ LAYOUT_OPTIONS_KEYS = {"layout"}
 DISTRIBUTIVE_PROPERTY_OPTIONS = {"base", "direction", "difficulty"}
 CHICKEN_RABBIT_OPTIONS = {"numberSize"}
 PLACE_VALUE_OPTIONS = {"placeValueDigits", "zeroMode"}
+FRACTION_OPTIONS = {"fractionDifficulty", "includeImproperFractions"}
 
 
 def parse_generate_request(payload: Any) -> GenerateRequest:
@@ -176,6 +184,8 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
             raise ValidationError("Problem count must be 4, 6, 8, or 10.")
         if worksheet_type in PLACE_VALUE_WORKSHEET_TYPES:
             raise ValidationError("Problem count must be 10 or 20.")
+        if worksheet_type in FRACTION_WORKSHEET_TYPES:
+            raise ValidationError("Problem count must be 10 or 20.")
         raise ValidationError("Problem count must be 10, 20, 30, or 50.")
 
     sheet_count = int_option(normalized, "sheetCount")
@@ -197,6 +207,8 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
         raise ValidationError("Sheet count must be between 1 and 10 for chicken-rabbit worksheets.")
     if worksheet_type in PLACE_VALUE_WORKSHEET_TYPES and sheet_count is not None and sheet_count > definition.max_sheet_count:
         raise ValidationError("Sheet count must be between 1 and 10 for place-value worksheets.")
+    if worksheet_type in FRACTION_WORKSHEET_TYPES and sheet_count is not None and sheet_count > definition.max_sheet_count:
+        raise ValidationError("Sheet count must be between 1 and 10 for fraction worksheets.")
 
     from_value = int_option(normalized, "from")
     to_value = int_option(normalized, "to")
@@ -227,6 +239,8 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
         raise ValidationError("Chicken-rabbit layout is only supported for chicken-rabbit worksheets.")
     if worksheet_type not in PLACE_VALUE_WORKSHEET_TYPES and layout == "place_value":
         raise ValidationError("Place-value layout is only supported for place-value worksheets.")
+    if worksheet_type not in FRACTION_WORKSHEET_TYPES and layout == "fraction":
+        raise ValidationError("Fraction layout is only supported for fraction worksheets.")
 
     base = normalized.get("base")
     if base is not None and base not in DISTRIBUTIVE_BASE_OPTIONS:
@@ -260,9 +274,14 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     if subtraction_regrouping is not None and subtraction_regrouping not in SUBTRACTION_REGROUPING_OPTIONS:
         raise ValidationError("Subtraction regrouping must be with borrowing, without borrowing, or mixed.")
 
+    fraction_difficulty = normalized.get("fractionDifficulty")
+    if fraction_difficulty is not None and fraction_difficulty not in FRACTION_DIFFICULTY_OPTIONS:
+        raise ValidationError("Fraction difficulty must be easy, medium, or hard.")
+
     bool_option(normalized, "smallOperandLessThan10")
     bool_option(normalized, "includeAnswerKey")
     bool_option(normalized, "borrowAcrossZeros")
+    bool_option(normalized, "includeImproperFractions")
 
     return normalized
 
@@ -292,6 +311,8 @@ def allowed_options_for(worksheet_type: str) -> set[str]:
         options.update(CHICKEN_RABBIT_OPTIONS)
     if profile == "place_value":
         options.update(PLACE_VALUE_OPTIONS)
+    if profile == "fraction":
+        options.update(FRACTION_OPTIONS)
     return options
 
 
