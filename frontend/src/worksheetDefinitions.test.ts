@@ -24,6 +24,7 @@ const existingWorksheetIds = [
   "number_line_missing",
   "time_read_clock",
   "time_draw_hands",
+  "hundred_chart_missing",
   "place_value_expanded_form",
   "place_value_standard_form",
   "place_value_digit_value",

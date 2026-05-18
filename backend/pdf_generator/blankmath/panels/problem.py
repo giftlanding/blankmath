@@ -11,6 +11,7 @@ from blankmath.panels.distributive_property import (
     parse_distributive_property_problem,
 )
 from blankmath.panels.fraction import FractionPanel
+from blankmath.panels.hundred_chart import HundredChartPanel
 from blankmath.panels.long_division import LongDivisionPanel
 from blankmath.panels.number_line import NumberLinePanel
 from blankmath.panels.place_value import PlaceValuePanel
@@ -29,6 +30,16 @@ class PanelGrid:
 
 
 def panel_grid(layout: str, problem_count: int) -> PanelGrid:
+    if layout == "hundred_chart":
+        return PanelGrid(
+            columns=1,
+            row_height=6.05 * inch,
+            left_padding=8,
+            right_padding=8,
+            top_padding=5,
+            bottom_padding=5,
+        )
+
     if layout == "clock":
         return PanelGrid(
             columns=2,
@@ -130,6 +141,8 @@ def panel_grid(layout: str, problem_count: int) -> PanelGrid:
 
 
 def page_problem_count(count_per_page: int, layout: str) -> int:
+    if layout == "hundred_chart":
+        return min(count_per_page, 1)
     if layout == "clock":
         return min(count_per_page, 6)
     if layout == "number_line":
@@ -168,6 +181,9 @@ def problem_panel(problem_number: int, problem, style, layout: str):
 
     if layout == "clock":
         return ClockPanel(problem)
+
+    if layout == "hundred_chart":
+        return HundredChartPanel(problem)
 
     if layout == "breaking_parentheses":
         return BreakingParenthesesPanel(prompt)

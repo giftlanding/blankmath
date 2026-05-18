@@ -262,6 +262,42 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 201)
 
+    def test_accepts_hundred_chart_request(self):
+        with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
+            result = handle_event({
+                "headers": {"x-blankmath-internal-token": "test-token"},
+                "body": json.dumps({
+                    "worksheetType": "hundred_chart_missing",
+                    "options": {
+                        "problemCount": 1,
+                        "sheetCount": 1,
+                        "chartRange": "1_100",
+                        "blankPercent": 20,
+                        "skipMultiple": 0,
+                        "includeAnswerKey": True,
+                    },
+                }),
+            })
+
+        self.assertEqual(result["statusCode"], 201)
+
+    def test_rejects_invalid_hundred_chart_options(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "hundred_chart_missing",
+                "options": {
+                    "problemCount": 1,
+                    "sheetCount": 1,
+                    "chartRange": "1_100",
+                    "blankPercent": 25,
+                    "skipMultiple": 0,
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
     def test_rejects_invalid_time_options(self):
         result = handle_event({
             "headers": {"x-blankmath-internal-token": "test-token"},

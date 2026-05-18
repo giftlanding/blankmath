@@ -25,7 +25,7 @@ BREAKING_PARENTHESES_SHEET_COUNT_MAX = 10
 RANGE_MIN = 0
 RANGE_MAX = 10000
 DIGIT_OPTIONS = {"1d", "2d", "3d", "l12", "l20"}
-LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses", "chicken_rabbit", "place_value", "fraction", "number_line", "clock"}
+LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses", "chicken_rabbit", "place_value", "fraction", "number_line", "clock", "hundred_chart"}
 DIVISION_LAYOUT_OPTIONS = {"horizontal", "equation", "long_division"}
 DISTRIBUTIVE_BASE_OPTIONS = {"near_10", "near_100", "mixed"}
 DISTRIBUTIVE_DIRECTION_OPTIONS = {"addition", "subtraction", "mixed"}
@@ -38,6 +38,9 @@ SUBTRACTION_REGROUPING_OPTIONS = {"with_borrowing", "without_borrowing", "mixed"
 FRACTION_DIFFICULTY_OPTIONS = {"easy", "medium", "hard"}
 NUMBER_LINE_SIZE_OPTIONS = {"small", "large"}
 TIME_INCREMENT_OPTIONS = {"hour", "half_hour", "quarter_hour", "five_minutes", "one_minute"}
+CHART_RANGE_OPTIONS = {"1_100", "0_99", "101_200", "201_300"}
+BLANK_PERCENT_OPTIONS = {10, 20, 30, 50}
+SKIP_MULTIPLE_OPTIONS = {0, 2, 3, 4, 5, 10}
 
 RANGE_WORKSHEET_TYPES = {
     "addition",
@@ -105,6 +108,10 @@ TIME_WORKSHEET_TYPES = {
     "time_draw_hands",
 }
 
+HUNDRED_CHART_WORKSHEET_TYPES = {
+    "hundred_chart_missing",
+}
+
 COMMON_OPTIONS = {"problemCount", "sheetCount", "includeAnswerKey"}
 RANGE_OPTIONS = {
     "from",
@@ -122,6 +129,7 @@ PLACE_VALUE_OPTIONS = {"placeValueDigits", "zeroMode"}
 FRACTION_OPTIONS = {"fractionDifficulty", "includeImproperFractions"}
 NUMBER_LINE_OPTIONS = {"numberLineSize"}
 TIME_OPTIONS = {"timeIncrement"}
+HUNDRED_CHART_OPTIONS = {"chartRange", "blankPercent", "skipMultiple"}
 
 
 def parse_generate_request(payload: Any) -> GenerateRequest:
@@ -203,6 +211,8 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
             raise ValidationError("Problem count must be 4, 6, or 8.")
         if worksheet_type in TIME_WORKSHEET_TYPES:
             raise ValidationError("Problem count must be 4, 6, or 8.")
+        if worksheet_type in HUNDRED_CHART_WORKSHEET_TYPES:
+            raise ValidationError("Problem count must be 1, 2, or 4.")
         raise ValidationError("Problem count must be 10, 20, 30, or 50.")
 
     sheet_count = int_option(normalized, "sheetCount")
@@ -230,6 +240,8 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
         raise ValidationError("Sheet count must be between 1 and 10 for number-line worksheets.")
     if worksheet_type in TIME_WORKSHEET_TYPES and sheet_count is not None and sheet_count > definition.max_sheet_count:
         raise ValidationError("Sheet count must be between 1 and 10 for time worksheets.")
+    if worksheet_type in HUNDRED_CHART_WORKSHEET_TYPES and sheet_count is not None and sheet_count > definition.max_sheet_count:
+        raise ValidationError("Sheet count must be between 1 and 10 for hundred-chart worksheets.")
 
     from_value = int_option(normalized, "from")
     to_value = int_option(normalized, "to")
@@ -266,6 +278,8 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
         raise ValidationError("Number-line layout is only supported for number-line worksheets.")
     if worksheet_type not in TIME_WORKSHEET_TYPES and layout == "clock":
         raise ValidationError("Clock layout is only supported for time worksheets.")
+    if worksheet_type not in HUNDRED_CHART_WORKSHEET_TYPES and layout == "hundred_chart":
+        raise ValidationError("Hundred-chart layout is only supported for hundred-chart worksheets.")
 
     base = normalized.get("base")
     if base is not None and base not in DISTRIBUTIVE_BASE_OPTIONS:
@@ -311,6 +325,18 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     if time_increment is not None and time_increment not in TIME_INCREMENT_OPTIONS:
         raise ValidationError("Time increment must be hour, half hour, quarter hour, five minutes, or one minute.")
 
+    chart_range = normalized.get("chartRange")
+    if chart_range is not None and chart_range not in CHART_RANGE_OPTIONS:
+        raise ValidationError("Chart range must be 1-100, 0-99, 101-200, or 201-300.")
+
+    blank_percent = int_option(normalized, "blankPercent")
+    if blank_percent is not None and blank_percent not in BLANK_PERCENT_OPTIONS:
+        raise ValidationError("Blank percent must be 10, 20, 30, or 50.")
+
+    skip_multiple = int_option(normalized, "skipMultiple")
+    if skip_multiple is not None and skip_multiple not in SKIP_MULTIPLE_OPTIONS:
+        raise ValidationError("Skip multiple must be none, 2, 3, 4, 5, or 10.")
+
     bool_option(normalized, "smallOperandLessThan10")
     bool_option(normalized, "includeAnswerKey")
     bool_option(normalized, "borrowAcrossZeros")
@@ -350,6 +376,8 @@ def allowed_options_for(worksheet_type: str) -> set[str]:
         options.update(NUMBER_LINE_OPTIONS)
     if profile == "time":
         options.update(TIME_OPTIONS)
+    if profile == "hundred_chart":
+        options.update(HUNDRED_CHART_OPTIONS)
     return options
 
 

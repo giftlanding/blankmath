@@ -16,6 +16,9 @@ export const subtractionRegroupingOptions = ["mixed", "with_borrowing", "without
 export const fractionDifficultyOptions = ["easy", "medium", "hard"] as const;
 export const numberLineSizeOptions = ["small", "large"] as const;
 export const timeIncrementOptions = ["hour", "half_hour", "quarter_hour", "five_minutes", "one_minute"] as const;
+export const chartRangeOptions = ["1_100", "0_99", "101_200", "201_300"] as const;
+export const blankPercentOptions = [10, 20, 30, 50] as const;
+export const skipMultipleOptions = [0, 2, 3, 4, 5, 10] as const;
 
 type SelectControl = {
   id: string;
@@ -53,6 +56,7 @@ export type WorksheetDefinition = {
     | "Multiplication & Division"
     | "Comparison"
     | "Fractions"
+    | "Hundred Charts"
     | "Math Properties"
     | "Number Lines"
     | "Place Value"
@@ -446,6 +450,65 @@ const timeControls = (): WorksheetControl[] => [
   answerKeyControl(),
 ];
 
+const hundredChartControls = (): WorksheetControl[] => [
+  {
+    id: "problemCount",
+    label: "Charts",
+    type: "select",
+    options: [1, 2, 4],
+    defaultValue: 1,
+  },
+  {
+    id: "sheetCount",
+    label: "Sets",
+    type: "select",
+    options: sheetCountOptions.slice(0, 10),
+    defaultValue: 1,
+  },
+  {
+    id: "chartRange",
+    label: "Range",
+    type: "select",
+    options: chartRangeOptions,
+    defaultValue: "1_100",
+    optionLabels: {
+      "1_100": "1-100",
+      "0_99": "0-99",
+      "101_200": "101-200",
+      "201_300": "201-300",
+    },
+  },
+  {
+    id: "blankPercent",
+    label: "Blanks",
+    type: "select",
+    options: blankPercentOptions,
+    defaultValue: 20,
+    optionLabels: {
+      "10": "10%",
+      "20": "20%",
+      "30": "30%",
+      "50": "50%",
+    },
+  },
+  {
+    id: "skipMultiple",
+    label: "Blank multiples",
+    type: "select",
+    options: skipMultipleOptions,
+    defaultValue: 0,
+    optionLabels: {
+      "0": "Any numbers",
+      "2": "Multiples of 2",
+      "3": "Multiples of 3",
+      "4": "Multiples of 4",
+      "5": "Multiples of 5",
+      "10": "Multiples of 10",
+    },
+  },
+  answerKeyControl(),
+];
+
 export const worksheets: WorksheetDefinition[] = [
   {
     id: "addition",
@@ -636,6 +699,14 @@ export const worksheets: WorksheetDefinition[] = [
     category: "Time",
     examples: ["Draw 8:30", "Draw 12:05"],
     controls: timeControls(),
+  },
+  {
+    id: "hundred_chart_missing",
+    path: "/hundred_chart_missing",
+    title: "Missing Hundred Chart",
+    category: "Hundred Charts",
+    examples: ["1-100 chart with blanks", "Skip-counting blanks"],
+    controls: hundredChartControls(),
   },
   {
     id: "place_value_expanded_form",

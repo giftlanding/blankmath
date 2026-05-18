@@ -39,6 +39,7 @@ Blankmath currently includes worksheet types in these areas:
 - Multi-number arithmetic
 - Comparison practice
 - Fraction practice
+- Hundred-chart practice
 - Number-line practice
 - Place-value practice
 - Time practice
@@ -207,6 +208,31 @@ Supported increments include:
 
 Clock worksheets use large clock faces so students can clearly see or draw the
 hour and minute hands.
+
+## Hundred Charts
+
+Hundred-chart worksheets help students practice counting patterns, missing
+numbers, and skip-counting.
+
+Current practice includes missing-number hundred charts.
+
+Example:
+
+```text
+1    2    ____  4    5
+11   ____ 13    14   15
+```
+
+Students fill in the missing cells by following the chart pattern.
+
+Teacher-facing options include:
+
+- Number of charts
+- Number of sets
+- Chart range, such as 1-100 or 101-200
+- Blank amount
+- Optional blanking of only multiples, such as multiples of 5 or 10
+- Answer key
 
 ## Place Value
 

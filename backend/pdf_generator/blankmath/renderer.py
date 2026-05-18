@@ -75,6 +75,10 @@ def render_pdf(
             story.append(Paragraph(title, title_style))
             story.append(Paragraph("Read the clock or draw the clock hands.", instruction_style))
             story.append(Spacer(1, 0.14 * inch))
+        if layout == "hundred_chart":
+            story.append(Paragraph(title, title_style))
+            story.append(Paragraph("Fill in the missing numbers on the chart.", instruction_style))
+            story.append(Spacer(1, 0.14 * inch))
         story.append(_problem_table(page_problems, worksheet_style, layout, start_number=start + 1))
 
     if include_answer_key:
@@ -123,7 +127,7 @@ def _problem_table(problems: list[Problem], style, layout: str, start_number: in
         ("TOPPADDING", (0, 0), (-1, -1), grid.top_padding),
         ("BOTTOMPADDING", (0, 0), (-1, -1), grid.bottom_padding),
     ]
-    if layout not in {"breaking_parentheses", "chicken_rabbit", "place_value", "fraction", "number_line", "clock"}:
+    if layout not in {"breaking_parentheses", "chicken_rabbit", "place_value", "fraction", "number_line", "clock", "hundred_chart"}:
         table_style_commands = [
             ("BOX", (0, 0), (-1, -1), 0.2, colors.HexColor("#d9dee8")),
             ("INNERGRID", (0, 0), (-1, -1), 0.15, colors.HexColor("#d9dee8")),

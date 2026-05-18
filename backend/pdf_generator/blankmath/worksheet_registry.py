@@ -113,6 +113,13 @@ WORKSHEETS: dict[str, WorksheetDefinition] = {
         allowed_problem_counts=(4, 6, 8),
         max_sheet_count=10,
     ),
+    "hundred_chart_missing": WorksheetDefinition(
+        "Missing Hundred Chart",
+        default_layout="hundred_chart",
+        option_profile="hundred_chart",
+        allowed_problem_counts=(1, 2, 4),
+        max_sheet_count=10,
+    ),
 }
 
 

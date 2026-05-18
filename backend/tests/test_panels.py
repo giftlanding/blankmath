@@ -16,12 +16,14 @@ try:
     from blankmath.panels.clock import ClockPanel
     from blankmath.panels.distributive_property import DistributivePropertyPanel
     from blankmath.panels.fraction import FractionPanel
+    from blankmath.panels.hundred_chart import HundredChartPanel
     from blankmath.panels.long_division import LongDivisionPanel
     from blankmath.panels.number_line import NumberLinePanel
     from blankmath.panels.place_value import PlaceValuePanel
     from blankmath.panels.problem import page_problem_count, problem_panel
     from blankmath.worksheets.chicken_rabbit import generate_chicken_rabbit_problem
     from blankmath.worksheets.number_lines import missing_labels
+    from blankmath.worksheets.hundred_charts import missing_numbers
     from blankmath.worksheets.time import read_clock
 except ModuleNotFoundError:
     BreakingParenthesesPanel = None
@@ -29,6 +31,7 @@ except ModuleNotFoundError:
     ClockPanel = None
     DistributivePropertyPanel = None
     FractionPanel = None
+    HundredChartPanel = None
     LongDivisionPanel = None
     NumberLinePanel = None
     PlaceValuePanel = None
@@ -36,6 +39,7 @@ except ModuleNotFoundError:
     problem_panel = None
     generate_chicken_rabbit_problem = None
     missing_labels = None
+    missing_numbers = None
     read_clock = None
 
 
@@ -114,6 +118,16 @@ class PanelsTest(unittest.TestCase):
 
         self.assertIsInstance(panel, ClockPanel)
         self.assertEqual(page_problem_count(8, "clock"), 6)
+
+    @unittest.skipIf(getSampleStyleSheet is None, "ReportLab is not installed")
+    def test_hundred_chart_layout_uses_dedicated_panel(self):
+        style = getSampleStyleSheet()["Normal"]
+        problem = missing_numbers({"chartRange": "1_100", "blankPercent": 20, "skipMultiple": 0})
+
+        panel = problem_panel(1, problem, style, "hundred_chart")
+
+        self.assertIsInstance(panel, HundredChartPanel)
+        self.assertEqual(page_problem_count(4, "hundred_chart"), 1)
 
 
 if __name__ == "__main__":

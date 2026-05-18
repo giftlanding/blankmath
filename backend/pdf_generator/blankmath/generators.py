@@ -4,6 +4,7 @@ from typing import Any
 
 from blankmath.worksheets.chicken_rabbit import generate_chicken_rabbit_problem
 from blankmath.worksheets.fractions import compare_fraction, equivalent_fraction, reduce_fraction
+from blankmath.worksheets.hundred_charts import missing_numbers
 from blankmath.worksheets.number_lines import missing_labels
 from blankmath.worksheets.place_value import digit_value, expanded_form, standard_form
 from blankmath.worksheets.time import draw_clock_hands, read_clock
@@ -79,6 +80,7 @@ def _generator_for(worksheet_type: str):
         "number_line_missing": missing_labels,
         "time_read_clock": read_clock,
         "time_draw_hands": draw_clock_hands,
+        "hundred_chart_missing": missing_numbers,
     }[worksheet_type]
 
 

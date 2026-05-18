@@ -11,6 +11,7 @@ from blankmath.generators import generate_problems
 from blankmath.generators import _has_addition_carry, _has_subtraction_borrow, _has_borrow_across_zeros
 from blankmath.worksheets.chicken_rabbit import ChickenRabbitProblem, VALID_SCENARIOS
 from blankmath.worksheets.fractions import FractionProblem
+from blankmath.worksheets.hundred_charts import HundredChartProblem
 from blankmath.worksheets.number_lines import NumberLineProblem
 from blankmath.worksheets.time import TimeProblem
 
@@ -280,6 +281,21 @@ class GeneratorTest(unittest.TestCase):
         self.assertEqual(len(problems), 4)
         self.assertTrue(all(problem.mode == "draw" for problem in problems))
         self.assertTrue(all(problem.minute % 5 == 0 for problem in problems))
+
+    def test_generates_hundred_chart_problems(self):
+        problems = generate_problems("hundred_chart_missing", {
+            "problemCount": 1,
+            "sheetCount": 1,
+            "chartRange": "1_100",
+            "blankPercent": 20,
+            "skipMultiple": 5,
+        })
+
+        self.assertEqual(len(problems), 1)
+        problem = problems[0]
+        self.assertIsInstance(problem, HundredChartProblem)
+        self.assertEqual(len(problem.values), 100)
+        self.assertTrue(all(value % 5 == 0 for value in problem.missing_values))
 
 
 def _binary_terms(prompt: str, operator: str) -> tuple[int, int]:
