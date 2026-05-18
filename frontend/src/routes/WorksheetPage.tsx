@@ -80,36 +80,59 @@ export function WorksheetPage() {
           </div>
         </div>
 
-        <form className="worksheet-form" onSubmit={submit}>
-          <div className="form-heading">
-            <div>
-              <span className="section-kicker">Worksheet options</span>
-              <h2>Generate a PDF</h2>
+        <div className="worksheet-main">
+          <form className="worksheet-form" onSubmit={submit}>
+            <div className="form-heading">
+              <div>
+                <span className="section-kicker">Worksheet options</span>
+                <h2>Generate a PDF</h2>
+              </div>
+              <span className="request-badge">{worksheet.id}</span>
             </div>
-            <span className="request-badge">{worksheet.id}</span>
-          </div>
-          <div className="form-grid">
-            {worksheet.controls.map((control) => (
-              <ControlField key={control.id} control={control} register={form.register} />
-            ))}
-          </div>
+            <div className="form-grid">
+              {worksheet.controls.map((control) => (
+                <ControlField key={control.id} control={control} register={form.register} />
+              ))}
+            </div>
 
-          {form.formState.errors.to && (
-            <p className="form-error">{String(form.formState.errors.to.message)}</p>
-          )}
-
-          {mutation.isError && <p className="form-error">{mutation.error.message}</p>}
-
-          <button className="generate-button" disabled={!form.formState.isValid || mutation.isPending} type="submit">
-            {mutation.isPending ? (
-              "Generating..."
-            ) : (
-              <>
-                <FileDown size={18} /> Create PDF
-              </>
+            {form.formState.errors.to && (
+              <p className="form-error">{String(form.formState.errors.to.message)}</p>
             )}
-          </button>
-        </form>
+
+            {mutation.isError && <p className="form-error">{mutation.error.message}</p>}
+
+            <button className="generate-button" disabled={!form.formState.isValid || mutation.isPending} type="submit">
+              {mutation.isPending ? (
+                "Generating..."
+              ) : (
+                <>
+                  <FileDown size={18} /> Create PDF
+                </>
+              )}
+            </button>
+          </form>
+
+          {worksheet.id === "chicken_rabbit" ? <ChickenRabbitVideo /> : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ChickenRabbitVideo() {
+  return (
+    <section className="worksheet-video" aria-labelledby="chicken-rabbit-video-title">
+      <div className="video-heading">
+        <span className="section-kicker">How to solve</span>
+        <h2 id="chicken-rabbit-video-title">Chicken-rabbit method</h2>
+      </div>
+      <div className="video-frame">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/lNn3Sr7Awl0"
+          title="How to solve chicken-rabbit problems"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        />
       </div>
     </section>
   );
