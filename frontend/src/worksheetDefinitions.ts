@@ -240,13 +240,6 @@ const chickenRabbitControls = (): WorksheetControl[] => [
     defaultValue: 6,
   },
   {
-    id: "sheetCount",
-    label: "Sheets",
-    type: "select",
-    options: sheetCountOptions.slice(0, 10),
-    defaultValue: 1,
-  },
-  {
     id: "numberSize",
     label: "Number size",
     type: "select",

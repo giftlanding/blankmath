@@ -78,7 +78,6 @@ class GeneratorTest(unittest.TestCase):
     def test_generates_chicken_rabbit_word_problems(self):
         problems = generate_problems("chicken_rabbit", {
             "problemCount": 10,
-            "sheetCount": 1,
             "numberSize": "small",
             "layout": "chicken_rabbit",
         })

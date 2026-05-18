@@ -138,7 +138,6 @@ class ApiTest(unittest.TestCase):
                     "worksheetType": "chicken_rabbit",
                     "options": {
                         "problemCount": 6,
-                        "sheetCount": 1,
                         "numberSize": "small",
                         "layout": "chicken_rabbit",
                     },
@@ -154,8 +153,23 @@ class ApiTest(unittest.TestCase):
                 "worksheetType": "chicken_rabbit",
                 "options": {
                     "problemCount": 6,
-                    "sheetCount": 1,
                     "numberSize": "medium",
+                    "layout": "chicken_rabbit",
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
+    def test_rejects_sheet_count_for_chicken_rabbit(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "chicken_rabbit",
+                "options": {
+                    "problemCount": 6,
+                    "sheetCount": 2,
+                    "numberSize": "small",
                     "layout": "chicken_rabbit",
                 },
             }),

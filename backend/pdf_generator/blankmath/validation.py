@@ -232,6 +232,8 @@ def allowed_options_for(worksheet_type: str) -> set[str]:
     options = set(COMMON_OPTIONS)
     if not definition.allow_answer_key:
         options.remove("includeAnswerKey")
+    if profile == "chicken_rabbit":
+        options.remove("sheetCount")
     if profile == "range_layout":
         options.update(RANGE_OPTIONS)
         options.update(LAYOUT_OPTIONS_KEYS)
