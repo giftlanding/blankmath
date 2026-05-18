@@ -139,7 +139,6 @@ class ApiTest(unittest.TestCase):
                     "options": {
                         "problemCount": 6,
                         "numberSize": "small",
-                        "layout": "chicken_rabbit",
                     },
                 }),
             })
@@ -154,7 +153,6 @@ class ApiTest(unittest.TestCase):
                 "options": {
                     "problemCount": 6,
                     "numberSize": "medium",
-                    "layout": "chicken_rabbit",
                 },
             }),
         })

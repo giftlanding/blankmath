@@ -250,16 +250,6 @@ const chickenRabbitControls = (): WorksheetControl[] => [
       big: "Big numbers",
     },
   },
-  {
-    id: "layout",
-    label: "Layout",
-    type: "select",
-    options: ["chicken_rabbit"],
-    defaultValue: "chicken_rabbit",
-    optionLabels: {
-      chicken_rabbit: "Word problem",
-    },
-  },
   answerKeyControl(),
 ];
 

@@ -79,7 +79,6 @@ class GeneratorTest(unittest.TestCase):
         problems = generate_problems("chicken_rabbit", {
             "problemCount": 10,
             "numberSize": "small",
-            "layout": "chicken_rabbit",
         })
 
         self.assertEqual(len(problems), 10)
