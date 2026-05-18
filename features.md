@@ -39,7 +39,9 @@ Blankmath currently includes worksheet types in these areas:
 - Multi-number arithmetic
 - Comparison practice
 - Fraction practice
+- Number-line practice
 - Place-value practice
+- Time practice
 - Math-property practice
 - Word problems
 
@@ -161,6 +163,50 @@ Expected answer:
 
 Fraction worksheets support easy, medium, and hard difficulty settings.
 Reducing-fraction worksheets can also include improper fractions.
+
+## Number Lines
+
+Number-line worksheets help students connect counting patterns, intervals, and
+number order to a visual model.
+
+Current practice includes missing-label whole-number number lines.
+
+Example:
+
+```text
+0    5    ____    15    ____    25
+```
+
+Students fill in the missing numbers by following the step pattern on the
+number line.
+
+Teacher-facing options include:
+
+- Number of problems
+- Number of sheets
+- Small-number or large-number practice
+- Answer key
+
+## Time
+
+Time worksheets help students read analog clocks and practice drawing clock
+hands.
+
+Current practice includes:
+
+- Reading analog clocks
+- Drawing hands on analog clocks
+
+Supported increments include:
+
+- Hour
+- Half hour
+- Quarter hour
+- Five minutes
+- One minute
+
+Clock worksheets use large clock faces so students can clearly see or draw the
+hour and minute hands.
 
 ## Place Value
 
@@ -352,10 +398,9 @@ needs and currently missing from Blankmath.
 
 - More fraction practice, including fraction addition/subtraction and visual
   fraction models.
-- Number lines: whole numbers first, then negative numbers, decimals, and
-  fractions.
-- Telling time: reading clocks and drawing hands on clocks at hour,
-  half-hour, quarter-hour, five-minute, and one-minute increments.
+- More number-line practice, including reading marked points, negative
+  numbers, decimals, and fractions.
+- More telling-time practice, including elapsed time and mixed clock review.
 - Hundred charts: counting, skip counting, missing numbers, and number
   patterns.
 - More carrying and borrowing practice, including dedicated multi-digit

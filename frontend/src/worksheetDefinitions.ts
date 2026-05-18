@@ -14,6 +14,8 @@ export const zeroModeOptions = ["avoid", "allow", "mixed"] as const;
 export const additionRegroupingOptions = ["mixed", "with_carrying", "without_carrying"] as const;
 export const subtractionRegroupingOptions = ["mixed", "with_borrowing", "without_borrowing"] as const;
 export const fractionDifficultyOptions = ["easy", "medium", "hard"] as const;
+export const numberLineSizeOptions = ["small", "large"] as const;
+export const timeIncrementOptions = ["hour", "half_hour", "quarter_hour", "five_minutes", "one_minute"] as const;
 
 type SelectControl = {
   id: string;
@@ -52,7 +54,9 @@ export type WorksheetDefinition = {
     | "Comparison"
     | "Fractions"
     | "Math Properties"
+    | "Number Lines"
     | "Place Value"
+    | "Time"
     | "Word Problems";
   examples: string[];
   controls: WorksheetControl[];
@@ -381,6 +385,67 @@ const fractionControls = (includeImproper = false): WorksheetControl[] => [
   answerKeyControl(),
 ];
 
+const numberLineControls = (): WorksheetControl[] => [
+  {
+    id: "problemCount",
+    label: "Problems",
+    type: "select",
+    options: [4, 6, 8],
+    defaultValue: 6,
+  },
+  {
+    id: "sheetCount",
+    label: "Sheets",
+    type: "select",
+    options: sheetCountOptions.slice(0, 10),
+    defaultValue: 1,
+  },
+  {
+    id: "numberLineSize",
+    label: "Numbers",
+    type: "select",
+    options: numberLineSizeOptions,
+    defaultValue: "small",
+    optionLabels: {
+      small: "Small numbers",
+      large: "Large numbers",
+    },
+  },
+  answerKeyControl(),
+];
+
+const timeControls = (): WorksheetControl[] => [
+  {
+    id: "problemCount",
+    label: "Problems",
+    type: "select",
+    options: [4, 6, 8],
+    defaultValue: 6,
+  },
+  {
+    id: "sheetCount",
+    label: "Sheets",
+    type: "select",
+    options: sheetCountOptions.slice(0, 10),
+    defaultValue: 1,
+  },
+  {
+    id: "timeIncrement",
+    label: "Increment",
+    type: "select",
+    options: timeIncrementOptions,
+    defaultValue: "five_minutes",
+    optionLabels: {
+      hour: "Hour",
+      half_hour: "Half hour",
+      quarter_hour: "Quarter hour",
+      five_minutes: "5 minutes",
+      one_minute: "1 minute",
+    },
+  },
+  answerKeyControl(),
+];
+
 export const worksheets: WorksheetDefinition[] = [
   {
     id: "addition",
@@ -547,6 +612,30 @@ export const worksheets: WorksheetDefinition[] = [
     category: "Fractions",
     examples: ["2/3 ____ 3/5", "1/4 ____ 2/7"],
     controls: fractionControls(),
+  },
+  {
+    id: "number_line_missing",
+    path: "/number_line_missing",
+    title: "Missing Number Lines",
+    category: "Number Lines",
+    examples: ["0, 5, __, 15, __", "20, __, 40, 50"],
+    controls: numberLineControls(),
+  },
+  {
+    id: "time_read_clock",
+    path: "/time_read_clock",
+    title: "Read Analog Clocks",
+    category: "Time",
+    examples: ["What time is shown?", "3:45"],
+    controls: timeControls(),
+  },
+  {
+    id: "time_draw_hands",
+    path: "/time_draw_hands",
+    title: "Draw Clock Hands",
+    category: "Time",
+    examples: ["Draw 8:30", "Draw 12:05"],
+    controls: timeControls(),
   },
   {
     id: "place_value_expanded_form",

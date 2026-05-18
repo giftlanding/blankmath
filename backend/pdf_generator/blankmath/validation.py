@@ -25,7 +25,7 @@ BREAKING_PARENTHESES_SHEET_COUNT_MAX = 10
 RANGE_MIN = 0
 RANGE_MAX = 10000
 DIGIT_OPTIONS = {"1d", "2d", "3d", "l12", "l20"}
-LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses", "chicken_rabbit", "place_value", "fraction"}
+LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses", "chicken_rabbit", "place_value", "fraction", "number_line", "clock"}
 DIVISION_LAYOUT_OPTIONS = {"horizontal", "equation", "long_division"}
 DISTRIBUTIVE_BASE_OPTIONS = {"near_10", "near_100", "mixed"}
 DISTRIBUTIVE_DIRECTION_OPTIONS = {"addition", "subtraction", "mixed"}
@@ -36,6 +36,8 @@ ZERO_MODE_OPTIONS = {"avoid", "allow", "mixed"}
 ADDITION_REGROUPING_OPTIONS = {"with_carrying", "without_carrying", "mixed"}
 SUBTRACTION_REGROUPING_OPTIONS = {"with_borrowing", "without_borrowing", "mixed"}
 FRACTION_DIFFICULTY_OPTIONS = {"easy", "medium", "hard"}
+NUMBER_LINE_SIZE_OPTIONS = {"small", "large"}
+TIME_INCREMENT_OPTIONS = {"hour", "half_hour", "quarter_hour", "five_minutes", "one_minute"}
 
 RANGE_WORKSHEET_TYPES = {
     "addition",
@@ -94,6 +96,15 @@ FRACTION_WORKSHEET_TYPES = {
     "fraction_compare",
 }
 
+NUMBER_LINE_WORKSHEET_TYPES = {
+    "number_line_missing",
+}
+
+TIME_WORKSHEET_TYPES = {
+    "time_read_clock",
+    "time_draw_hands",
+}
+
 COMMON_OPTIONS = {"problemCount", "sheetCount", "includeAnswerKey"}
 RANGE_OPTIONS = {
     "from",
@@ -109,6 +120,8 @@ DISTRIBUTIVE_PROPERTY_OPTIONS = {"base", "direction", "difficulty"}
 CHICKEN_RABBIT_OPTIONS = {"numberSize"}
 PLACE_VALUE_OPTIONS = {"placeValueDigits", "zeroMode"}
 FRACTION_OPTIONS = {"fractionDifficulty", "includeImproperFractions"}
+NUMBER_LINE_OPTIONS = {"numberLineSize"}
+TIME_OPTIONS = {"timeIncrement"}
 
 
 def parse_generate_request(payload: Any) -> GenerateRequest:
@@ -186,6 +199,10 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
             raise ValidationError("Problem count must be 10 or 20.")
         if worksheet_type in FRACTION_WORKSHEET_TYPES:
             raise ValidationError("Problem count must be 10 or 20.")
+        if worksheet_type in NUMBER_LINE_WORKSHEET_TYPES:
+            raise ValidationError("Problem count must be 4, 6, or 8.")
+        if worksheet_type in TIME_WORKSHEET_TYPES:
+            raise ValidationError("Problem count must be 4, 6, or 8.")
         raise ValidationError("Problem count must be 10, 20, 30, or 50.")
 
     sheet_count = int_option(normalized, "sheetCount")
@@ -209,6 +226,10 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
         raise ValidationError("Sheet count must be between 1 and 10 for place-value worksheets.")
     if worksheet_type in FRACTION_WORKSHEET_TYPES and sheet_count is not None and sheet_count > definition.max_sheet_count:
         raise ValidationError("Sheet count must be between 1 and 10 for fraction worksheets.")
+    if worksheet_type in NUMBER_LINE_WORKSHEET_TYPES and sheet_count is not None and sheet_count > definition.max_sheet_count:
+        raise ValidationError("Sheet count must be between 1 and 10 for number-line worksheets.")
+    if worksheet_type in TIME_WORKSHEET_TYPES and sheet_count is not None and sheet_count > definition.max_sheet_count:
+        raise ValidationError("Sheet count must be between 1 and 10 for time worksheets.")
 
     from_value = int_option(normalized, "from")
     to_value = int_option(normalized, "to")
@@ -241,6 +262,10 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
         raise ValidationError("Place-value layout is only supported for place-value worksheets.")
     if worksheet_type not in FRACTION_WORKSHEET_TYPES and layout == "fraction":
         raise ValidationError("Fraction layout is only supported for fraction worksheets.")
+    if worksheet_type not in NUMBER_LINE_WORKSHEET_TYPES and layout == "number_line":
+        raise ValidationError("Number-line layout is only supported for number-line worksheets.")
+    if worksheet_type not in TIME_WORKSHEET_TYPES and layout == "clock":
+        raise ValidationError("Clock layout is only supported for time worksheets.")
 
     base = normalized.get("base")
     if base is not None and base not in DISTRIBUTIVE_BASE_OPTIONS:
@@ -278,6 +303,14 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     if fraction_difficulty is not None and fraction_difficulty not in FRACTION_DIFFICULTY_OPTIONS:
         raise ValidationError("Fraction difficulty must be easy, medium, or hard.")
 
+    number_line_size = normalized.get("numberLineSize")
+    if number_line_size is not None and number_line_size not in NUMBER_LINE_SIZE_OPTIONS:
+        raise ValidationError("Number line size must be small or large.")
+
+    time_increment = normalized.get("timeIncrement")
+    if time_increment is not None and time_increment not in TIME_INCREMENT_OPTIONS:
+        raise ValidationError("Time increment must be hour, half hour, quarter hour, five minutes, or one minute.")
+
     bool_option(normalized, "smallOperandLessThan10")
     bool_option(normalized, "includeAnswerKey")
     bool_option(normalized, "borrowAcrossZeros")
@@ -313,6 +346,10 @@ def allowed_options_for(worksheet_type: str) -> set[str]:
         options.update(PLACE_VALUE_OPTIONS)
     if profile == "fraction":
         options.update(FRACTION_OPTIONS)
+    if profile == "number_line":
+        options.update(NUMBER_LINE_OPTIONS)
+    if profile == "time":
+        options.update(TIME_OPTIONS)
     return options
 
 

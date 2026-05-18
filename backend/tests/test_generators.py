@@ -11,6 +11,8 @@ from blankmath.generators import generate_problems
 from blankmath.generators import _has_addition_carry, _has_subtraction_borrow, _has_borrow_across_zeros
 from blankmath.worksheets.chicken_rabbit import ChickenRabbitProblem, VALID_SCENARIOS
 from blankmath.worksheets.fractions import FractionProblem
+from blankmath.worksheets.number_lines import NumberLineProblem
+from blankmath.worksheets.time import TimeProblem
 
 
 class GeneratorTest(unittest.TestCase):
@@ -240,6 +242,44 @@ class GeneratorTest(unittest.TestCase):
             left = problem.left_numerator * problem.right_denominator
             right = problem.right_numerator * problem.left_denominator
             self.assertEqual(problem.answer, ">" if left > right else "<")
+
+    def test_generates_missing_number_line_problems(self):
+        problems = generate_problems("number_line_missing", {
+            "problemCount": 4,
+            "sheetCount": 1,
+            "numberLineSize": "small",
+        })
+
+        self.assertEqual(len(problems), 4)
+        self.assertTrue(all(isinstance(problem, NumberLineProblem) for problem in problems))
+        for problem in problems:
+            self.assertEqual(len(problem.labels), 7)
+            self.assertGreaterEqual(len(problem.missing_indexes), 2)
+            self.assertEqual(len(problem.answer.split(", ")), len(problem.missing_indexes))
+
+    def test_generates_read_clock_problems(self):
+        problems = generate_problems("time_read_clock", {
+            "problemCount": 4,
+            "sheetCount": 1,
+            "timeIncrement": "quarter_hour",
+        })
+
+        self.assertEqual(len(problems), 4)
+        self.assertTrue(all(isinstance(problem, TimeProblem) for problem in problems))
+        for problem in problems:
+            self.assertEqual(problem.mode, "read")
+            self.assertEqual(problem.minute % 15, 0)
+
+    def test_generates_draw_clock_hands_problems(self):
+        problems = generate_problems("time_draw_hands", {
+            "problemCount": 4,
+            "sheetCount": 1,
+            "timeIncrement": "five_minutes",
+        })
+
+        self.assertEqual(len(problems), 4)
+        self.assertTrue(all(problem.mode == "draw" for problem in problems))
+        self.assertTrue(all(problem.minute % 5 == 0 for problem in problems))
 
 
 def _binary_terms(prompt: str, operator: str) -> tuple[int, int]:

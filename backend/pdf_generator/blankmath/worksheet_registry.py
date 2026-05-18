@@ -92,6 +92,27 @@ WORKSHEETS: dict[str, WorksheetDefinition] = {
         allowed_problem_counts=(10, 20),
         max_sheet_count=10,
     ),
+    "number_line_missing": WorksheetDefinition(
+        "Missing Number Lines",
+        default_layout="number_line",
+        option_profile="number_line",
+        allowed_problem_counts=(4, 6, 8),
+        max_sheet_count=10,
+    ),
+    "time_read_clock": WorksheetDefinition(
+        "Read Analog Clocks",
+        default_layout="clock",
+        option_profile="time",
+        allowed_problem_counts=(4, 6, 8),
+        max_sheet_count=10,
+    ),
+    "time_draw_hands": WorksheetDefinition(
+        "Draw Clock Hands",
+        default_layout="clock",
+        option_profile="time",
+        allowed_problem_counts=(4, 6, 8),
+        max_sheet_count=10,
+    ),
 }
 
 
