@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from blankmath.worksheets.chicken_rabbit import generate_chicken_rabbit_problem
+from blankmath.worksheets.place_value import digit_value, expanded_form, standard_form
 
 
 @dataclass(frozen=True)
@@ -66,6 +67,9 @@ def _generator_for(worksheet_type: str):
         "distributive_property_near_numbers": _distributive_property_near_numbers,
         "breaking_parentheses": _breaking_parentheses,
         "chicken_rabbit": generate_chicken_rabbit_problem,
+        "place_value_expanded_form": expanded_form,
+        "place_value_standard_form": standard_form,
+        "place_value_digit_value": digit_value,
     }[worksheet_type]
 
 

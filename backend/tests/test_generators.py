@@ -92,6 +92,46 @@ class GeneratorTest(unittest.TestCase):
     def test_chicken_rabbit_has_many_scenario_templates(self):
         self.assertGreaterEqual(len(VALID_SCENARIOS), 20)
 
+    def test_generates_place_value_expanded_form(self):
+        problems = generate_problems("place_value_expanded_form", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "placeValueDigits": "4d",
+            "zeroMode": "allow",
+        })
+
+        self.assertEqual(len(problems), 10)
+        for problem in problems:
+            self.assertTrue(problem.prompt.endswith("="))
+            self.assertIn("+", problem.answer)
+            self.assertRegex(problem.prompt, r"^\d,\d{3} =$")
+
+    def test_generates_place_value_standard_form(self):
+        problems = generate_problems("place_value_standard_form", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "placeValueDigits": "3d",
+            "zeroMode": "avoid",
+        })
+
+        self.assertEqual(len(problems), 10)
+        for problem in problems:
+            self.assertIn("+", problem.prompt)
+            self.assertRegex(problem.answer, r"^\d{3}$")
+
+    def test_generates_place_value_digit_value(self):
+        problems = generate_problems("place_value_digit_value", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "placeValueDigits": "5d",
+            "zeroMode": "mixed",
+        })
+
+        self.assertEqual(len(problems), 10)
+        for problem in problems:
+            self.assertIn("what is the value of", problem.prompt)
+            self.assertNotEqual(problem.answer, "0")
+
 
 if __name__ == "__main__":
     unittest.main()

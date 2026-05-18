@@ -50,6 +50,27 @@ WORKSHEETS: dict[str, WorksheetDefinition] = {
         allowed_problem_counts=(4, 6, 8, 10),
         max_sheet_count=10,
     ),
+    "place_value_expanded_form": WorksheetDefinition(
+        "Expanded Form",
+        default_layout="place_value",
+        option_profile="place_value",
+        allowed_problem_counts=(10, 20),
+        max_sheet_count=10,
+    ),
+    "place_value_standard_form": WorksheetDefinition(
+        "Standard Form",
+        default_layout="place_value",
+        option_profile="place_value",
+        allowed_problem_counts=(10, 20),
+        max_sheet_count=10,
+    ),
+    "place_value_digit_value": WorksheetDefinition(
+        "Digit Value",
+        default_layout="place_value",
+        option_profile="place_value",
+        allowed_problem_counts=(10, 20),
+        max_sheet_count=10,
+    ),
 }
 
 

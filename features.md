@@ -92,6 +92,68 @@ Example:
 
 These worksheets are useful for early number sense and place-value review.
 
+## Place Value
+
+Place-value worksheets help students understand how digits represent different
+values depending on their position in a number.
+
+Current practice includes:
+
+- Expanded form
+- Standard form
+- Digit value
+
+### Expanded Form
+
+Students rewrite a number as the sum of its place-value parts.
+
+Example:
+
+```text
+4,582 = ________________________________________
+```
+
+Expected answer:
+
+```text
+4,000 + 500 + 80 + 2
+```
+
+### Standard Form
+
+Students convert an expanded expression back into a regular number.
+
+Example:
+
+```text
+3,000 + 400 + 20 + 8 = _________________________
+```
+
+Expected answer:
+
+```text
+3,428
+```
+
+### Digit Value
+
+Students identify the value of a highlighted digit within a number.
+
+Example:
+
+```text
+In 4,582, what is the value of 5? _______________
+```
+
+Expected answer:
+
+```text
+500
+```
+
+Place-value worksheets support different number sizes and optional practice
+with zeros inside numbers.
+
 ## Math Properties
 
 Math-property worksheets focus on strategies and structure, not only final
@@ -189,7 +251,7 @@ PDF design priorities:
 
 Some worksheets use specialized layouts, such as vertical arithmetic,
 long division, guided distributive-property panels, rewrite lines, and
-word-problem panels.
+place-value rows, and word-problem panels.
 
 ## Suggested Worksheets
 
@@ -210,7 +272,7 @@ Potential future worksheet areas include:
 - Multi-step word problems
 - Fraction practice
 - Decimal practice
-- Place-value practice
+- More place-value skills, such as rounding and place-name practice
 - Equation-solving readiness
 - More visual and drawing-friendly worksheets for younger students
 

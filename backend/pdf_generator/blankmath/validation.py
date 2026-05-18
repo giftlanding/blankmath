@@ -25,12 +25,14 @@ BREAKING_PARENTHESES_SHEET_COUNT_MAX = 10
 RANGE_MIN = 0
 RANGE_MAX = 10000
 DIGIT_OPTIONS = {"1d", "2d", "3d", "l12", "l20"}
-LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses", "chicken_rabbit"}
+LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses", "chicken_rabbit", "place_value"}
 DIVISION_LAYOUT_OPTIONS = {"horizontal", "equation", "long_division"}
 DISTRIBUTIVE_BASE_OPTIONS = {"near_10", "near_100", "mixed"}
 DISTRIBUTIVE_DIRECTION_OPTIONS = {"addition", "subtraction", "mixed"}
 DISTRIBUTIVE_DIFFICULTY_OPTIONS = {"one_digit", "two_digit", "multiples_of_10", "mixed"}
 NUMBER_SIZE_OPTIONS = {"small", "big"}
+PLACE_VALUE_DIGIT_OPTIONS = {"2d", "3d", "4d", "5d"}
+ZERO_MODE_OPTIONS = {"avoid", "allow", "mixed"}
 
 RANGE_WORKSHEET_TYPES = {
     "addition",
@@ -77,12 +79,19 @@ BREAKING_PARENTHESES_WORKSHEET_TYPES = {
     "breaking_parentheses",
 }
 
+PLACE_VALUE_WORKSHEET_TYPES = {
+    "place_value_expanded_form",
+    "place_value_standard_form",
+    "place_value_digit_value",
+}
+
 COMMON_OPTIONS = {"problemCount", "sheetCount", "includeAnswerKey"}
 RANGE_OPTIONS = {"from", "to", "smallOperandLessThan10"}
 DIGIT_OPTIONS_KEYS = {"digits"}
 LAYOUT_OPTIONS_KEYS = {"layout"}
 DISTRIBUTIVE_PROPERTY_OPTIONS = {"base", "direction", "difficulty"}
 CHICKEN_RABBIT_OPTIONS = {"numberSize"}
+PLACE_VALUE_OPTIONS = {"placeValueDigits", "zeroMode"}
 
 
 def parse_generate_request(payload: Any) -> GenerateRequest:
@@ -156,6 +165,8 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
             raise ValidationError("Problem count must be 10, 15, or 20.")
         if worksheet_type == "chicken_rabbit":
             raise ValidationError("Problem count must be 4, 6, 8, or 10.")
+        if worksheet_type in PLACE_VALUE_WORKSHEET_TYPES:
+            raise ValidationError("Problem count must be 10 or 20.")
         raise ValidationError("Problem count must be 10, 20, 30, or 50.")
 
     sheet_count = int_option(normalized, "sheetCount")
@@ -175,6 +186,8 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
         raise ValidationError("Sheet count must be between 1 and 10 for breaking parentheses worksheets.")
     if worksheet_type == "chicken_rabbit" and sheet_count is not None and sheet_count > definition.max_sheet_count:
         raise ValidationError("Sheet count must be between 1 and 10 for chicken-rabbit worksheets.")
+    if worksheet_type in PLACE_VALUE_WORKSHEET_TYPES and sheet_count is not None and sheet_count > definition.max_sheet_count:
+        raise ValidationError("Sheet count must be between 1 and 10 for place-value worksheets.")
 
     from_value = int_option(normalized, "from")
     to_value = int_option(normalized, "to")
@@ -203,6 +216,8 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
         raise ValidationError("Breaking parentheses layout is only supported for breaking parentheses worksheets.")
     if worksheet_type != "chicken_rabbit" and layout == "chicken_rabbit":
         raise ValidationError("Chicken-rabbit layout is only supported for chicken-rabbit worksheets.")
+    if worksheet_type not in PLACE_VALUE_WORKSHEET_TYPES and layout == "place_value":
+        raise ValidationError("Place-value layout is only supported for place-value worksheets.")
 
     base = normalized.get("base")
     if base is not None and base not in DISTRIBUTIVE_BASE_OPTIONS:
@@ -219,6 +234,14 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     number_size = normalized.get("numberSize")
     if number_size is not None and number_size not in NUMBER_SIZE_OPTIONS:
         raise ValidationError("Number size must be small or big.")
+
+    place_value_digits = normalized.get("placeValueDigits")
+    if place_value_digits is not None and place_value_digits not in PLACE_VALUE_DIGIT_OPTIONS:
+        raise ValidationError("Place-value digits must be 2d, 3d, 4d, or 5d.")
+
+    zero_mode = normalized.get("zeroMode")
+    if zero_mode is not None and zero_mode not in ZERO_MODE_OPTIONS:
+        raise ValidationError("Zero mode must be avoid, allow, or mixed.")
 
     bool_option(normalized, "smallOperandLessThan10")
     bool_option(normalized, "includeAnswerKey")
@@ -249,6 +272,8 @@ def allowed_options_for(worksheet_type: str) -> set[str]:
     if profile == "chicken_rabbit":
         options.update(LAYOUT_OPTIONS_KEYS)
         options.update(CHICKEN_RABBIT_OPTIONS)
+    if profile == "place_value":
+        options.update(PLACE_VALUE_OPTIONS)
     return options
 
 

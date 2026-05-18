@@ -9,6 +9,8 @@ export const distributiveBaseOptions = ["near_10", "near_100", "mixed"] as const
 export const distributiveDirectionOptions = ["subtraction", "addition", "mixed"] as const;
 export const distributiveDifficultyOptions = ["multiples_of_10", "one_digit", "two_digit", "mixed"] as const;
 export const numberSizeOptions = ["small", "big"] as const;
+export const placeValueDigitOptions = ["2d", "3d", "4d", "5d"] as const;
+export const zeroModeOptions = ["avoid", "allow", "mixed"] as const;
 
 type SelectControl = {
   id: string;
@@ -41,7 +43,13 @@ export type WorksheetDefinition = {
   id: string;
   path: string;
   title: string;
-  category: "Addition & Subtraction" | "Multiplication & Division" | "Comparison" | "Math Properties" | "Word Problems";
+  category:
+    | "Addition & Subtraction"
+    | "Multiplication & Division"
+    | "Comparison"
+    | "Math Properties"
+    | "Place Value"
+    | "Word Problems";
   examples: string[];
   controls: WorksheetControl[];
 };
@@ -253,6 +261,49 @@ const chickenRabbitControls = (): WorksheetControl[] => [
   answerKeyControl(),
 ];
 
+const placeValueControls = (): WorksheetControl[] => [
+  {
+    id: "problemCount",
+    label: "Problems",
+    type: "select",
+    options: [10, 20],
+    defaultValue: 10,
+  },
+  {
+    id: "sheetCount",
+    label: "Sheets",
+    type: "select",
+    options: sheetCountOptions.slice(0, 10),
+    defaultValue: 1,
+  },
+  {
+    id: "placeValueDigits",
+    label: "Number size",
+    type: "select",
+    options: placeValueDigitOptions,
+    defaultValue: "3d",
+    optionLabels: {
+      "2d": "2 digits",
+      "3d": "3 digits",
+      "4d": "4 digits",
+      "5d": "5 digits",
+    },
+  },
+  {
+    id: "zeroMode",
+    label: "Zeros",
+    type: "select",
+    options: zeroModeOptions,
+    defaultValue: "mixed",
+    optionLabels: {
+      avoid: "Avoid zeros",
+      allow: "Allow zeros",
+      mixed: "Mixed",
+    },
+  },
+  answerKeyControl(),
+];
+
 export const worksheets: WorksheetDefinition[] = [
   {
     id: "addition",
@@ -381,6 +432,30 @@ export const worksheets: WorksheetDefinition[] = [
     category: "Comparison",
     examples: ["12 __ 9"],
     controls: [problemCount(10), sheetCount(), digits("l20")],
+  },
+  {
+    id: "place_value_expanded_form",
+    path: "/place_value_expanded_form",
+    title: "Expanded Form",
+    category: "Place Value",
+    examples: ["4,582 = 4,000 + 500 + 80 + 2", "6,040 = 6,000 + 40"],
+    controls: placeValueControls(),
+  },
+  {
+    id: "place_value_standard_form",
+    path: "/place_value_standard_form",
+    title: "Standard Form",
+    category: "Place Value",
+    examples: ["3,000 + 400 + 20 + 8 = 3,428", "900 + 60 + 5 = 965"],
+    controls: placeValueControls(),
+  },
+  {
+    id: "place_value_digit_value",
+    path: "/place_value_digit_value",
+    title: "Digit Value",
+    category: "Place Value",
+    examples: ["In 4,582, what is the value of 5?", "In 7,306, what is the value of 3?"],
+    controls: placeValueControls(),
   },
   {
     id: "distributive_property_near_numbers",
