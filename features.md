@@ -384,10 +384,15 @@ Depending on the worksheet type, users may be able to choose:
 - Number range
 - Layout
 - Difficulty style
+- Name/date line
 - Whether to include an answer key
 
 Options are intentionally kept worksheet-specific. If a worksheet has only one
 meaningful format, unnecessary controls are hidden.
+
+Answer keys are available for worksheet types where there is a clear expected
+answer. Worksheets focused on open rewriting practice may omit answer keys when
+the classroom task is the student work itself.
 
 ## Printable PDF Experience
 
@@ -397,6 +402,7 @@ PDF design priorities:
 
 - Large readable text
 - Clear blanks instead of question marks where students should answer
+- Optional name/date lines for classroom use
 - Distinct problem numbering when numbering is useful
 - Dedicated space for written work
 - Layouts that match the kind of math being practiced
@@ -436,8 +442,7 @@ needs and currently missing from Blankmath.
 
 These features would make existing worksheets more useful in classrooms.
 
-- Consistent answer-key choices across worksheet types.
-- Name/date or memo lines on printable worksheets.
+- Memo or class-period lines on printable worksheets.
 - Clearer support for generating multiple different worksheet versions from
   the same settings.
 - Difficulty presets such as easy, medium, hard, drawing-friendly, and

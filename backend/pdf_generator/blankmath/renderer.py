@@ -22,6 +22,7 @@ def render_pdf(
     problems: list[Problem],
     count_per_page: int,
     include_answer_key: bool,
+    include_name_date: bool = False,
     layout: str = "horizontal",
 ) -> bytes:
     buffer = BytesIO()
@@ -51,6 +52,9 @@ def render_pdf(
         page_problems = problems[start:start + problems_per_page]
         if page_number > 1:
             story.append(PageBreak())
+        if include_name_date:
+            story.append(_name_date_table())
+            story.append(Spacer(1, 0.12 * inch))
         if layout == "breaking_parentheses":
             story.append(Paragraph(title, title_style))
             story.append(Paragraph("Rewrite each expression without parentheses. Do not solve.", instruction_style))
@@ -134,6 +138,27 @@ def _problem_table(problems: list[Problem], style, layout: str, start_number: in
             *table_style_commands,
         ]
     table.setStyle(TableStyle(table_style_commands))
+    return table
+
+
+def _name_date_table() -> Table:
+    style = getSampleStyleSheet()["Normal"]
+    style.fontSize = 10
+    style.leading = 12
+    table = Table(
+        [[Paragraph("Name:", style), "", Paragraph("Date:", style), ""]],
+        colWidths=[0.58 * inch, 3.25 * inch, 0.48 * inch, 2.8 * inch],
+        rowHeights=0.28 * inch,
+    )
+    table.setStyle(TableStyle([
+        ("LINEBELOW", (1, 0), (1, 0), 0.8, colors.HexColor("#5f6b7a")),
+        ("LINEBELOW", (3, 0), (3, 0), 0.8, colors.HexColor("#5f6b7a")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+        ("VALIGN", (0, 0), (-1, -1), "BOTTOM"),
+    ]))
     return table
 
 

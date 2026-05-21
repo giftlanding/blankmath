@@ -145,6 +145,13 @@ const answerKeyControl = (): CheckboxControl => ({
   defaultValue: false,
 });
 
+const nameDateControl = (): CheckboxControl => ({
+  id: "includeNameDate",
+  label: "Name/date line",
+  type: "checkbox",
+  defaultValue: false,
+});
+
 const additionRegroupingControl = (): SelectControl => ({
   id: "additionRegrouping",
   label: "Carrying",
@@ -181,7 +188,6 @@ const borrowAcrossZerosControl = (): CheckboxControl => ({
 const rangeWorksheetControls = (
   defaultLayout: "horizontal" | "vertical",
   restrictionLabel?: string,
-  includeAnswerKey = false,
   regroupingControls: WorksheetControl[] = [],
 ): WorksheetControl[] => [
   problemCount(),
@@ -190,7 +196,8 @@ const rangeWorksheetControls = (
   ...rangeControls(),
   ...regroupingControls,
   ...(restrictionLabel ? [smallerOperandControl(restrictionLabel)] : []),
-  ...(includeAnswerKey ? [answerKeyControl()] : []),
+  answerKeyControl(),
+  nameDateControl(),
 ];
 
 const digitWorksheetControls = (defaultLayout: "horizontal" | "vertical"): WorksheetControl[] => [
@@ -198,6 +205,8 @@ const digitWorksheetControls = (defaultLayout: "horizontal" | "vertical"): Works
   sheetCount(),
   digits(),
   layout(defaultLayout),
+  answerKeyControl(),
+  nameDateControl(),
 ];
 
 const divisionWorksheetControls = (): WorksheetControl[] => [
@@ -205,6 +214,8 @@ const divisionWorksheetControls = (): WorksheetControl[] => [
   sheetCount(),
   digits(),
   divisionLayout(),
+  answerKeyControl(),
+  nameDateControl(),
 ];
 
 const distributivePropertyControls = (): WorksheetControl[] => [
@@ -257,6 +268,8 @@ const distributivePropertyControls = (): WorksheetControl[] => [
       distributive_property: "Guided steps",
     },
   },
+  answerKeyControl(),
+  nameDateControl(),
 ];
 
 const breakingParenthesesControls = (): WorksheetControl[] => [
@@ -284,6 +297,7 @@ const breakingParenthesesControls = (): WorksheetControl[] => [
       breaking_parentheses: "Rewrite lines",
     },
   },
+  nameDateControl(),
 ];
 
 const chickenRabbitControls = (): WorksheetControl[] => [
@@ -306,6 +320,7 @@ const chickenRabbitControls = (): WorksheetControl[] => [
     },
   },
   answerKeyControl(),
+  nameDateControl(),
 ];
 
 const placeValueControls = (): WorksheetControl[] => [
@@ -349,6 +364,7 @@ const placeValueControls = (): WorksheetControl[] => [
     },
   },
   answerKeyControl(),
+  nameDateControl(),
 ];
 
 const fractionControls = (includeImproper = false): WorksheetControl[] => [
@@ -387,6 +403,7 @@ const fractionControls = (includeImproper = false): WorksheetControl[] => [
       }]
     : []),
   answerKeyControl(),
+  nameDateControl(),
 ];
 
 const numberLineControls = (): WorksheetControl[] => [
@@ -416,6 +433,7 @@ const numberLineControls = (): WorksheetControl[] => [
     },
   },
   answerKeyControl(),
+  nameDateControl(),
 ];
 
 const timeControls = (): WorksheetControl[] => [
@@ -448,6 +466,7 @@ const timeControls = (): WorksheetControl[] => [
     },
   },
   answerKeyControl(),
+  nameDateControl(),
 ];
 
 const hundredChartControls = (): WorksheetControl[] => [
@@ -507,6 +526,7 @@ const hundredChartControls = (): WorksheetControl[] => [
     },
   },
   answerKeyControl(),
+  nameDateControl(),
 ];
 
 export const worksheets: WorksheetDefinition[] = [
@@ -516,7 +536,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Addition",
     category: "Addition & Subtraction",
     examples: ["12 + 9 = ?"],
-    controls: rangeWorksheetControls("vertical", "Smaller addend under 10", false, [additionRegroupingControl()]),
+    controls: rangeWorksheetControls("vertical", "Smaller addend under 10", [additionRegroupingControl()]),
   },
   {
     id: "minus",
@@ -524,7 +544,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Minus",
     category: "Addition & Subtraction",
     examples: ["12 - 9 = ?"],
-    controls: rangeWorksheetControls("vertical", "Subtrahend under 10", false, [
+    controls: rangeWorksheetControls("vertical", "Subtrahend under 10", [
       subtractionRegroupingControl(),
       borrowAcrossZerosControl(),
     ]),
@@ -535,7 +555,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Mixed Addition and Subtraction",
     category: "Addition & Subtraction",
     examples: ["12 + 9 = ?", "12 - 9 = ?"],
-    controls: rangeWorksheetControls("vertical", "Smaller operand under 10", false, [
+    controls: rangeWorksheetControls("vertical", "Smaller operand under 10", [
       additionRegroupingControl(),
       subtractionRegroupingControl(),
       borrowAcrossZerosControl(),
@@ -547,7 +567,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Addition Missing Number",
     category: "Addition & Subtraction",
     examples: ["7 + ? = 15", "? + 3 = 12"],
-    controls: rangeWorksheetControls("horizontal", "Smaller addend under 10", false, [additionRegroupingControl()]),
+    controls: rangeWorksheetControls("horizontal", "Smaller addend under 10", [additionRegroupingControl()]),
   },
   {
     id: "minusmn",
@@ -555,7 +575,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Minus Missing Number",
     category: "Addition & Subtraction",
     examples: ["7 - ? = 5", "? - 3 = 12"],
-    controls: rangeWorksheetControls("horizontal", "Subtrahend under 10", false, [
+    controls: rangeWorksheetControls("horizontal", "Subtrahend under 10", [
       subtractionRegroupingControl(),
       borrowAcrossZerosControl(),
     ]),
@@ -566,7 +586,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Mixed Addition and Subtraction Missing Number",
     category: "Addition & Subtraction",
     examples: ["7 + ? = 15", "? - 3 = 12"],
-    controls: rangeWorksheetControls("horizontal", "Smaller operand under 10", true, [
+    controls: rangeWorksheetControls("horizontal", "Smaller operand under 10", [
       additionRegroupingControl(),
       subtractionRegroupingControl(),
       borrowAcrossZerosControl(),
@@ -578,7 +598,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Add Three Numbers",
     category: "Addition & Subtraction",
     examples: ["7 + 8 + 12 = ?"],
-    controls: [problemCount(), sheetCount(), digits()],
+    controls: [problemCount(), sheetCount(), digits(), answerKeyControl(), nameDateControl()],
   },
   {
     id: "add_minus_three_numbers",
@@ -586,7 +606,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Add and Subtract Three Numbers",
     category: "Addition & Subtraction",
     examples: ["17 - 8 + 7 = ?"],
-    controls: [problemCount(), sheetCount(), digits()],
+    controls: [problemCount(), sheetCount(), digits(), answerKeyControl(), nameDateControl()],
   },
   {
     id: "add_three_numbers_mn",
@@ -594,7 +614,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Add Three Numbers Missing Number",
     category: "Addition & Subtraction",
     examples: ["7 + ? + 8 = 20"],
-    controls: [problemCount(), sheetCount(), digits()],
+    controls: [problemCount(), sheetCount(), digits(), answerKeyControl(), nameDateControl()],
   },
   {
     id: "multiplication",
@@ -650,7 +670,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Comparision",
     category: "Comparison",
     examples: ["12 __ 9"],
-    controls: [problemCount(10), sheetCount(), digits("l20")],
+    controls: [problemCount(10), sheetCount(), digits("l20"), answerKeyControl(), nameDateControl()],
   },
   {
     id: "fraction_reduce",

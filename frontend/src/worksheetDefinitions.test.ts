@@ -50,4 +50,15 @@ describe("worksheet definitions", () => {
       expect(worksheetById.get(worksheet.id)).toBe(worksheet);
     }
   });
+
+  it("offers answer keys for worksheets that support one", () => {
+    for (const worksheet of worksheets) {
+      const controlIds = worksheet.controls.map((control) => control.id);
+      if (worksheet.id === "breaking_parentheses") {
+        expect(controlIds).not.toContain("includeAnswerKey");
+      } else {
+        expect(controlIds).toContain("includeAnswerKey");
+      }
+    }
+  });
 });
