@@ -3,6 +3,7 @@ import { z } from "zod";
 export const problemCountOptions = [10, 20, 30, 50] as const;
 export const sheetCountOptions = Array.from({ length: 50 }, (_, index) => index + 1);
 export const digitOptions = ["1d", "2d", "3d", "l12", "l20"] as const;
+export const difficultyPresetOptions = ["custom", "easy", "medium", "hard"] as const;
 export const focusFactorOptions = ["any", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 export const layoutOptions = ["horizontal", "vertical"] as const;
 export const divisionLayoutOptions = ["equation", "long_division"] as const;
@@ -151,6 +152,20 @@ const rangeControls = (): WorksheetControl[] => [
   { id: "to", label: "To", type: "number", min: 0, max: 10000, defaultValue: 20 },
 ];
 
+const difficultyPresetControl = (): SelectControl => ({
+  id: "difficultyPreset",
+  label: "Difficulty",
+  type: "select",
+  options: difficultyPresetOptions,
+  defaultValue: "custom",
+  optionLabels: {
+    custom: "Custom",
+    easy: "Easy: 0-10",
+    medium: "Medium: 0-20",
+    hard: "Hard: 0-100",
+  },
+});
+
 const smallerOperandControl = (label: string): CheckboxControl => ({
   id: "smallOperandLessThan10",
   label,
@@ -235,6 +250,7 @@ const rangeWorksheetControls = (
   problemCount(),
   sheetCount(),
   layout(defaultLayout),
+  difficultyPresetControl(),
   ...rangeControls(),
   ...regroupingControls,
   ...(restrictionLabel ? [smallerOperandControl(restrictionLabel)] : []),

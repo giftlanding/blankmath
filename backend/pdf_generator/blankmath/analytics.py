@@ -50,6 +50,7 @@ def build_measurement_payload(generate_request: dict[str, Any]) -> dict[str, Any
         ("base", "base"),
         ("direction", "direction"),
         ("difficulty", "difficulty"),
+        ("difficultyPreset", "difficulty_preset"),
         ("focusFactor", "focus_factor"),
         ("includeAnswerKey", "include_answer_key"),
         ("allowDuplicateProblems", "allow_duplicate_problems"),

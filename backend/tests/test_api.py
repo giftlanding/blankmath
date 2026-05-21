@@ -326,6 +326,7 @@ class ApiTest(unittest.TestCase):
                     "options": {
                         "problemCount": 20,
                         "sheetCount": 1,
+                        "difficultyPreset": "easy",
                         "from": 0,
                         "to": 20,
                         "includeNameDate": True,
@@ -336,6 +337,23 @@ class ApiTest(unittest.TestCase):
             })
 
         self.assertEqual(result["statusCode"], 201)
+
+    def test_rejects_invalid_difficulty_preset(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "addition",
+                "options": {
+                    "problemCount": 20,
+                    "sheetCount": 1,
+                    "from": 0,
+                    "to": 20,
+                    "difficultyPreset": "extreme",
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
 
     def test_rejects_long_memo_text(self):
         result = handle_event({

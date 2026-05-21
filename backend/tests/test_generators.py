@@ -54,6 +54,18 @@ class GeneratorTest(unittest.TestCase):
             left, right = _binary_terms(problem.prompt, "+")
             self.assertFalse(_has_addition_carry(left, right))
 
+    def test_generates_range_difficulty_preset(self):
+        problems = generate_problems("addition", {
+            "problemCount": 10,
+            "sheetCount": 1,
+            "from": 500,
+            "to": 600,
+            "difficultyPreset": "easy",
+        })
+
+        for problem in problems:
+            self.assertLessEqual(int(problem.answer), 10)
+
     def test_generates_subtraction_with_borrowing(self):
         problems = generate_problems("minus", {
             "problemCount": 10,

@@ -25,6 +25,7 @@ BREAKING_PARENTHESES_SHEET_COUNT_MAX = 10
 RANGE_MIN = 0
 RANGE_MAX = 10000
 DIGIT_OPTIONS = {"1d", "2d", "3d", "l12", "l20"}
+DIFFICULTY_PRESET_OPTIONS = {"custom", "easy", "medium", "hard"}
 FOCUS_FACTOR_OPTIONS = {"any", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}
 LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses", "chicken_rabbit", "place_value", "fraction", "number_line", "clock", "hundred_chart"}
 DIVISION_LAYOUT_OPTIONS = {"horizontal", "equation", "long_division"}
@@ -134,6 +135,7 @@ COMMON_OPTIONS = {
 RANGE_OPTIONS = {
     "from",
     "to",
+    "difficultyPreset",
     "smallOperandLessThan10",
     "additionRegrouping",
     "subtractionRegrouping",
@@ -275,6 +277,10 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     digits = normalized.get("digits")
     if digits is not None and digits not in DIGIT_OPTIONS:
         raise ValidationError("Digits must be one of 1d, 2d, 3d, l12, or l20.")
+
+    difficulty_preset = normalized.get("difficultyPreset")
+    if difficulty_preset is not None and difficulty_preset not in DIFFICULTY_PRESET_OPTIONS:
+        raise ValidationError("Difficulty preset must be custom, easy, medium, or hard.")
 
     focus_factor = normalized.get("focusFactor")
     if focus_factor is not None and str(focus_factor) not in FOCUS_FACTOR_OPTIONS:

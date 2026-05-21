@@ -63,8 +63,9 @@ Available practice includes:
 - Adding and subtracting three numbers
 - Adding three numbers with a missing number
 
-Teachers can adjust number ranges and choose worksheet size. Some worksheets
-also support constraints such as keeping the smaller operand under 10.
+Teachers can use easy, medium, or hard presets, or set custom number ranges.
+Some worksheets also support constraints such as keeping the smaller operand
+under 10.
 
 Addition and subtraction worksheets also support regrouping controls:
 
@@ -458,8 +459,8 @@ needs and currently missing from Blankmath.
 
 These features would make existing worksheets more useful in classrooms.
 
-- Difficulty presets such as easy, medium, hard, drawing-friendly, and
-  equation-ready.
+- Broader difficulty presets, such as drawing-friendly and equation-ready
+  choices for word problems.
 - Broader exact operand selection, such as addition practice only with a
   specific addend or numbers from 1 through 5.
 

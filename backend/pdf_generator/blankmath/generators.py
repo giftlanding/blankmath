@@ -18,6 +18,11 @@ class Problem:
 
 NEAR_10_BASES = (10, 20, 30, 40, 50, 60, 70, 80, 90)
 NEAR_100_BASES = (100, 200, 300, 400, 500, 600, 700, 800, 900)
+RANGE_DIFFICULTY_PRESETS = {
+    "easy": (0, 10),
+    "medium": (0, 20),
+    "hard": (0, 100),
+}
 
 
 def generate_problems(worksheet_type: str, options: dict[str, Any]) -> list[Problem]:
@@ -86,6 +91,9 @@ def _generator_for(worksheet_type: str):
 
 
 def _range(options: dict[str, Any]) -> tuple[int, int]:
+    preset = str(options.get("difficultyPreset", "custom"))
+    if preset in RANGE_DIFFICULTY_PRESETS:
+        return RANGE_DIFFICULTY_PRESETS[preset]
     return int(options.get("from", 0)), int(options.get("to", 20))
 
 
