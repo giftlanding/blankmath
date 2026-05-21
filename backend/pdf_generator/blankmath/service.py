@@ -13,6 +13,7 @@ def generate_worksheet_pdf(request: dict[str, Any]) -> str:
     count_per_page = int(options.get("problemCount", 20))
     include_answer_key = bool(options.get("includeAnswerKey", False))
     include_name_date = bool(options.get("includeNameDate", False))
+    include_class_period = bool(options.get("includeClassPeriod", False))
     layout = str(options.get("layout", default_layout_for(worksheet_type)))
     problems = generate_problems(worksheet_type, options)
     pdf = render_pdf(
@@ -21,6 +22,7 @@ def generate_worksheet_pdf(request: dict[str, Any]) -> str:
         count_per_page=count_per_page,
         include_answer_key=include_answer_key,
         include_name_date=include_name_date,
+        include_class_period=include_class_period,
         layout=layout,
     )
     return upload_pdf(pdf)

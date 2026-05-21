@@ -22,8 +22,9 @@ def render_pdf(
     problems: list[Problem],
     count_per_page: int,
     include_answer_key: bool,
-    include_name_date: bool = False,
     layout: str = "horizontal",
+    include_name_date: bool = False,
+    include_class_period: bool = False,
 ) -> bytes:
     buffer = BytesIO()
     document = SimpleDocTemplate(
@@ -45,16 +46,28 @@ def render_pdf(
     instruction_style.fontSize = 12
     instruction_style.leading = 15
     instruction_style.textColor = colors.HexColor("#394150")
+    version_style = styles["Normal"].clone("WorksheetVersion")
+    version_style.fontSize = 10
+    version_style.leading = 12
+    version_style.textColor = colors.HexColor("#5f6b7a")
+    version_style.alignment = 2
     story = []
     problems_per_page = page_problem_count(count_per_page, layout)
+    version_chunks = [
+        problems[start:start + problems_per_page]
+        for start in range(0, len(problems), problems_per_page)
+    ]
+    version_count = len(version_chunks)
 
-    for page_number, start in enumerate(range(0, len(problems), problems_per_page), start=1):
-        page_problems = problems[start:start + problems_per_page]
+    for page_number, page_problems in enumerate(version_chunks, start=1):
         if page_number > 1:
             story.append(PageBreak())
-        if include_name_date:
-            story.append(_name_date_table())
+        if include_name_date or include_class_period:
+            story.append(_worksheet_info_table(include_name_date, include_class_period))
             story.append(Spacer(1, 0.12 * inch))
+        if version_count > 1:
+            story.append(Paragraph(f"Version {page_number}", version_style))
+            story.append(Spacer(1, 0.08 * inch))
         if layout == "breaking_parentheses":
             story.append(Paragraph(title, title_style))
             story.append(Paragraph("Rewrite each expression without parentheses. Do not solve.", instruction_style))
@@ -83,13 +96,15 @@ def render_pdf(
             story.append(Paragraph(title, title_style))
             story.append(Paragraph("Fill in the missing numbers on the chart.", instruction_style))
             story.append(Spacer(1, 0.14 * inch))
-        story.append(_problem_table(page_problems, worksheet_style, layout, start_number=start + 1))
+        story.append(_problem_table(page_problems, worksheet_style, layout))
 
     if include_answer_key:
-        story.append(PageBreak())
-        story.append(Paragraph("Answer Key", styles["Title"]))
-        story.append(Spacer(1, 0.16 * inch))
-        story.append(_answer_table(problems, styles["Normal"]))
+        for page_number, page_problems in enumerate(version_chunks, start=1):
+            story.append(PageBreak())
+            answer_title = "Answer Key" if version_count == 1 else f"Answer Key - Version {page_number}"
+            story.append(Paragraph(answer_title, styles["Title"]))
+            story.append(Spacer(1, 0.16 * inch))
+            story.append(_answer_table(page_problems, styles["Normal"]))
 
     document.build(story, onFirstPage=_draw_page_header, onLaterPages=_draw_page_header)
     return buffer.getvalue()
@@ -141,24 +156,36 @@ def _problem_table(problems: list[Problem], style, layout: str, start_number: in
     return table
 
 
-def _name_date_table() -> Table:
+def _worksheet_info_table(include_name_date: bool, include_class_period: bool) -> Table:
     style = getSampleStyleSheet()["Normal"]
     style.fontSize = 10
     style.leading = 12
-    table = Table(
-        [[Paragraph("Name:", style), "", Paragraph("Date:", style), ""]],
-        colWidths=[0.58 * inch, 3.25 * inch, 0.48 * inch, 2.8 * inch],
-        rowHeights=0.28 * inch,
-    )
-    table.setStyle(TableStyle([
-        ("LINEBELOW", (1, 0), (1, 0), 0.8, colors.HexColor("#5f6b7a")),
-        ("LINEBELOW", (3, 0), (3, 0), 0.8, colors.HexColor("#5f6b7a")),
+    rows = []
+    table_style_commands = [
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
         ("TOPPADDING", (0, 0), (-1, -1), 0),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
         ("VALIGN", (0, 0), (-1, -1), "BOTTOM"),
-    ]))
+    ]
+    if include_name_date:
+        rows.append([Paragraph("Name:", style), "", Paragraph("Date:", style), ""])
+        row_index = len(rows) - 1
+        table_style_commands.extend([
+            ("LINEBELOW", (1, row_index), (1, row_index), 0.8, colors.HexColor("#5f6b7a")),
+            ("LINEBELOW", (3, row_index), (3, row_index), 0.8, colors.HexColor("#5f6b7a")),
+        ])
+    if include_class_period:
+        rows.append([Paragraph("Class/Period:", style), "", "", ""])
+        row_index = len(rows) - 1
+        table_style_commands.append(("LINEBELOW", (1, row_index), (3, row_index), 0.8, colors.HexColor("#5f6b7a")))
+
+    table = Table(
+        rows,
+        colWidths=[0.88 * inch, 2.95 * inch, 0.48 * inch, 2.8 * inch],
+        rowHeights=[0.28 * inch] * len(rows),
+    )
+    table.setStyle(TableStyle(table_style_commands))
     return table
 
 

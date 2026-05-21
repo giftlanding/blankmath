@@ -112,7 +112,7 @@ HUNDRED_CHART_WORKSHEET_TYPES = {
     "hundred_chart_missing",
 }
 
-COMMON_OPTIONS = {"problemCount", "sheetCount", "includeAnswerKey", "includeNameDate"}
+COMMON_OPTIONS = {"problemCount", "sheetCount", "includeAnswerKey", "includeNameDate", "includeClassPeriod"}
 RANGE_OPTIONS = {
     "from",
     "to",
@@ -340,6 +340,7 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     bool_option(normalized, "smallOperandLessThan10")
     bool_option(normalized, "includeAnswerKey")
     bool_option(normalized, "includeNameDate")
+    bool_option(normalized, "includeClassPeriod")
     bool_option(normalized, "borrowAcrossZeros")
     bool_option(normalized, "includeImproperFractions")
 

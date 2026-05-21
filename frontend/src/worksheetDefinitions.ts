@@ -84,7 +84,7 @@ const propertyProblemCount = (): SelectControl => ({
 
 const sheetCount = (): SelectControl => ({
   id: "sheetCount",
-  label: "Sheets",
+  label: "Versions",
   type: "select",
   options: sheetCountOptions,
   defaultValue: 1,
@@ -92,7 +92,7 @@ const sheetCount = (): SelectControl => ({
 
 const propertySheetCount = (): SelectControl => ({
   id: "sheetCount",
-  label: "Sheets",
+  label: "Versions",
   type: "select",
   options: sheetCountOptions.slice(0, 10),
   defaultValue: 1,
@@ -152,6 +152,13 @@ const nameDateControl = (): CheckboxControl => ({
   defaultValue: false,
 });
 
+const classPeriodControl = (): CheckboxControl => ({
+  id: "includeClassPeriod",
+  label: "Class/period line",
+  type: "checkbox",
+  defaultValue: false,
+});
+
 const additionRegroupingControl = (): SelectControl => ({
   id: "additionRegrouping",
   label: "Carrying",
@@ -198,6 +205,7 @@ const rangeWorksheetControls = (
   ...(restrictionLabel ? [smallerOperandControl(restrictionLabel)] : []),
   answerKeyControl(),
   nameDateControl(),
+  classPeriodControl(),
 ];
 
 const digitWorksheetControls = (defaultLayout: "horizontal" | "vertical"): WorksheetControl[] => [
@@ -207,6 +215,7 @@ const digitWorksheetControls = (defaultLayout: "horizontal" | "vertical"): Works
   layout(defaultLayout),
   answerKeyControl(),
   nameDateControl(),
+  classPeriodControl(),
 ];
 
 const divisionWorksheetControls = (): WorksheetControl[] => [
@@ -216,6 +225,7 @@ const divisionWorksheetControls = (): WorksheetControl[] => [
   divisionLayout(),
   answerKeyControl(),
   nameDateControl(),
+  classPeriodControl(),
 ];
 
 const distributivePropertyControls = (): WorksheetControl[] => [
@@ -270,6 +280,7 @@ const distributivePropertyControls = (): WorksheetControl[] => [
   },
   answerKeyControl(),
   nameDateControl(),
+  classPeriodControl(),
 ];
 
 const breakingParenthesesControls = (): WorksheetControl[] => [
@@ -282,7 +293,7 @@ const breakingParenthesesControls = (): WorksheetControl[] => [
   },
   {
     id: "sheetCount",
-    label: "Sheets",
+    label: "Versions",
     type: "select",
     options: sheetCountOptions.slice(0, 10),
     defaultValue: 1,
@@ -298,6 +309,7 @@ const breakingParenthesesControls = (): WorksheetControl[] => [
     },
   },
   nameDateControl(),
+  classPeriodControl(),
 ];
 
 const chickenRabbitControls = (): WorksheetControl[] => [
@@ -321,6 +333,7 @@ const chickenRabbitControls = (): WorksheetControl[] => [
   },
   answerKeyControl(),
   nameDateControl(),
+  classPeriodControl(),
 ];
 
 const placeValueControls = (): WorksheetControl[] => [
@@ -333,7 +346,7 @@ const placeValueControls = (): WorksheetControl[] => [
   },
   {
     id: "sheetCount",
-    label: "Sheets",
+    label: "Versions",
     type: "select",
     options: sheetCountOptions.slice(0, 10),
     defaultValue: 1,
@@ -365,6 +378,7 @@ const placeValueControls = (): WorksheetControl[] => [
   },
   answerKeyControl(),
   nameDateControl(),
+  classPeriodControl(),
 ];
 
 const fractionControls = (includeImproper = false): WorksheetControl[] => [
@@ -377,7 +391,7 @@ const fractionControls = (includeImproper = false): WorksheetControl[] => [
   },
   {
     id: "sheetCount",
-    label: "Sheets",
+    label: "Versions",
     type: "select",
     options: sheetCountOptions.slice(0, 10),
     defaultValue: 1,
@@ -404,6 +418,7 @@ const fractionControls = (includeImproper = false): WorksheetControl[] => [
     : []),
   answerKeyControl(),
   nameDateControl(),
+  classPeriodControl(),
 ];
 
 const numberLineControls = (): WorksheetControl[] => [
@@ -416,7 +431,7 @@ const numberLineControls = (): WorksheetControl[] => [
   },
   {
     id: "sheetCount",
-    label: "Sheets",
+    label: "Versions",
     type: "select",
     options: sheetCountOptions.slice(0, 10),
     defaultValue: 1,
@@ -434,6 +449,7 @@ const numberLineControls = (): WorksheetControl[] => [
   },
   answerKeyControl(),
   nameDateControl(),
+  classPeriodControl(),
 ];
 
 const timeControls = (): WorksheetControl[] => [
@@ -446,7 +462,7 @@ const timeControls = (): WorksheetControl[] => [
   },
   {
     id: "sheetCount",
-    label: "Sheets",
+    label: "Versions",
     type: "select",
     options: sheetCountOptions.slice(0, 10),
     defaultValue: 1,
@@ -467,6 +483,7 @@ const timeControls = (): WorksheetControl[] => [
   },
   answerKeyControl(),
   nameDateControl(),
+  classPeriodControl(),
 ];
 
 const hundredChartControls = (): WorksheetControl[] => [
@@ -479,7 +496,7 @@ const hundredChartControls = (): WorksheetControl[] => [
   },
   {
     id: "sheetCount",
-    label: "Sets",
+    label: "Versions",
     type: "select",
     options: sheetCountOptions.slice(0, 10),
     defaultValue: 1,
@@ -527,6 +544,7 @@ const hundredChartControls = (): WorksheetControl[] => [
   },
   answerKeyControl(),
   nameDateControl(),
+  classPeriodControl(),
 ];
 
 export const worksheets: WorksheetDefinition[] = [
@@ -598,7 +616,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Add Three Numbers",
     category: "Addition & Subtraction",
     examples: ["7 + 8 + 12 = ?"],
-    controls: [problemCount(), sheetCount(), digits(), answerKeyControl(), nameDateControl()],
+    controls: [problemCount(), sheetCount(), digits(), answerKeyControl(), nameDateControl(), classPeriodControl()],
   },
   {
     id: "add_minus_three_numbers",
@@ -606,7 +624,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Add and Subtract Three Numbers",
     category: "Addition & Subtraction",
     examples: ["17 - 8 + 7 = ?"],
-    controls: [problemCount(), sheetCount(), digits(), answerKeyControl(), nameDateControl()],
+    controls: [problemCount(), sheetCount(), digits(), answerKeyControl(), nameDateControl(), classPeriodControl()],
   },
   {
     id: "add_three_numbers_mn",
@@ -614,7 +632,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Add Three Numbers Missing Number",
     category: "Addition & Subtraction",
     examples: ["7 + ? + 8 = 20"],
-    controls: [problemCount(), sheetCount(), digits(), answerKeyControl(), nameDateControl()],
+    controls: [problemCount(), sheetCount(), digits(), answerKeyControl(), nameDateControl(), classPeriodControl()],
   },
   {
     id: "multiplication",
@@ -670,7 +688,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Comparision",
     category: "Comparison",
     examples: ["12 __ 9"],
-    controls: [problemCount(10), sheetCount(), digits("l20"), answerKeyControl(), nameDateControl()],
+    controls: [problemCount(10), sheetCount(), digits("l20"), answerKeyControl(), nameDateControl(), classPeriodControl()],
   },
   {
     id: "fraction_reduce",

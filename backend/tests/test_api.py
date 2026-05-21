@@ -293,6 +293,7 @@ class ApiTest(unittest.TestCase):
                         "from": 0,
                         "to": 20,
                         "includeNameDate": True,
+                        "includeClassPeriod": True,
                     },
                 }),
             })

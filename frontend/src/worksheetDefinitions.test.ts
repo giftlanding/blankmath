@@ -61,4 +61,12 @@ describe("worksheet definitions", () => {
       }
     }
   });
+
+  it("offers classroom header lines for every worksheet", () => {
+    for (const worksheet of worksheets) {
+      const controlIds = worksheet.controls.map((control) => control.id);
+      expect(controlIds).toContain("includeNameDate");
+      expect(controlIds).toContain("includeClassPeriod");
+    }
+  });
 });
