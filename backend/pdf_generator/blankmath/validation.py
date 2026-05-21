@@ -129,6 +129,7 @@ COMMON_OPTIONS = {
     "includeNameDate",
     "includeClassPeriod",
     "allowDuplicateProblems",
+    "memoText",
 }
 RANGE_OPTIONS = {
     "from",
@@ -278,6 +279,15 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     focus_factor = normalized.get("focusFactor")
     if focus_factor is not None and str(focus_factor) not in FOCUS_FACTOR_OPTIONS:
         raise ValidationError("Focus factor must be any or a number from 1 through 12.")
+
+    memo_text = normalized.get("memoText")
+    if memo_text is not None:
+        if not isinstance(memo_text, str):
+            raise ValidationError("Memo text must be text.")
+        stripped_memo_text = memo_text.strip()
+        if len(stripped_memo_text) > 60:
+            raise ValidationError("Memo text must be 60 characters or fewer.")
+        normalized["memoText"] = stripped_memo_text
 
     layout = normalized.get("layout")
     if layout is not None and layout not in LAYOUT_OPTIONS:

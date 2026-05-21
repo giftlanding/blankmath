@@ -330,11 +330,29 @@ class ApiTest(unittest.TestCase):
                         "to": 20,
                         "includeNameDate": True,
                         "includeClassPeriod": True,
+                        "memoText": "Period 2 quiz review",
                     },
                 }),
             })
 
         self.assertEqual(result["statusCode"], 201)
+
+    def test_rejects_long_memo_text(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "addition",
+                "options": {
+                    "problemCount": 20,
+                    "sheetCount": 1,
+                    "from": 0,
+                    "to": 20,
+                    "memoText": "x" * 61,
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
 
     def test_rejects_invalid_hundred_chart_options(self):
         result = handle_event({

@@ -67,6 +67,7 @@ describe("worksheet definitions", () => {
       const controlIds = worksheet.controls.map((control) => control.id);
       expect(controlIds).toContain("includeNameDate");
       expect(controlIds).toContain("includeClassPeriod");
+      expect(controlIds).toContain("memoText");
     }
   });
 });

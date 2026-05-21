@@ -25,6 +25,7 @@ def render_pdf(
     layout: str = "horizontal",
     include_name_date: bool = False,
     include_class_period: bool = False,
+    memo_text: str = "",
 ) -> bytes:
     buffer = BytesIO()
     document = SimpleDocTemplate(
@@ -62,8 +63,8 @@ def render_pdf(
     for page_number, page_problems in enumerate(version_chunks, start=1):
         if page_number > 1:
             story.append(PageBreak())
-        if include_name_date or include_class_period:
-            story.append(_worksheet_info_table(include_name_date, include_class_period))
+        if include_name_date or include_class_period or memo_text:
+            story.append(_worksheet_info_table(include_name_date, include_class_period, memo_text))
             story.append(Spacer(1, 0.12 * inch))
         if version_count > 1:
             story.append(Paragraph(f"Version {page_number}", version_style))
@@ -156,7 +157,7 @@ def _problem_table(problems: list[Problem], style, layout: str, start_number: in
     return table
 
 
-def _worksheet_info_table(include_name_date: bool, include_class_period: bool) -> Table:
+def _worksheet_info_table(include_name_date: bool, include_class_period: bool, memo_text: str = "") -> Table:
     style = getSampleStyleSheet()["Normal"]
     style.fontSize = 10
     style.leading = 12
@@ -179,6 +180,10 @@ def _worksheet_info_table(include_name_date: bool, include_class_period: bool) -
         rows.append([Paragraph("Class/Period:", style), "", "", ""])
         row_index = len(rows) - 1
         table_style_commands.append(("LINEBELOW", (1, row_index), (3, row_index), 0.8, colors.HexColor("#5f6b7a")))
+    if memo_text:
+        rows.append([Paragraph("Memo:", style), Paragraph(memo_text, style), "", ""])
+        row_index = len(rows) - 1
+        table_style_commands.append(("SPAN", (1, row_index), (3, row_index)))
 
     table = Table(
         rows,

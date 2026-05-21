@@ -46,7 +46,15 @@ type NumberControl = {
   defaultValue: number;
 };
 
-export type WorksheetControl = SelectControl | CheckboxControl | NumberControl;
+type TextControl = {
+  id: string;
+  label: string;
+  type: "text";
+  maxLength: number;
+  defaultValue: string;
+};
+
+export type WorksheetControl = SelectControl | CheckboxControl | NumberControl | TextControl;
 
 export type WorksheetDefinition = {
   id: string;
@@ -171,6 +179,14 @@ const classPeriodControl = (): CheckboxControl => ({
   defaultValue: false,
 });
 
+const memoTextControl = (): TextControl => ({
+  id: "memoText",
+  label: "Memo",
+  type: "text",
+  maxLength: 60,
+  defaultValue: "",
+});
+
 const duplicateProblemsControl = (): CheckboxControl => ({
   id: "allowDuplicateProblems",
   label: "Allow repeats",
@@ -225,6 +241,7 @@ const rangeWorksheetControls = (
   answerKeyControl(),
   nameDateControl(),
   classPeriodControl(),
+  memoTextControl(),
 ];
 
 const digitWorksheetControls = (
@@ -239,6 +256,7 @@ const digitWorksheetControls = (
   answerKeyControl(),
   nameDateControl(),
   classPeriodControl(),
+  memoTextControl(),
 ];
 
 const divisionWorksheetControls = (): WorksheetControl[] => [
@@ -251,6 +269,7 @@ const divisionWorksheetControls = (): WorksheetControl[] => [
   answerKeyControl(),
   nameDateControl(),
   classPeriodControl(),
+  memoTextControl(),
 ];
 
 const distributivePropertyControls = (): WorksheetControl[] => [
@@ -306,6 +325,7 @@ const distributivePropertyControls = (): WorksheetControl[] => [
   answerKeyControl(),
   nameDateControl(),
   classPeriodControl(),
+  memoTextControl(),
 ];
 
 const breakingParenthesesControls = (): WorksheetControl[] => [
@@ -335,6 +355,7 @@ const breakingParenthesesControls = (): WorksheetControl[] => [
   },
   nameDateControl(),
   classPeriodControl(),
+  memoTextControl(),
 ];
 
 const chickenRabbitControls = (): WorksheetControl[] => [
@@ -359,6 +380,7 @@ const chickenRabbitControls = (): WorksheetControl[] => [
   answerKeyControl(),
   nameDateControl(),
   classPeriodControl(),
+  memoTextControl(),
 ];
 
 const placeValueControls = (): WorksheetControl[] => [
@@ -404,6 +426,7 @@ const placeValueControls = (): WorksheetControl[] => [
   answerKeyControl(),
   nameDateControl(),
   classPeriodControl(),
+  memoTextControl(),
 ];
 
 const fractionControls = (includeImproper = false): WorksheetControl[] => [
@@ -444,6 +467,7 @@ const fractionControls = (includeImproper = false): WorksheetControl[] => [
   answerKeyControl(),
   nameDateControl(),
   classPeriodControl(),
+  memoTextControl(),
 ];
 
 const numberLineControls = (): WorksheetControl[] => [
@@ -475,6 +499,7 @@ const numberLineControls = (): WorksheetControl[] => [
   answerKeyControl(),
   nameDateControl(),
   classPeriodControl(),
+  memoTextControl(),
 ];
 
 const timeControls = (): WorksheetControl[] => [
@@ -509,6 +534,7 @@ const timeControls = (): WorksheetControl[] => [
   answerKeyControl(),
   nameDateControl(),
   classPeriodControl(),
+  memoTextControl(),
 ];
 
 const hundredChartControls = (): WorksheetControl[] => [
@@ -570,6 +596,7 @@ const hundredChartControls = (): WorksheetControl[] => [
   answerKeyControl(),
   nameDateControl(),
   classPeriodControl(),
+  memoTextControl(),
 ];
 
 export const worksheets: WorksheetDefinition[] = [
@@ -641,7 +668,15 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Add Three Numbers",
     category: "Addition & Subtraction",
     examples: ["7 + 8 + 12 = ?"],
-    controls: [problemCount(), sheetCount(), digits(), answerKeyControl(), nameDateControl(), classPeriodControl()],
+    controls: [
+      problemCount(),
+      sheetCount(),
+      digits(),
+      answerKeyControl(),
+      nameDateControl(),
+      classPeriodControl(),
+      memoTextControl(),
+    ],
   },
   {
     id: "add_minus_three_numbers",
@@ -649,7 +684,15 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Add and Subtract Three Numbers",
     category: "Addition & Subtraction",
     examples: ["17 - 8 + 7 = ?"],
-    controls: [problemCount(), sheetCount(), digits(), answerKeyControl(), nameDateControl(), classPeriodControl()],
+    controls: [
+      problemCount(),
+      sheetCount(),
+      digits(),
+      answerKeyControl(),
+      nameDateControl(),
+      classPeriodControl(),
+      memoTextControl(),
+    ],
   },
   {
     id: "add_three_numbers_mn",
@@ -657,7 +700,15 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Add Three Numbers Missing Number",
     category: "Addition & Subtraction",
     examples: ["7 + ? + 8 = 20"],
-    controls: [problemCount(), sheetCount(), digits(), answerKeyControl(), nameDateControl(), classPeriodControl()],
+    controls: [
+      problemCount(),
+      sheetCount(),
+      digits(),
+      answerKeyControl(),
+      nameDateControl(),
+      classPeriodControl(),
+      memoTextControl(),
+    ],
   },
   {
     id: "multiplication",
@@ -713,7 +764,15 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Comparision",
     category: "Comparison",
     examples: ["12 __ 9"],
-    controls: [problemCount(10), sheetCount(), digits("l20"), answerKeyControl(), nameDateControl(), classPeriodControl()],
+    controls: [
+      problemCount(10),
+      sheetCount(),
+      digits("l20"),
+      answerKeyControl(),
+      nameDateControl(),
+      classPeriodControl(),
+      memoTextControl(),
+    ],
   },
   {
     id: "fraction_reduce",
@@ -839,6 +898,8 @@ export function schemaForWorksheet(definition: WorksheetDefinition) {
       shape[control.id] = z.boolean();
     } else if (control.type === "number") {
       shape[control.id] = z.coerce.number().min(control.min).max(control.max);
+    } else if (control.type === "text") {
+      shape[control.id] = z.string().max(control.maxLength);
     } else {
       shape[control.id] = z.union([z.string(), z.coerce.number()]);
     }

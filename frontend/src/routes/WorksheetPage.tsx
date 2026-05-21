@@ -163,6 +163,15 @@ function ControlField({
     );
   }
 
+  if (control.type === "text") {
+    return (
+      <label className="field">
+        <span>{control.label}</span>
+        <input type="text" maxLength={control.maxLength} {...register(control.id)} />
+      </label>
+    );
+  }
+
   return (
     <label className="field">
       <span>{control.label}</span>

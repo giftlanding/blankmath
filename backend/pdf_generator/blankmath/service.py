@@ -14,6 +14,7 @@ def generate_worksheet_pdf(request: dict[str, Any]) -> str:
     include_answer_key = bool(options.get("includeAnswerKey", False))
     include_name_date = bool(options.get("includeNameDate", False))
     include_class_period = bool(options.get("includeClassPeriod", False))
+    memo_text = str(options.get("memoText", "")).strip()
     layout = str(options.get("layout", default_layout_for(worksheet_type)))
     problems = generate_problems(worksheet_type, options)
     pdf = render_pdf(
@@ -23,6 +24,7 @@ def generate_worksheet_pdf(request: dict[str, Any]) -> str:
         include_answer_key=include_answer_key,
         include_name_date=include_name_date,
         include_class_period=include_class_period,
+        memo_text=memo_text,
         layout=layout,
     )
     return upload_pdf(pdf)

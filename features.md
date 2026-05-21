@@ -394,6 +394,7 @@ Depending on the worksheet type, users may be able to choose:
 - Whether repeated problems are allowed
 - Name/date line
 - Class/period line
+- Custom memo text
 - Whether to include an answer key
 
 Options are intentionally kept worksheet-specific. If a worksheet has only one
@@ -417,6 +418,7 @@ PDF design priorities:
 - Clear blanks instead of question marks where students should answer
 - Optional name/date lines for classroom use
 - Optional class/period lines for classroom sorting
+- Optional custom memo text
 - Distinct problem numbering when numbering is useful
 - Dedicated space for written work
 - Layouts that match the kind of math being practiced
@@ -456,7 +458,6 @@ needs and currently missing from Blankmath.
 
 These features would make existing worksheets more useful in classrooms.
 
-- Optional custom memo text on printable worksheets.
 - Difficulty presets such as easy, medium, hard, drawing-friendly, and
   equation-ready.
 - Broader exact operand selection, such as addition practice only with a
