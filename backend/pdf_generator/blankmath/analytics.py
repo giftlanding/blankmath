@@ -50,7 +50,9 @@ def build_measurement_payload(generate_request: dict[str, Any]) -> dict[str, Any
         ("base", "base"),
         ("direction", "direction"),
         ("difficulty", "difficulty"),
+        ("focusFactor", "focus_factor"),
         ("includeAnswerKey", "include_answer_key"),
+        ("allowDuplicateProblems", "allow_duplicate_problems"),
     ]:
         value = options.get(source_key)
         if isinstance(value, str | int | float | bool):

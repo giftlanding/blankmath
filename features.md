@@ -90,6 +90,11 @@ Division worksheets support both equation-style problems and long-division
 practice. Long-division worksheets are formatted with space for the student to
 work through the steps.
 
+Multiplication and division worksheets can focus practice on a specific fact
+family, such as 5s or 8s. Focused fact worksheets can also allow repeated
+problems so teachers can fill a page even when the selected fact family has a
+small number of unique combinations.
+
 ## Comparison
 
 Comparison worksheets ask students to compare numbers using greater-than,
@@ -385,6 +390,8 @@ Depending on the worksheet type, users may be able to choose:
 - Versions from the same settings
 - Layout
 - Difficulty style
+- Focused fact practice
+- Whether repeated problems are allowed
 - Name/date line
 - Class/period line
 - Whether to include an answer key
@@ -452,10 +459,8 @@ These features would make existing worksheets more useful in classrooms.
 - Optional custom memo text on printable worksheets.
 - Difficulty presets such as easy, medium, hard, drawing-friendly, and
   equation-ready.
-- Exact operand or factor selection, such as practice only with 5s or numbers
-  from 1 through 5.
-- Duplicate policy controls for whether worksheets should stay unique or fill
-  the page even when repeats are needed.
+- Broader exact operand selection, such as addition practice only with a
+  specific addend or numbers from 1 through 5.
 
 ### Priority 3: More Visual And Applied Math
 

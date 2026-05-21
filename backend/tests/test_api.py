@@ -112,6 +112,42 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 201)
 
+    def test_accepts_focused_fact_options(self):
+        with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
+            result = handle_event({
+                "headers": {"x-blankmath-internal-token": "test-token"},
+                "body": json.dumps({
+                    "worksheetType": "multiplication",
+                    "options": {
+                        "problemCount": 20,
+                        "sheetCount": 1,
+                        "digits": "1d",
+                        "layout": "vertical",
+                        "focusFactor": 5,
+                        "allowDuplicateProblems": True,
+                    },
+                }),
+            })
+
+        self.assertEqual(result["statusCode"], 201)
+
+    def test_rejects_invalid_focus_factor(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "multiplication",
+                "options": {
+                    "problemCount": 20,
+                    "sheetCount": 1,
+                    "digits": "1d",
+                    "layout": "vertical",
+                    "focusFactor": 13,
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
     def test_accepts_distributive_property_request(self):
         with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
             result = handle_event({

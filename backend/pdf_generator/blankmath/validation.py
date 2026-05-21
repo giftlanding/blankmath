@@ -25,6 +25,7 @@ BREAKING_PARENTHESES_SHEET_COUNT_MAX = 10
 RANGE_MIN = 0
 RANGE_MAX = 10000
 DIGIT_OPTIONS = {"1d", "2d", "3d", "l12", "l20"}
+FOCUS_FACTOR_OPTIONS = {"any", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}
 LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses", "chicken_rabbit", "place_value", "fraction", "number_line", "clock", "hundred_chart"}
 DIVISION_LAYOUT_OPTIONS = {"horizontal", "equation", "long_division"}
 DISTRIBUTIVE_BASE_OPTIONS = {"near_10", "near_100", "mixed"}
@@ -112,7 +113,23 @@ HUNDRED_CHART_WORKSHEET_TYPES = {
     "hundred_chart_missing",
 }
 
-COMMON_OPTIONS = {"problemCount", "sheetCount", "includeAnswerKey", "includeNameDate", "includeClassPeriod"}
+FACT_PRACTICE_WORKSHEET_TYPES = {
+    "multiplication",
+    "division",
+    "mixed_times_divide",
+    "multiplicationmn",
+    "division_mn",
+    "mixed_times_divide_mn",
+}
+
+COMMON_OPTIONS = {
+    "problemCount",
+    "sheetCount",
+    "includeAnswerKey",
+    "includeNameDate",
+    "includeClassPeriod",
+    "allowDuplicateProblems",
+}
 RANGE_OPTIONS = {
     "from",
     "to",
@@ -122,6 +139,7 @@ RANGE_OPTIONS = {
     "borrowAcrossZeros",
 }
 DIGIT_OPTIONS_KEYS = {"digits"}
+FACT_PRACTICE_OPTIONS = {"focusFactor"}
 LAYOUT_OPTIONS_KEYS = {"layout"}
 DISTRIBUTIVE_PROPERTY_OPTIONS = {"base", "direction", "difficulty"}
 CHICKEN_RABBIT_OPTIONS = {"numberSize"}
@@ -257,6 +275,10 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     if digits is not None and digits not in DIGIT_OPTIONS:
         raise ValidationError("Digits must be one of 1d, 2d, 3d, l12, or l20.")
 
+    focus_factor = normalized.get("focusFactor")
+    if focus_factor is not None and str(focus_factor) not in FOCUS_FACTOR_OPTIONS:
+        raise ValidationError("Focus factor must be any or a number from 1 through 12.")
+
     layout = normalized.get("layout")
     if layout is not None and layout not in LAYOUT_OPTIONS:
         raise ValidationError("Layout must be horizontal, vertical, equation, long_division, distributive_property, or breaking_parentheses.")
@@ -341,6 +363,7 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     bool_option(normalized, "includeAnswerKey")
     bool_option(normalized, "includeNameDate")
     bool_option(normalized, "includeClassPeriod")
+    bool_option(normalized, "allowDuplicateProblems")
     bool_option(normalized, "borrowAcrossZeros")
     bool_option(normalized, "includeImproperFractions")
 
@@ -360,6 +383,8 @@ def allowed_options_for(worksheet_type: str) -> set[str]:
         options.update(LAYOUT_OPTIONS_KEYS)
     if profile in {"digits", "digits_layout", "division"}:
         options.update(DIGIT_OPTIONS_KEYS)
+    if worksheet_type in FACT_PRACTICE_WORKSHEET_TYPES:
+        options.update(FACT_PRACTICE_OPTIONS)
     if profile in {"digits_layout", "division"}:
         options.update(LAYOUT_OPTIONS_KEYS)
     if profile == "distributive_property":

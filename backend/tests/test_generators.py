@@ -104,6 +104,34 @@ class GeneratorTest(unittest.TestCase):
         self.assertTrue(all("____" in problem.prompt for problem in problems))
         self.assertTrue(all(problem.answer for problem in problems))
 
+    def test_generates_focused_multiplication_facts(self):
+        problems = generate_problems("multiplication", {
+            "problemCount": 20,
+            "sheetCount": 1,
+            "digits": "1d",
+            "focusFactor": 5,
+            "allowDuplicateProblems": True,
+        })
+
+        self.assertEqual(len(problems), 20)
+        for problem in problems:
+            left, right = _binary_terms(problem.prompt, "x")
+            self.assertIn(5, (left, right))
+
+    def test_generates_focused_division_facts(self):
+        problems = generate_problems("division", {
+            "problemCount": 20,
+            "sheetCount": 1,
+            "digits": "1d",
+            "focusFactor": 5,
+            "allowDuplicateProblems": True,
+        })
+
+        self.assertEqual(len(problems), 20)
+        for problem in problems:
+            _dividend, divisor = _binary_terms(problem.prompt, "/")
+            self.assertEqual(divisor, 5)
+
     def test_generates_distributive_property_near_number_problems(self):
         problems = generate_problems("distributive_property_near_numbers", {
             "problemCount": 10,

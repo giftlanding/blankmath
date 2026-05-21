@@ -25,6 +25,7 @@ def generate_problems(worksheet_type: str, options: dict[str, Any]) -> list[Prob
     sheets = int(options.get("sheetCount", 1))
     total = count * sheets
     generator = _generator_for(worksheet_type)
+    allow_duplicates = bool(options.get("allowDuplicateProblems", False))
 
     problems: list[Problem] = []
     seen: set[str] = set()
@@ -42,7 +43,7 @@ def generate_problems(worksheet_type: str, options: dict[str, Any]) -> list[Prob
                 "__groupPrefix": ("+", "-")[(len(problems) // 3) % 2],
             }
         problem = generator(problem_options)
-        if problem.prompt in seen:
+        if not allow_duplicates and problem.prompt in seen:
             continue
         seen.add(problem.prompt)
         problems.append(problem)
@@ -99,6 +100,31 @@ def _number_for_digits(options: dict[str, Any]) -> int:
     if mode == "l20":
         return random.randint(0, 20)
     return random.randint(1, 9)
+
+
+def _focus_factor(options: dict[str, Any]) -> int | None:
+    value = options.get("focusFactor", "any")
+    if value in (None, "", "any"):
+        return None
+    return int(value)
+
+
+def _multiplication_terms(options: dict[str, Any]) -> tuple[int, int]:
+    focus = _focus_factor(options)
+    if focus is None:
+        return _number_for_digits(options), _number_for_digits(options)
+    other = _number_for_digits(options)
+    if random.choice([True, False]):
+        return focus, other
+    return other, focus
+
+
+def _division_terms(options: dict[str, Any]) -> tuple[int, int, int]:
+    divisor = _focus_factor(options)
+    if divisor is None:
+        divisor = max(1, _number_for_digits(options))
+    quotient = _number_for_digits(options)
+    return divisor * quotient, divisor, quotient
 
 
 def _addition(options: dict[str, Any]) -> Problem:
@@ -208,15 +234,12 @@ def _add_three_numbers_missing_number(options: dict[str, Any]) -> Problem:
 
 
 def _multiplication(options: dict[str, Any]) -> Problem:
-    left = _number_for_digits(options)
-    right = _number_for_digits(options)
+    left, right = _multiplication_terms(options)
     return Problem(f"{left} x {right} = ?", str(left * right))
 
 
 def _division(options: dict[str, Any]) -> Problem:
-    divisor = max(1, _number_for_digits(options))
-    quotient = _number_for_digits(options)
-    dividend = divisor * quotient
+    dividend, divisor, quotient = _division_terms(options)
     return Problem(f"{dividend} / {divisor} = ?", str(quotient))
 
 
@@ -225,8 +248,7 @@ def _mixed_multiply_divide(options: dict[str, Any]) -> Problem:
 
 
 def _multiplication_missing_number(options: dict[str, Any]) -> Problem:
-    left = _number_for_digits(options)
-    right = _number_for_digits(options)
+    left, right = _multiplication_terms(options)
     product = left * right
     hidden = random.choice(["left", "right", "result"])
     if hidden == "left":
@@ -237,9 +259,7 @@ def _multiplication_missing_number(options: dict[str, Any]) -> Problem:
 
 
 def _division_missing_number(options: dict[str, Any]) -> Problem:
-    divisor = max(1, _number_for_digits(options))
-    quotient = _number_for_digits(options)
-    dividend = divisor * quotient
+    dividend, divisor, quotient = _division_terms(options)
     hidden = random.choice(["dividend", "divisor", "quotient"])
     if hidden == "dividend":
         return Problem(f"____ / {divisor} = {quotient}", str(dividend))

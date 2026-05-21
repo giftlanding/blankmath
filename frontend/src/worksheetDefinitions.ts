@@ -3,6 +3,7 @@ import { z } from "zod";
 export const problemCountOptions = [10, 20, 30, 50] as const;
 export const sheetCountOptions = Array.from({ length: 50 }, (_, index) => index + 1);
 export const digitOptions = ["1d", "2d", "3d", "l12", "l20"] as const;
+export const focusFactorOptions = ["any", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 export const layoutOptions = ["horizontal", "vertical"] as const;
 export const divisionLayoutOptions = ["equation", "long_division"] as const;
 export const distributiveBaseOptions = ["near_10", "near_100", "mixed"] as const;
@@ -126,6 +127,17 @@ const digits = (defaultValue = "1d"): SelectControl => ({
   defaultValue,
 });
 
+const focusFactorControl = (): SelectControl => ({
+  id: "focusFactor",
+  label: "Focus fact",
+  type: "select",
+  options: focusFactorOptions,
+  defaultValue: "any",
+  optionLabels: {
+    any: "Any",
+  },
+});
+
 const rangeControls = (): WorksheetControl[] => [
   { id: "from", label: "From", type: "number", min: 0, max: 10000, defaultValue: 0 },
   { id: "to", label: "To", type: "number", min: 0, max: 10000, defaultValue: 20 },
@@ -157,6 +169,13 @@ const classPeriodControl = (): CheckboxControl => ({
   label: "Class/period line",
   type: "checkbox",
   defaultValue: false,
+});
+
+const duplicateProblemsControl = (): CheckboxControl => ({
+  id: "allowDuplicateProblems",
+  label: "Allow repeats",
+  type: "checkbox",
+  defaultValue: true,
 });
 
 const additionRegroupingControl = (): SelectControl => ({
@@ -208,10 +227,14 @@ const rangeWorksheetControls = (
   classPeriodControl(),
 ];
 
-const digitWorksheetControls = (defaultLayout: "horizontal" | "vertical"): WorksheetControl[] => [
+const digitWorksheetControls = (
+  defaultLayout: "horizontal" | "vertical",
+  includeFactPractice = false,
+): WorksheetControl[] => [
   problemCount(),
   sheetCount(),
   digits(),
+  ...(includeFactPractice ? [focusFactorControl(), duplicateProblemsControl()] : []),
   layout(defaultLayout),
   answerKeyControl(),
   nameDateControl(),
@@ -222,6 +245,8 @@ const divisionWorksheetControls = (): WorksheetControl[] => [
   problemCount(),
   sheetCount(),
   digits(),
+  focusFactorControl(),
+  duplicateProblemsControl(),
   divisionLayout(),
   answerKeyControl(),
   nameDateControl(),
@@ -640,7 +665,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Multiplication",
     category: "Multiplication & Division",
     examples: ["8 x 9 = ?"],
-    controls: digitWorksheetControls("vertical"),
+    controls: digitWorksheetControls("vertical", true),
   },
   {
     id: "division",
@@ -656,7 +681,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Mixed Multiplication and Division",
     category: "Multiplication & Division",
     examples: ["8 x 9 = ?", "8 / 2 = ?"],
-    controls: digitWorksheetControls("horizontal"),
+    controls: digitWorksheetControls("horizontal", true),
   },
   {
     id: "multiplicationmn",
@@ -664,7 +689,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Multiplication Missing Number",
     category: "Multiplication & Division",
     examples: ["8 x ? = 72"],
-    controls: digitWorksheetControls("horizontal"),
+    controls: digitWorksheetControls("horizontal", true),
   },
   {
     id: "division_mn",
@@ -672,7 +697,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Division Missing Number",
     category: "Multiplication & Division",
     examples: ["8 / ? = 2", "? / 4 = 3"],
-    controls: digitWorksheetControls("horizontal"),
+    controls: digitWorksheetControls("horizontal", true),
   },
   {
     id: "mixed_times_divide_mn",
@@ -680,7 +705,7 @@ export const worksheets: WorksheetDefinition[] = [
     title: "Mixed Multiplication and Division Missing Number",
     category: "Multiplication & Division",
     examples: ["8 x ? = 72", "? / 4 = 3"],
-    controls: digitWorksheetControls("horizontal"),
+    controls: digitWorksheetControls("horizontal", true),
   },
   {
     id: "greater_than_less_than",
