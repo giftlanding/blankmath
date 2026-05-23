@@ -65,7 +65,8 @@ Available practice includes:
 
 Teachers can use easy, medium, or hard presets, or set custom number ranges.
 Some worksheets also support constraints such as keeping the smaller operand
-under 10.
+under 10. Addition and subtraction worksheets can also focus on a specific
+number, such as always adding 7 or always subtracting 5.
 
 Addition and subtraction worksheets also support regrouping controls:
 
@@ -391,6 +392,7 @@ Depending on the worksheet type, users may be able to choose:
 - Versions from the same settings
 - Layout
 - Difficulty style
+- Focused number practice
 - Focused fact practice
 - Whether repeated problems are allowed
 - Name/date line
@@ -461,8 +463,8 @@ These features would make existing worksheets more useful in classrooms.
 
 - Broader difficulty presets, such as drawing-friendly and equation-ready
   choices for word problems.
-- Broader exact operand selection, such as addition practice only with a
-  specific addend or numbers from 1 through 5.
+- Broader exact operand selection for multi-number arithmetic and comparison
+  worksheets.
 
 ### Priority 3: More Visual And Applied Math
 

@@ -27,6 +27,7 @@ RANGE_MAX = 10000
 DIGIT_OPTIONS = {"1d", "2d", "3d", "l12", "l20"}
 DIFFICULTY_PRESET_OPTIONS = {"custom", "easy", "medium", "hard"}
 FOCUS_FACTOR_OPTIONS = {"any", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}
+FOCUS_NUMBER_OPTIONS = {"any", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"}
 LAYOUT_OPTIONS = {"horizontal", "vertical", "equation", "long_division", "distributive_property", "breaking_parentheses", "chicken_rabbit", "place_value", "fraction", "number_line", "clock", "hundred_chart"}
 DIVISION_LAYOUT_OPTIONS = {"horizontal", "equation", "long_division"}
 DISTRIBUTIVE_BASE_OPTIONS = {"near_10", "near_100", "mixed"}
@@ -136,6 +137,7 @@ RANGE_OPTIONS = {
     "from",
     "to",
     "difficultyPreset",
+    "focusNumber",
     "smallOperandLessThan10",
     "additionRegrouping",
     "subtractionRegrouping",
@@ -285,6 +287,19 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     focus_factor = normalized.get("focusFactor")
     if focus_factor is not None and str(focus_factor) not in FOCUS_FACTOR_OPTIONS:
         raise ValidationError("Focus factor must be any or a number from 1 through 12.")
+
+    focus_number = normalized.get("focusNumber")
+    if focus_number is not None and str(focus_number) not in FOCUS_NUMBER_OPTIONS:
+        raise ValidationError("Focus number must be any or a number from 0 through 20.")
+    if focus_number is not None and str(focus_number) != "any":
+        low, high = _effective_range(normalized)
+        focus_number_value = int(focus_number)
+        if worksheet_type in {"addition", "additionmn"}:
+            focus_number_too_large = focus_number_value > high
+        else:
+            focus_number_too_large = focus_number_value > high - low
+        if focus_number_too_large:
+            raise ValidationError("Focus number is too large for the selected range.")
 
     memo_text = normalized.get("memoText")
     if memo_text is not None:
@@ -446,3 +461,18 @@ def bool_option(options: dict[str, str | int | float | bool], key: str) -> bool 
     if not isinstance(value, bool):
         raise ValidationError(f"{key} must be true or false.")
     return value
+
+
+def _effective_range(options: dict[str, str | int | float | bool]) -> tuple[int, int]:
+    preset = options.get("difficultyPreset")
+    if preset == "easy":
+        return 0, 10
+    if preset == "medium":
+        return 0, 20
+    if preset == "hard":
+        return 0, 100
+    from_value = int_option(options, "from")
+    to_value = int_option(options, "to")
+    if from_value is None or to_value is None:
+        return 0, 20
+    return from_value, to_value

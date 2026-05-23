@@ -5,6 +5,7 @@ export const sheetCountOptions = Array.from({ length: 50 }, (_, index) => index 
 export const digitOptions = ["1d", "2d", "3d", "l12", "l20"] as const;
 export const difficultyPresetOptions = ["custom", "easy", "medium", "hard"] as const;
 export const focusFactorOptions = ["any", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
+export const focusNumberOptions = ["any", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] as const;
 export const layoutOptions = ["horizontal", "vertical"] as const;
 export const divisionLayoutOptions = ["equation", "long_division"] as const;
 export const distributiveBaseOptions = ["near_10", "near_100", "mixed"] as const;
@@ -147,6 +148,17 @@ const focusFactorControl = (): SelectControl => ({
   },
 });
 
+const focusNumberControl = (): SelectControl => ({
+  id: "focusNumber",
+  label: "Focus number",
+  type: "select",
+  options: focusNumberOptions,
+  defaultValue: "any",
+  optionLabels: {
+    any: "Any",
+  },
+});
+
 const rangeControls = (): WorksheetControl[] => [
   { id: "from", label: "From", type: "number", min: 0, max: 10000, defaultValue: 0 },
   { id: "to", label: "To", type: "number", min: 0, max: 10000, defaultValue: 20 },
@@ -251,6 +263,8 @@ const rangeWorksheetControls = (
   sheetCount(),
   layout(defaultLayout),
   difficultyPresetControl(),
+  focusNumberControl(),
+  duplicateProblemsControl(),
   ...rangeControls(),
   ...regroupingControls,
   ...(restrictionLabel ? [smallerOperandControl(restrictionLabel)] : []),

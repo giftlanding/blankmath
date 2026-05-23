@@ -66,6 +66,36 @@ class GeneratorTest(unittest.TestCase):
         for problem in problems:
             self.assertLessEqual(int(problem.answer), 10)
 
+    def test_generates_focused_addition_number(self):
+        problems = generate_problems("addition", {
+            "problemCount": 20,
+            "sheetCount": 1,
+            "from": 0,
+            "to": 20,
+            "focusNumber": 7,
+            "allowDuplicateProblems": True,
+        })
+
+        self.assertEqual(len(problems), 20)
+        for problem in problems:
+            left, right = _binary_terms(problem.prompt, "+")
+            self.assertIn(7, (left, right))
+
+    def test_generates_focused_subtraction_number(self):
+        problems = generate_problems("minus", {
+            "problemCount": 20,
+            "sheetCount": 1,
+            "from": 0,
+            "to": 20,
+            "focusNumber": 7,
+            "allowDuplicateProblems": True,
+        })
+
+        self.assertEqual(len(problems), 20)
+        for problem in problems:
+            _left, right = _binary_terms(problem.prompt, "-")
+            self.assertEqual(right, 7)
+
     def test_generates_subtraction_with_borrowing(self):
         problems = generate_problems("minus", {
             "problemCount": 10,

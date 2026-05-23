@@ -117,6 +117,13 @@ def _focus_factor(options: dict[str, Any]) -> int | None:
     return int(value)
 
 
+def _focus_number(options: dict[str, Any]) -> int | None:
+    value = options.get("focusNumber", "any")
+    if value in (None, "", "any"):
+        return None
+    return int(value)
+
+
 def _multiplication_terms(options: dict[str, Any]) -> tuple[int, int]:
     focus = _focus_factor(options)
     if focus is None:
@@ -138,11 +145,17 @@ def _division_terms(options: dict[str, Any]) -> tuple[int, int, int]:
 def _addition(options: dict[str, Any]) -> Problem:
     low, high = _range(options)
     mode = str(options.get("additionRegrouping", "mixed"))
+    focus = _focus_number(options)
     for _ in range(1000):
-        total = random.randint(low, high)
-        left = random.randint(0, total)
-        right = total - left
-        if options.get("smallOperandLessThan10"):
+        if focus is None:
+            total = random.randint(low, high)
+            left = random.randint(0, total)
+            right = total - left
+        else:
+            total = random.randint(max(low, focus), high)
+            other = total - focus
+            left, right = (focus, other) if random.choice([True, False]) else (other, focus)
+        if options.get("smallOperandLessThan10") and focus is None:
             left, right = _force_small_operand(left, right)
         if _matches_addition_regrouping(left, right, mode):
             break
@@ -155,11 +168,13 @@ def _subtraction(options: dict[str, Any]) -> Problem:
     low, high = _range(options)
     mode = str(options.get("subtractionRegrouping", "mixed"))
     allow_across_zeros = bool(options.get("borrowAcrossZeros", True))
+    focus = _focus_number(options)
     for _ in range(1000):
-        result = random.randint(low, high)
-        right = random.randint(0, max(0, high - result))
+        result_high = high if focus is None else high - focus
+        result = random.randint(low, result_high)
+        right = focus if focus is not None else random.randint(0, max(0, high - result))
         left = result + right
-        if options.get("smallOperandLessThan10") and right >= 10:
+        if options.get("smallOperandLessThan10") and focus is None and right >= 10:
             right = random.randint(0, 9)
             left = result + right
         if _matches_subtraction_regrouping(left, right, mode, allow_across_zeros):
