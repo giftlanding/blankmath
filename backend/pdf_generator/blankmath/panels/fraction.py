@@ -25,9 +25,13 @@ class FractionPanel(Flowable):
         left_denominator = getattr(self.problem, "left_denominator", None)
         right_numerator = getattr(self.problem, "right_numerator", None)
         right_denominator = getattr(self.problem, "right_denominator", None)
+        left_whole = getattr(self.problem, "left_whole", None)
+        right_whole = getattr(self.problem, "right_whole", None)
         operator = getattr(self.problem, "operator", "")
         if left_numerator is None or left_denominator is None:
-            left_numerator, left_denominator = _parse_first_fraction(getattr(self.problem, "prompt", str(self.problem)))
+            parsed_fraction = _parse_first_fraction(getattr(self.problem, "prompt", str(self.problem)))
+            if parsed_fraction is not None:
+                left_numerator, left_denominator = parsed_fraction
 
         canvas.saveState()
         canvas.setFillColor(colors.black)
@@ -39,6 +43,13 @@ class FractionPanel(Flowable):
             self._draw_fraction(canvas, 0.62 * inch, center_y, left_numerator, left_denominator)
             self._draw_blank(canvas, self.width / 2 - 0.23 * inch, center_y - 0.02 * inch, 0.46 * inch)
             self._draw_fraction(canvas, self.width - 0.62 * inch, center_y, right_numerator, right_denominator)
+        elif operator == "add":
+            next_x = self._draw_term(canvas, 0.24 * inch, center_y, left_whole, left_numerator, left_denominator)
+            canvas.setFont(FONT, FRACTION_FONT_SIZE)
+            canvas.drawString(next_x + 0.12 * inch, center_y - 0.07 * inch, "+")
+            next_x = self._draw_term(canvas, next_x + 0.42 * inch, center_y, right_whole, right_numerator, right_denominator)
+            canvas.drawString(next_x + 0.12 * inch, center_y - 0.07 * inch, "=")
+            self._draw_blank(canvas, next_x + 0.43 * inch, center_y - 0.02 * inch, max(0.4 * inch, self.width - next_x - 0.62 * inch))
         else:
             self._draw_fraction(canvas, 0.72 * inch, center_y, left_numerator, left_denominator)
             canvas.setFont(FONT, FRACTION_FONT_SIZE)
@@ -60,11 +71,42 @@ class FractionPanel(Flowable):
         canvas.line(center_x - fraction_width / 2, center_y + 0.08 * inch, center_x + fraction_width / 2, center_y + 0.08 * inch)
         canvas.drawCentredString(center_x, center_y - 0.14 * inch, denominator_text)
 
+    def _draw_term(
+        self,
+        canvas,
+        x: float,
+        center_y: float,
+        whole: int | None,
+        numerator: int | None,
+        denominator: int | None,
+    ) -> float:
+        canvas.setFont(FONT, FRACTION_FONT_SIZE)
+        next_x = x
+        if whole is not None:
+            whole_text = str(whole)
+            canvas.drawString(next_x, center_y - 0.07 * inch, whole_text)
+            next_x += canvas.stringWidth(whole_text, FONT, FRACTION_FONT_SIZE) + 0.1 * inch
+        if numerator is None or denominator is None:
+            return next_x
+        fraction_width = self._fraction_width(canvas, numerator, denominator)
+        self._draw_fraction(canvas, next_x + fraction_width / 2, center_y, numerator, denominator)
+        return next_x + fraction_width
+
     def _draw_blank(self, canvas, x: float, y: float, width: float) -> None:
         canvas.line(x, y, x + width, y)
 
+    def _fraction_width(self, canvas, numerator: int, denominator: int) -> float:
+        canvas.setFont(FONT, FRACTION_FONT_SIZE)
+        return max(
+            canvas.stringWidth(str(numerator), FONT, FRACTION_FONT_SIZE),
+            canvas.stringWidth(str(denominator), FONT, FRACTION_FONT_SIZE),
+            0.28 * inch,
+        ) + 0.12 * inch
 
-def _parse_first_fraction(text: str) -> tuple[int, int]:
+
+def _parse_first_fraction(text: str) -> tuple[int, int] | None:
     token = text.split()[0]
+    if "/" not in token:
+        return None
     numerator, denominator = token.split("/")
     return int(numerator), int(denominator)

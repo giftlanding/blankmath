@@ -264,6 +264,24 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 201)
 
+    def test_accepts_fraction_addition_request(self):
+        with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
+            result = handle_event({
+                "headers": {"x-blankmath-internal-token": "test-token"},
+                "body": json.dumps({
+                    "worksheetType": "fraction_addition",
+                    "options": {
+                        "problemCount": 10,
+                        "sheetCount": 1,
+                        "fractionDifficulty": "easy",
+                        "fractionAdditionStyle": "integer_mixed",
+                        "includeAnswerKey": True,
+                    },
+                }),
+            })
+
+        self.assertEqual(result["statusCode"], 201)
+
     def test_accepts_number_line_request(self):
         with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
             result = handle_event({
@@ -464,6 +482,22 @@ class ApiTest(unittest.TestCase):
                     "problemCount": 10,
                     "sheetCount": 1,
                     "fractionDifficulty": "extreme",
+                },
+            }),
+        })
+
+        self.assertEqual(result["statusCode"], 400)
+
+    def test_rejects_invalid_fraction_addition_style(self):
+        result = handle_event({
+            "headers": {"x-blankmath-internal-token": "test-token"},
+            "body": json.dumps({
+                "worksheetType": "fraction_addition",
+                "options": {
+                    "problemCount": 10,
+                    "sheetCount": 1,
+                    "fractionDifficulty": "easy",
+                    "fractionAdditionStyle": "mixed_number_only",
                 },
             }),
         })

@@ -92,6 +92,13 @@ WORKSHEETS: dict[str, WorksheetDefinition] = {
         allowed_problem_counts=(10, 20),
         max_sheet_count=10,
     ),
+    "fraction_addition": WorksheetDefinition(
+        "Add Fractions",
+        default_layout="fraction",
+        option_profile="fraction",
+        allowed_problem_counts=(10, 20),
+        max_sheet_count=10,
+    ),
     "number_line_missing": WorksheetDefinition(
         "Missing Number Lines",
         default_layout="number_line",

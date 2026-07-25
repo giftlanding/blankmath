@@ -9,10 +9,12 @@ from typing import Any
 class FractionProblem:
     prompt: str
     answer: str
-    left_numerator: int
-    left_denominator: int
+    left_numerator: int | None
+    left_denominator: int | None
+    left_whole: int | None = None
     right_numerator: int | None = None
     right_denominator: int | None = None
+    right_whole: int | None = None
     operator: str = ""
 
 
@@ -84,6 +86,56 @@ def compare_fraction(options: dict[str, Any]) -> FractionProblem:
     raise ValueError("Unable to generate comparable fractions.")
 
 
+def add_fraction(options: dict[str, Any]) -> FractionProblem:
+    denominator_max = _denominator_max(options)
+    style = str(options.get("fractionAdditionStyle", "fraction_fraction"))
+    if style == "mixed":
+        style = random.choice(["fraction_fraction", "integer_fraction", "integer_mixed"])
+
+    left_whole: int | None = None
+    right_whole: int | None = None
+    left_numerator: int | None
+    left_denominator: int | None
+    right_numerator: int | None
+    right_denominator: int | None
+
+    if style == "fraction_fraction":
+        left_numerator, left_denominator = _proper_fraction_terms(denominator_max)
+        right_numerator, right_denominator = _proper_fraction_terms(denominator_max)
+        left_value = Fraction(left_numerator, left_denominator)
+        right_value = Fraction(right_numerator, right_denominator)
+    elif style == "integer_fraction":
+        left_whole = random.randint(1, 9)
+        left_numerator = None
+        left_denominator = None
+        right_numerator, right_denominator = _proper_fraction_terms(denominator_max)
+        left_value = Fraction(left_whole, 1)
+        right_value = Fraction(right_numerator, right_denominator)
+    elif style == "integer_mixed":
+        left_whole = random.randint(1, 9)
+        left_numerator = None
+        left_denominator = None
+        right_whole = random.randint(1, 9)
+        right_numerator, right_denominator = _proper_fraction_terms(denominator_max)
+        left_value = Fraction(left_whole, 1)
+        right_value = Fraction(right_whole, 1) + Fraction(right_numerator, right_denominator)
+    else:
+        raise ValueError("Unsupported fraction addition style.")
+
+    prompt = f"{_term_text(left_whole, left_numerator, left_denominator)} + {_term_text(right_whole, right_numerator, right_denominator)} = ?"
+    return FractionProblem(
+        prompt=prompt,
+        answer=_mixed_fraction_text(left_value + right_value),
+        left_numerator=left_numerator,
+        left_denominator=left_denominator,
+        left_whole=left_whole,
+        right_numerator=right_numerator,
+        right_denominator=right_denominator,
+        right_whole=right_whole,
+        operator="add",
+    )
+
+
 def _denominator_max(options: dict[str, Any]) -> int:
     difficulty = str(options.get("fractionDifficulty", "easy"))
     if difficulty == "hard":
@@ -95,3 +147,29 @@ def _denominator_max(options: dict[str, Any]) -> int:
 
 def _fraction_text(numerator: int, denominator: int) -> str:
     return f"{numerator}/{denominator}"
+
+
+def _proper_fraction_terms(denominator_max: int) -> tuple[int, int]:
+    denominator = random.randint(2, denominator_max)
+    numerator = random.randint(1, denominator - 1)
+    return numerator, denominator
+
+
+def _term_text(whole: int | None, numerator: int | None, denominator: int | None) -> str:
+    if numerator is None or denominator is None:
+        return str(whole)
+    fraction = _fraction_text(numerator, denominator)
+    if whole is None:
+        return fraction
+    return f"{whole} {fraction}"
+
+
+def _mixed_fraction_text(value: Fraction) -> str:
+    whole = value.numerator // value.denominator
+    remainder = value - whole
+    if remainder == 0:
+        return str(whole)
+    fraction = _fraction_text(remainder.numerator, remainder.denominator)
+    if whole == 0:
+        return fraction
+    return f"{whole} {fraction}"

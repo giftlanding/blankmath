@@ -2,6 +2,7 @@ import sys
 import unittest
 import re
 import math
+from fractions import Fraction
 from pathlib import Path
 
 
@@ -314,6 +315,43 @@ class GeneratorTest(unittest.TestCase):
             right = problem.right_numerator * problem.left_denominator
             self.assertEqual(problem.answer, ">" if left > right else "<")
 
+    def test_generates_fraction_addition_styles(self):
+        style_expectations = {
+            "fraction_fraction": r"^\d+/\d+ \+ \d+/\d+ = \?$",
+            "integer_fraction": r"^\d+ \+ \d+/\d+ = \?$",
+            "integer_mixed": r"^\d+ \+ \d+ \d+/\d+ = \?$",
+        }
+
+        for style, prompt_pattern in style_expectations.items():
+            with self.subTest(style=style):
+                problems = generate_problems("fraction_addition", {
+                    "problemCount": 10,
+                    "sheetCount": 1,
+                    "fractionDifficulty": "easy",
+                    "fractionAdditionStyle": style,
+                })
+
+                self.assertEqual(len(problems), 10)
+                self.assertTrue(all(isinstance(problem, FractionProblem) for problem in problems))
+                for problem in problems:
+                    self.assertRegex(problem.prompt, prompt_pattern)
+                    self.assertEqual(problem.operator, "add")
+                    self.assertEqual(_fraction_addition_answer(problem.prompt), _number_or_fraction_value(problem.answer))
+
+    def test_generates_mixed_fraction_addition_style(self):
+        problems = generate_problems("fraction_addition", {
+            "problemCount": 20,
+            "sheetCount": 1,
+            "fractionDifficulty": "easy",
+            "fractionAdditionStyle": "mixed",
+        })
+
+        self.assertEqual(len(problems), 20)
+        for problem in problems:
+            self.assertIn(" + ", problem.prompt)
+            self.assertEqual(problem.operator, "add")
+            self.assertEqual(_fraction_addition_answer(problem.prompt), _number_or_fraction_value(problem.answer))
+
     def test_generates_missing_number_line_problems(self):
         problems = generate_problems("number_line_missing", {
             "problemCount": 4,
@@ -377,6 +415,22 @@ def _binary_terms(prompt: str, operator: str) -> tuple[int, int]:
 def _fraction_terms(value: str) -> tuple[int, int]:
     numerator, denominator = value.split("/")
     return int(numerator), int(denominator)
+
+
+def _fraction_addition_answer(prompt: str) -> Fraction:
+    equation = prompt.removesuffix(" = ?")
+    left, right = equation.split(" + ")
+    return _number_or_fraction_value(left) + _number_or_fraction_value(right)
+
+
+def _number_or_fraction_value(value: str) -> Fraction:
+    if " " in value:
+        whole, fraction = value.split()
+        return Fraction(int(whole), 1) + _number_or_fraction_value(fraction)
+    if "/" in value:
+        numerator, denominator = value.split("/")
+        return Fraction(int(numerator), int(denominator))
+    return Fraction(int(value), 1)
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@ const existingWorksheetIds = [
   "fraction_reduce",
   "fraction_equivalent",
   "fraction_compare",
+  "fraction_addition",
   "number_line_missing",
   "time_read_clock",
   "time_draw_hands",
@@ -49,6 +50,17 @@ describe("worksheet definitions", () => {
     for (const worksheet of worksheets) {
       expect(worksheetById.get(worksheet.id)).toBe(worksheet);
     }
+  });
+
+  it("offers all fraction addition styles", () => {
+    const worksheet = worksheetById.get("fraction_addition");
+    const styleControl = worksheet?.controls.find((control) => control.id === "fractionAdditionStyle");
+
+    expect(styleControl).toMatchObject({
+      type: "select",
+      options: ["fraction_fraction", "integer_fraction", "integer_mixed", "mixed"],
+      defaultValue: "mixed",
+    });
   });
 
   it("offers answer keys for worksheets that support one", () => {
