@@ -68,6 +68,12 @@ variable "cloudflare_pages_project_name" {
   default     = "blankmath"
 }
 
+variable "email_forward_destination" {
+  description = "Destination address for Cloudflare Email Routing catch-all forwarding."
+  type        = string
+  default     = "yefuwang@gmail.com"
+}
+
 variable "ga4_measurement_id" {
   description = "Google Analytics 4 measurement ID for server-side PDF generation events."
   type        = string

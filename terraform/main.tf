@@ -350,12 +350,16 @@ resource "cloudflare_dns_record" "generated_pdfs" {
 
 resource "cloudflare_email_routing_dns" "primary" {
   zone_id = var.cloudflare_zone_id
-  name    = var.domain_name
+}
+
+resource "cloudflare_email_routing_address" "forward_destination" {
+  account_id = var.cloudflare_account_id
+  email      = var.email_forward_destination
 }
 
 resource "cloudflare_email_routing_catch_all" "primary" {
   zone_id = var.cloudflare_zone_id
-  name    = "Forward all blankmath.com mail to yefuwang@gmail.com"
+  name    = "Forward all ${var.domain_name} email to ${var.email_forward_destination}"
   enabled = true
 
   matchers = [{
@@ -364,8 +368,11 @@ resource "cloudflare_email_routing_catch_all" "primary" {
 
   actions = [{
     type  = "forward"
-    value = ["yefuwang@gmail.com"]
+    value = [var.email_forward_destination]
   }]
 
-  depends_on = [cloudflare_email_routing_dns.primary]
+  depends_on = [
+    cloudflare_email_routing_address.forward_destination,
+    cloudflare_email_routing_dns.primary,
+  ]
 }

@@ -19,6 +19,9 @@ Spacelift should provide these values:
 - `TF_VAR_cloudflare_account_id`
 - `TF_VAR_cloudflare_zone_id`
 
+The Cloudflare API token also needs permission to manage Email Routing for the
+zone and account destination addresses.
+
 Optional:
 
 - `TF_VAR_aws_region`, defaults to `us-east-1`
@@ -48,6 +51,9 @@ The initial production architecture is intentionally small and scale-to-zero:
 - Lambda Function URL for the backend endpoint.
 - Public S3 bucket for generated PDFs at `https://r.blankmath.com`.
 - Cloudflare DNS for the generated PDF domain.
+- Cloudflare Email Routing DNS setup.
+- Email Routing destination address: `yefuwang@gmail.com`.
+- Email Routing catch-all forwarding for `*@blankmath.com`.
 - S3 lifecycle expiration for generated PDFs.
 - Random internal API token shared by Cloudflare Pages Functions and Lambda.
 
