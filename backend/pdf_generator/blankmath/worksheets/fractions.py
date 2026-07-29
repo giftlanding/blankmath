@@ -151,7 +151,7 @@ def multiply_divide_fraction(options: dict[str, Any]) -> FractionProblem:
         prompt_operator = "x"
         answer = left_value * right_value
     elif style == "divide":
-        prompt_operator = "/"
+        prompt_operator = "÷"
         answer = left_value / right_value
     else:
         raise ValueError("Unsupported fraction multiplication/division style.")

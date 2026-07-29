@@ -355,7 +355,7 @@ class GeneratorTest(unittest.TestCase):
     def test_generates_fraction_multiplication_division_styles(self):
         style_expectations = {
             "multiply": r"^\d+/\d+ x \d+/\d+ = \?$",
-            "divide": r"^\d+/\d+ / \d+/\d+ = \?$",
+            "divide": r"^\d+/\d+ ÷ \d+/\d+ = \?$",
         }
 
         for style, prompt_pattern in style_expectations.items():
@@ -464,7 +464,7 @@ def _fraction_multiplication_division_answer(prompt: str) -> Fraction:
     if " x " in equation:
         left, right = equation.split(" x ")
         return _number_or_fraction_value(left) * _number_or_fraction_value(right)
-    left, right = equation.split(" / ")
+    left, right = equation.split(" ÷ ")
     return _number_or_fraction_value(left) / _number_or_fraction_value(right)
 
 
