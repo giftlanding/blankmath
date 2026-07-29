@@ -50,6 +50,13 @@ class FractionPanel(Flowable):
             next_x = self._draw_term(canvas, next_x + 0.42 * inch, center_y, right_whole, right_numerator, right_denominator)
             canvas.drawString(next_x + 0.12 * inch, center_y - 0.07 * inch, "=")
             self._draw_blank(canvas, next_x + 0.43 * inch, center_y - 0.02 * inch, max(0.4 * inch, self.width - next_x - 0.62 * inch))
+        elif operator in {"multiply", "divide"}:
+            next_x = self._draw_term(canvas, 0.24 * inch, center_y, left_whole, left_numerator, left_denominator)
+            canvas.setFont(FONT, FRACTION_FONT_SIZE)
+            canvas.drawString(next_x + 0.12 * inch, center_y - 0.07 * inch, "x" if operator == "multiply" else "/")
+            next_x = self._draw_term(canvas, next_x + 0.42 * inch, center_y, right_whole, right_numerator, right_denominator)
+            canvas.drawString(next_x + 0.12 * inch, center_y - 0.07 * inch, "=")
+            self._draw_blank(canvas, next_x + 0.43 * inch, center_y - 0.02 * inch, max(0.4 * inch, self.width - next_x - 0.62 * inch))
         else:
             self._draw_fraction(canvas, 0.72 * inch, center_y, left_numerator, left_denominator)
             canvas.setFont(FONT, FRACTION_FONT_SIZE)

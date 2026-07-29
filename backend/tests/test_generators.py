@@ -352,6 +352,42 @@ class GeneratorTest(unittest.TestCase):
             self.assertEqual(problem.operator, "add")
             self.assertEqual(_fraction_addition_answer(problem.prompt), _number_or_fraction_value(problem.answer))
 
+    def test_generates_fraction_multiplication_division_styles(self):
+        style_expectations = {
+            "multiply": r"^\d+/\d+ x \d+/\d+ = \?$",
+            "divide": r"^\d+/\d+ / \d+/\d+ = \?$",
+        }
+
+        for style, prompt_pattern in style_expectations.items():
+            with self.subTest(style=style):
+                problems = generate_problems("fraction_multiplication_division", {
+                    "problemCount": 10,
+                    "sheetCount": 1,
+                    "fractionDifficulty": "easy",
+                    "fractionMultiplicationDivisionStyle": style,
+                })
+
+                self.assertEqual(len(problems), 10)
+                self.assertTrue(all(isinstance(problem, FractionProblem) for problem in problems))
+                for problem in problems:
+                    self.assertRegex(problem.prompt, prompt_pattern)
+                    self.assertEqual(problem.operator, style)
+                    self.assertEqual(_fraction_multiplication_division_answer(problem.prompt), _number_or_fraction_value(problem.answer))
+
+    def test_generates_mixed_fraction_multiplication_division_style(self):
+        problems = generate_problems("fraction_multiplication_division", {
+            "problemCount": 20,
+            "sheetCount": 1,
+            "fractionDifficulty": "easy",
+            "fractionMultiplicationDivisionStyle": "mixed",
+        })
+
+        self.assertEqual(len(problems), 20)
+        for problem in problems:
+            self.assertRegex(problem.prompt, r" \S+ ")
+            self.assertIn(problem.operator, {"multiply", "divide"})
+            self.assertEqual(_fraction_multiplication_division_answer(problem.prompt), _number_or_fraction_value(problem.answer))
+
     def test_generates_missing_number_line_problems(self):
         problems = generate_problems("number_line_missing", {
             "problemCount": 4,
@@ -421,6 +457,15 @@ def _fraction_addition_answer(prompt: str) -> Fraction:
     equation = prompt.removesuffix(" = ?")
     left, right = equation.split(" + ")
     return _number_or_fraction_value(left) + _number_or_fraction_value(right)
+
+
+def _fraction_multiplication_division_answer(prompt: str) -> Fraction:
+    equation = prompt.removesuffix(" = ?")
+    if " x " in equation:
+        left, right = equation.split(" x ")
+        return _number_or_fraction_value(left) * _number_or_fraction_value(right)
+    left, right = equation.split(" / ")
+    return _number_or_fraction_value(left) / _number_or_fraction_value(right)
 
 
 def _number_or_fraction_value(value: str) -> Fraction:

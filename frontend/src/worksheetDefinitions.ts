@@ -18,6 +18,7 @@ export const additionRegroupingOptions = ["mixed", "with_carrying", "without_car
 export const subtractionRegroupingOptions = ["mixed", "with_borrowing", "without_borrowing"] as const;
 export const fractionDifficultyOptions = ["easy", "medium", "hard"] as const;
 export const fractionAdditionStyleOptions = ["fraction_fraction", "integer_fraction", "integer_mixed", "mixed"] as const;
+export const fractionMultiplicationDivisionStyleOptions = ["multiply", "divide", "mixed"] as const;
 export const numberLineSizeOptions = ["small", "large"] as const;
 export const timeIncrementOptions = ["hour", "half_hour", "quarter_hour", "five_minutes", "one_minute"] as const;
 export const chartRangeOptions = ["1_100", "0_99", "101_200", "201_300"] as const;
@@ -547,6 +548,51 @@ const fractionAdditionControls = (): WorksheetControl[] => [
   memoTextControl(),
 ];
 
+const fractionMultiplicationDivisionControls = (): WorksheetControl[] => [
+  {
+    id: "problemCount",
+    label: "Problems",
+    type: "select",
+    options: [10, 20],
+    defaultValue: 10,
+  },
+  {
+    id: "sheetCount",
+    label: "Versions",
+    type: "select",
+    options: sheetCountOptions.slice(0, 10),
+    defaultValue: 1,
+  },
+  {
+    id: "fractionDifficulty",
+    label: "Difficulty",
+    type: "select",
+    options: fractionDifficultyOptions,
+    defaultValue: "easy",
+    optionLabels: {
+      easy: "Easy",
+      medium: "Medium",
+      hard: "Hard",
+    },
+  },
+  {
+    id: "fractionMultiplicationDivisionStyle",
+    label: "Style",
+    type: "select",
+    options: fractionMultiplicationDivisionStyleOptions,
+    defaultValue: "mixed",
+    optionLabels: {
+      multiply: "Multiply",
+      divide: "Divide",
+      mixed: "Mixed",
+    },
+  },
+  answerKeyControl(),
+  nameDateControl(),
+  classPeriodControl(),
+  memoTextControl(),
+];
+
 const numberLineControls = (): WorksheetControl[] => [
   {
     id: "problemCount",
@@ -882,6 +928,14 @@ export const worksheets: WorksheetDefinition[] = [
     category: "Fractions",
     examples: ["1/2 + 2/3 = ?", "1 + 1/2 = ?", "2 + 1 1/3 = ?"],
     controls: fractionAdditionControls(),
+  },
+  {
+    id: "fraction_multiplication_division",
+    path: "/fraction_multiplication_division",
+    title: "Multiply and Divide Fractions",
+    category: "Fractions",
+    examples: ["1/2 x 2/3 = ?", "3/4 / 1/2 = ?"],
+    controls: fractionMultiplicationDivisionControls(),
   },
   {
     id: "number_line_missing",

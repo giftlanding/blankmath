@@ -40,6 +40,7 @@ ADDITION_REGROUPING_OPTIONS = {"with_carrying", "without_carrying", "mixed"}
 SUBTRACTION_REGROUPING_OPTIONS = {"with_borrowing", "without_borrowing", "mixed"}
 FRACTION_DIFFICULTY_OPTIONS = {"easy", "medium", "hard"}
 FRACTION_ADDITION_STYLE_OPTIONS = {"fraction_fraction", "integer_fraction", "integer_mixed", "mixed"}
+FRACTION_MULTIPLICATION_DIVISION_STYLE_OPTIONS = {"multiply", "divide", "mixed"}
 NUMBER_LINE_SIZE_OPTIONS = {"small", "large"}
 TIME_INCREMENT_OPTIONS = {"hour", "half_hour", "quarter_hour", "five_minutes", "one_minute"}
 CHART_RANGE_OPTIONS = {"1_100", "0_99", "101_200", "201_300"}
@@ -102,6 +103,7 @@ FRACTION_WORKSHEET_TYPES = {
     "fraction_equivalent",
     "fraction_compare",
     "fraction_addition",
+    "fraction_multiplication_division",
 }
 
 NUMBER_LINE_WORKSHEET_TYPES = {
@@ -151,7 +153,7 @@ LAYOUT_OPTIONS_KEYS = {"layout"}
 DISTRIBUTIVE_PROPERTY_OPTIONS = {"base", "direction", "difficulty"}
 CHICKEN_RABBIT_OPTIONS = {"numberSize"}
 PLACE_VALUE_OPTIONS = {"placeValueDigits", "zeroMode"}
-FRACTION_OPTIONS = {"fractionDifficulty", "includeImproperFractions", "fractionAdditionStyle"}
+FRACTION_OPTIONS = {"fractionDifficulty", "includeImproperFractions", "fractionAdditionStyle", "fractionMultiplicationDivisionStyle"}
 NUMBER_LINE_OPTIONS = {"numberLineSize"}
 TIME_OPTIONS = {"timeIncrement"}
 HUNDRED_CHART_OPTIONS = {"chartRange", "blankPercent", "skipMultiple"}
@@ -377,6 +379,15 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
         raise ValidationError("Fraction addition style is only supported for fraction addition worksheets.")
     if fraction_addition_style is not None and fraction_addition_style not in FRACTION_ADDITION_STYLE_OPTIONS:
         raise ValidationError("Fraction addition style must be fraction + fraction, integer + fraction, integer + mixed number, or mixed.")
+
+    fraction_multiplication_division_style = normalized.get("fractionMultiplicationDivisionStyle")
+    if fraction_multiplication_division_style is not None and worksheet_type != "fraction_multiplication_division":
+        raise ValidationError("Fraction multiplication/division style is only supported for fraction multiplication and division worksheets.")
+    if (
+        fraction_multiplication_division_style is not None
+        and fraction_multiplication_division_style not in FRACTION_MULTIPLICATION_DIVISION_STYLE_OPTIONS
+    ):
+        raise ValidationError("Fraction multiplication/division style must be multiply, divide, or mixed.")
 
     number_line_size = normalized.get("numberLineSize")
     if number_line_size is not None and number_line_size not in NUMBER_LINE_SIZE_OPTIONS:

@@ -22,6 +22,7 @@ const existingWorksheetIds = [
   "fraction_equivalent",
   "fraction_compare",
   "fraction_addition",
+  "fraction_multiplication_division",
   "number_line_missing",
   "time_read_clock",
   "time_draw_hands",
@@ -59,6 +60,17 @@ describe("worksheet definitions", () => {
     expect(styleControl).toMatchObject({
       type: "select",
       options: ["fraction_fraction", "integer_fraction", "integer_mixed", "mixed"],
+      defaultValue: "mixed",
+    });
+  });
+
+  it("offers all fraction multiplication and division styles", () => {
+    const worksheet = worksheetById.get("fraction_multiplication_division");
+    const styleControl = worksheet?.controls.find((control) => control.id === "fractionMultiplicationDivisionStyle");
+
+    expect(styleControl).toMatchObject({
+      type: "select",
+      options: ["multiply", "divide", "mixed"],
       defaultValue: "mixed",
     });
   });

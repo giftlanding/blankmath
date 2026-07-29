@@ -136,6 +136,38 @@ def add_fraction(options: dict[str, Any]) -> FractionProblem:
     )
 
 
+def multiply_divide_fraction(options: dict[str, Any]) -> FractionProblem:
+    denominator_max = _denominator_max(options)
+    style = str(options.get("fractionMultiplicationDivisionStyle", "mixed"))
+    if style == "mixed":
+        style = random.choice(["multiply", "divide"])
+
+    left_numerator, left_denominator = _proper_fraction_terms(denominator_max)
+    right_numerator, right_denominator = _proper_fraction_terms(denominator_max)
+    left_value = Fraction(left_numerator, left_denominator)
+    right_value = Fraction(right_numerator, right_denominator)
+
+    if style == "multiply":
+        prompt_operator = "x"
+        answer = left_value * right_value
+    elif style == "divide":
+        prompt_operator = "/"
+        answer = left_value / right_value
+    else:
+        raise ValueError("Unsupported fraction multiplication/division style.")
+
+    prompt = f"{_fraction_text(left_numerator, left_denominator)} {prompt_operator} {_fraction_text(right_numerator, right_denominator)} = ?"
+    return FractionProblem(
+        prompt=prompt,
+        answer=_mixed_fraction_text(answer),
+        left_numerator=left_numerator,
+        left_denominator=left_denominator,
+        right_numerator=right_numerator,
+        right_denominator=right_denominator,
+        operator=style,
+    )
+
+
 def _denominator_max(options: dict[str, Any]) -> int:
     difficulty = str(options.get("fractionDifficulty", "easy"))
     if difficulty == "hard":
