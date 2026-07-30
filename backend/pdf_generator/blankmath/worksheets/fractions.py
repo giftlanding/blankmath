@@ -45,8 +45,7 @@ def reduce_fraction(options: dict[str, Any]) -> FractionProblem:
 def equivalent_fraction(options: dict[str, Any]) -> FractionProblem:
     denominator_max = _denominator_max(options)
     for _ in range(1000):
-        denominator = random.randint(2, max(3, denominator_max // 2))
-        numerator = random.randint(1, denominator - 1)
+        numerator, denominator = _proper_fraction_terms(max(3, denominator_max // 2))
         multiplier = random.randint(2, max(2, denominator_max // denominator))
         equivalent_numerator = numerator * multiplier
         equivalent_denominator = denominator * multiplier
@@ -65,10 +64,8 @@ def equivalent_fraction(options: dict[str, Any]) -> FractionProblem:
 def compare_fraction(options: dict[str, Any]) -> FractionProblem:
     denominator_max = _denominator_max(options)
     for _ in range(1000):
-        left_denominator = random.randint(2, denominator_max)
-        right_denominator = random.randint(2, denominator_max)
-        left_numerator = random.randint(1, left_denominator - 1)
-        right_numerator = random.randint(1, right_denominator - 1)
+        left_numerator, left_denominator = _proper_fraction_terms(denominator_max)
+        right_numerator, right_denominator = _proper_fraction_terms(denominator_max)
         left_value = Fraction(left_numerator, left_denominator)
         right_value = Fraction(right_numerator, right_denominator)
         if left_value == right_value:
@@ -182,9 +179,12 @@ def _fraction_text(numerator: int, denominator: int) -> str:
 
 
 def _proper_fraction_terms(denominator_max: int) -> tuple[int, int]:
-    denominator = random.randint(2, denominator_max)
-    numerator = random.randint(1, denominator - 1)
-    return numerator, denominator
+    for _ in range(1000):
+        denominator = random.randint(2, denominator_max)
+        numerator = random.randint(1, denominator - 1)
+        if math.gcd(numerator, denominator) == 1:
+            return numerator, denominator
+    raise ValueError("Unable to generate a simplified proper fraction.")
 
 
 def _term_text(whole: int | None, numerator: int | None, denominator: int | None) -> str:

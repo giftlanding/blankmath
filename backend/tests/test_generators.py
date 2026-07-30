@@ -297,6 +297,7 @@ class GeneratorTest(unittest.TestCase):
 
         self.assertEqual(len(problems), 10)
         for problem in problems:
+            self.assertEqual(math.gcd(problem.left_numerator, problem.left_denominator), 1)
             self.assertEqual(
                 problem.left_numerator * problem.right_denominator,
                 problem.right_numerator * problem.left_denominator,
@@ -311,6 +312,8 @@ class GeneratorTest(unittest.TestCase):
 
         self.assertEqual(len(problems), 10)
         for problem in problems:
+            self.assertEqual(math.gcd(problem.left_numerator, problem.left_denominator), 1)
+            self.assertEqual(math.gcd(problem.right_numerator, problem.right_denominator), 1)
             left = problem.left_numerator * problem.right_denominator
             right = problem.right_numerator * problem.left_denominator
             self.assertEqual(problem.answer, ">" if left > right else "<")
@@ -336,6 +339,8 @@ class GeneratorTest(unittest.TestCase):
                 for problem in problems:
                     self.assertRegex(problem.prompt, prompt_pattern)
                     self.assertEqual(problem.operator, "add")
+                    self.assert_simplified_fraction_terms(problem.left_numerator, problem.left_denominator)
+                    self.assert_simplified_fraction_terms(problem.right_numerator, problem.right_denominator)
                     self.assertEqual(_fraction_addition_answer(problem.prompt), _number_or_fraction_value(problem.answer))
 
     def test_generates_mixed_fraction_addition_style(self):
@@ -350,6 +355,8 @@ class GeneratorTest(unittest.TestCase):
         for problem in problems:
             self.assertIn(" + ", problem.prompt)
             self.assertEqual(problem.operator, "add")
+            self.assert_simplified_fraction_terms(problem.left_numerator, problem.left_denominator)
+            self.assert_simplified_fraction_terms(problem.right_numerator, problem.right_denominator)
             self.assertEqual(_fraction_addition_answer(problem.prompt), _number_or_fraction_value(problem.answer))
 
     def test_generates_fraction_multiplication_division_styles(self):
@@ -372,6 +379,8 @@ class GeneratorTest(unittest.TestCase):
                 for problem in problems:
                     self.assertRegex(problem.prompt, prompt_pattern)
                     self.assertEqual(problem.operator, style)
+                    self.assert_simplified_fraction_terms(problem.left_numerator, problem.left_denominator)
+                    self.assert_simplified_fraction_terms(problem.right_numerator, problem.right_denominator)
                     self.assertEqual(_fraction_multiplication_division_answer(problem.prompt), _number_or_fraction_value(problem.answer))
 
     def test_generates_mixed_fraction_multiplication_division_style(self):
@@ -386,7 +395,14 @@ class GeneratorTest(unittest.TestCase):
         for problem in problems:
             self.assertRegex(problem.prompt, r" \S+ ")
             self.assertIn(problem.operator, {"multiply", "divide"})
+            self.assert_simplified_fraction_terms(problem.left_numerator, problem.left_denominator)
+            self.assert_simplified_fraction_terms(problem.right_numerator, problem.right_denominator)
             self.assertEqual(_fraction_multiplication_division_answer(problem.prompt), _number_or_fraction_value(problem.answer))
+
+    def assert_simplified_fraction_terms(self, numerator: int | None, denominator: int | None):
+        if numerator is None or denominator is None:
+            return
+        self.assertEqual(math.gcd(numerator, denominator), 1)
 
     def test_generates_missing_number_line_problems(self):
         problems = generate_problems("number_line_missing", {
