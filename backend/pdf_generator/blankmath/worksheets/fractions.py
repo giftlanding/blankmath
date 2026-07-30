@@ -139,28 +139,50 @@ def multiply_divide_fraction(options: dict[str, Any]) -> FractionProblem:
     if style == "mixed":
         style = random.choice(["multiply", "divide"])
 
-    left_numerator, left_denominator = _proper_fraction_terms(denominator_max)
-    right_numerator, right_denominator = _proper_fraction_terms(denominator_max)
-    left_value = Fraction(left_numerator, left_denominator)
-    right_value = Fraction(right_numerator, right_denominator)
+    left_whole: int | None = None
+    right_whole: int | None = None
+    left_numerator: int | None
+    left_denominator: int | None
+    right_numerator: int | None
+    right_denominator: int | None
 
     if style == "multiply":
+        multiplication_style = random.choice(["fraction_fraction", "mixed_integer"])
         prompt_operator = "x"
+        if multiplication_style == "mixed_integer":
+            left_whole = _fraction_whole_value(options)
+            left_numerator, left_denominator = _proper_fraction_terms(denominator_max)
+            right_whole = random.randint(2, 12)
+            right_numerator = None
+            right_denominator = None
+            left_value = Fraction(left_whole, 1) + Fraction(left_numerator, left_denominator)
+            right_value = Fraction(right_whole, 1)
+        else:
+            left_numerator, left_denominator = _proper_fraction_terms(denominator_max)
+            right_numerator, right_denominator = _proper_fraction_terms(denominator_max)
+            left_value = Fraction(left_numerator, left_denominator)
+            right_value = Fraction(right_numerator, right_denominator)
         answer = left_value * right_value
     elif style == "divide":
         prompt_operator = "÷"
+        left_numerator, left_denominator = _proper_fraction_terms(denominator_max)
+        right_numerator, right_denominator = _proper_fraction_terms(denominator_max)
+        left_value = Fraction(left_numerator, left_denominator)
+        right_value = Fraction(right_numerator, right_denominator)
         answer = left_value / right_value
     else:
         raise ValueError("Unsupported fraction multiplication/division style.")
 
-    prompt = f"{_fraction_text(left_numerator, left_denominator)} {prompt_operator} {_fraction_text(right_numerator, right_denominator)} = ?"
+    prompt = f"{_term_text(left_whole, left_numerator, left_denominator)} {prompt_operator} {_term_text(right_whole, right_numerator, right_denominator)} = ?"
     return FractionProblem(
         prompt=prompt,
         answer=_mixed_fraction_text(answer),
         left_numerator=left_numerator,
         left_denominator=left_denominator,
+        left_whole=left_whole,
         right_numerator=right_numerator,
         right_denominator=right_denominator,
+        right_whole=right_whole,
         operator=style,
     )
 
@@ -172,6 +194,15 @@ def _denominator_max(options: dict[str, Any]) -> int:
     if difficulty == "medium":
         return 16
     return 12
+
+
+def _fraction_whole_value(options: dict[str, Any]) -> int:
+    difficulty = str(options.get("fractionDifficulty", "easy"))
+    if difficulty == "hard":
+        return random.randint(2, 20)
+    if difficulty == "medium":
+        return random.randint(2, 12)
+    return random.randint(2, 10)
 
 
 def _fraction_text(numerator: int, denominator: int) -> str:

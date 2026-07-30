@@ -934,7 +934,7 @@ export const worksheets: WorksheetDefinition[] = [
     path: "/fraction_multiplication_division",
     title: "Multiply and Divide Fractions",
     category: "Fractions",
-    examples: ["1/2 x 2/3 = ?", "3/4 ÷ 1/2 = ?"],
+    examples: ["10 3/5 x 4 = ?", "3/4 ÷ 1/2 = ?"],
     controls: fractionMultiplicationDivisionControls(),
   },
   {

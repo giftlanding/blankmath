@@ -4,6 +4,7 @@ import re
 import math
 from fractions import Fraction
 from pathlib import Path
+from unittest.mock import patch
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pdf_generator"))
@@ -11,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pdf_generator"))
 from blankmath.generators import generate_problems
 from blankmath.generators import _has_addition_carry, _has_subtraction_borrow, _has_borrow_across_zeros
 from blankmath.worksheets.chicken_rabbit import ChickenRabbitProblem, VALID_SCENARIOS
-from blankmath.worksheets.fractions import FractionProblem
+from blankmath.worksheets.fractions import FractionProblem, multiply_divide_fraction
 from blankmath.worksheets.hundred_charts import HundredChartProblem
 from blankmath.worksheets.number_lines import NumberLineProblem
 from blankmath.worksheets.time import TimeProblem
@@ -361,7 +362,7 @@ class GeneratorTest(unittest.TestCase):
 
     def test_generates_fraction_multiplication_division_styles(self):
         style_expectations = {
-            "multiply": r"^\d+/\d+ x \d+/\d+ = \?$",
+            "multiply": r"^(\d+/\d+ x \d+/\d+|\d+ \d+/\d+ x \d+) = \?$",
             "divide": r"^\d+/\d+ ÷ \d+/\d+ = \?$",
         }
 
@@ -382,6 +383,22 @@ class GeneratorTest(unittest.TestCase):
                     self.assert_simplified_fraction_terms(problem.left_numerator, problem.left_denominator)
                     self.assert_simplified_fraction_terms(problem.right_numerator, problem.right_denominator)
                     self.assertEqual(_fraction_multiplication_division_answer(problem.prompt), _number_or_fraction_value(problem.answer))
+
+    def test_generates_mixed_number_times_integer_fraction_problem(self):
+        with patch("blankmath.worksheets.fractions.random.choice", return_value="mixed_integer"):
+            problem = multiply_divide_fraction({
+                "fractionDifficulty": "easy",
+                "fractionMultiplicationDivisionStyle": "multiply",
+            })
+
+        self.assertRegex(problem.prompt, r"^\d+ \d+/\d+ x \d+ = \?$")
+        self.assertEqual(problem.operator, "multiply")
+        self.assertIsNotNone(problem.left_whole)
+        self.assert_simplified_fraction_terms(problem.left_numerator, problem.left_denominator)
+        self.assertIsNotNone(problem.right_whole)
+        self.assertIsNone(problem.right_numerator)
+        self.assertIsNone(problem.right_denominator)
+        self.assertEqual(_fraction_multiplication_division_answer(problem.prompt), _number_or_fraction_value(problem.answer))
 
     def test_generates_mixed_fraction_multiplication_division_style(self):
         problems = generate_problems("fraction_multiplication_division", {
