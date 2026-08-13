@@ -5,7 +5,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
-from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import Flowable, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from blankmath.generators import Problem
 from blankmath.panels.problem import page_problem_count, panel_grid, problem_panel
@@ -105,7 +105,7 @@ def render_pdf(
             answer_title = "Answer Key" if version_count == 1 else f"Answer Key - Version {page_number}"
             story.append(Paragraph(answer_title, styles["Title"]))
             story.append(Spacer(1, 0.16 * inch))
-            story.append(_answer_table(page_problems, styles["Normal"]))
+            story.append(_answer_table(page_problems, styles["Normal"], layout))
 
     document.build(story, onFirstPage=_draw_page_header, onLaterPages=_draw_page_header)
     return buffer.getvalue()
@@ -194,7 +194,67 @@ def _worksheet_info_table(include_name_date: bool, include_class_period: bool, m
     return table
 
 
-def _answer_table(problems: list[Problem], style) -> Table:
+class FractionAnswer(Flowable):
+    def __init__(self, problem_number: int, answer: str):
+        super().__init__()
+        self.problem_number = problem_number
+        self.answer = answer
+        self.width = 1.6 * inch
+        self.height = 0.34 * inch
+
+    def wrap(self, available_width, available_height):
+        self.width = available_width
+        return self.width, self.height
+
+    def draw(self):
+        canvas = self.canv
+        canvas.saveState()
+        canvas.setFillColor(colors.black)
+        canvas.setStrokeColor(colors.black)
+        canvas.setFont("Helvetica", 10)
+        label = f"{self.problem_number}."
+        label_width = canvas.stringWidth(label, "Helvetica", 10)
+        canvas.drawString(0, 0.13 * inch, label)
+        self._draw_answer(canvas, label_width + 0.08 * inch, 0.17 * inch)
+        canvas.restoreState()
+
+    def _draw_answer(self, canvas, x: float, center_y: float) -> None:
+        whole, numerator, denominator = _parse_fraction_answer(self.answer)
+        if numerator is None or denominator is None:
+            canvas.drawString(x, center_y - 0.04 * inch, self.answer)
+            return
+
+        fraction_x = x
+        if whole is not None:
+            whole_text = str(whole)
+            canvas.drawString(x, center_y - 0.04 * inch, whole_text)
+            fraction_x += canvas.stringWidth(whole_text, "Helvetica", 10) + 0.07 * inch
+
+        numerator_text = str(numerator)
+        denominator_text = str(denominator)
+        fraction_width = max(
+            canvas.stringWidth(numerator_text, "Helvetica", 10),
+            canvas.stringWidth(denominator_text, "Helvetica", 10),
+            0.18 * inch,
+        ) + 0.06 * inch
+        center_x = fraction_x + fraction_width / 2
+        canvas.drawCentredString(center_x, center_y + 0.07 * inch, numerator_text)
+        canvas.line(fraction_x, center_y + 0.035 * inch, fraction_x + fraction_width, center_y + 0.035 * inch)
+        canvas.drawCentredString(center_x, center_y - 0.09 * inch, denominator_text)
+
+
+def _parse_fraction_answer(answer: str) -> tuple[int | None, int | None, int | None]:
+    parts = answer.split()
+    if len(parts) == 1 and "/" in parts[0]:
+        numerator, denominator = parts[0].split("/", 1)
+        return None, int(numerator), int(denominator)
+    if len(parts) == 2 and "/" in parts[1]:
+        numerator, denominator = parts[1].split("/", 1)
+        return int(parts[0]), int(numerator), int(denominator)
+    return None, None, None
+
+
+def _answer_table(problems: list[Problem], style, layout: str = "horizontal") -> Table:
     columns = 4
     rows = []
     for index in range(0, len(problems), columns):
@@ -203,13 +263,17 @@ def _answer_table(problems: list[Problem], style) -> Table:
             problem_index = index + offset
             if problem_index < len(problems):
                 problem = problems[problem_index]
+                if layout == "fraction":
+                    row.append(FractionAnswer(problem_index + 1, problem.answer))
+                    continue
                 text = f"{problem_index + 1}. {problem.answer}"
             else:
                 text = ""
             row.append(Paragraph(text, style))
         rows.append(row)
 
-    table = Table(rows, colWidths=[7.4 * inch / columns] * columns)
+    row_heights = [0.46 * inch] * len(rows) if layout == "fraction" else None
+    table = Table(rows, colWidths=[7.4 * inch / columns] * columns, rowHeights=row_heights)
     table.setStyle(TableStyle([
         ("INNERGRID", (0, 0), (-1, -1), 0.2, colors.HexColor("#d9dee8")),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
