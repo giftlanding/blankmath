@@ -53,51 +53,52 @@ def render_pdf(
     version_style.textColor = colors.HexColor("#5f6b7a")
     version_style.alignment = 2
     story = []
+    problems_per_version = max(1, count_per_page)
     problems_per_page = page_problem_count(count_per_page, layout)
-    version_chunks = [
-        problems[start:start + problems_per_page]
-        for start in range(0, len(problems), problems_per_page)
-    ]
+    version_chunks = _chunk_problems(problems, problems_per_version)
     version_count = len(version_chunks)
+    has_problem_page = False
 
-    for page_number, page_problems in enumerate(version_chunks, start=1):
-        if page_number > 1:
-            story.append(PageBreak())
-        if include_name_date or include_class_period or memo_text:
-            story.append(_worksheet_info_table(include_name_date, include_class_period, memo_text))
-            story.append(Spacer(1, 0.12 * inch))
-        if version_count > 1:
-            story.append(Paragraph(f"Version {page_number}", version_style))
-            story.append(Spacer(1, 0.08 * inch))
-        if layout == "breaking_parentheses":
-            story.append(Paragraph(title, title_style))
-            story.append(Paragraph("Rewrite each expression without parentheses. Do not solve.", instruction_style))
-            story.append(Spacer(1, 0.14 * inch))
-        if layout == "chicken_rabbit":
-            story.append(Paragraph(title, title_style))
-            story.append(Paragraph("Use drawing, guess-and-check, or equations. Show your work.", instruction_style))
-            story.append(Spacer(1, 0.12 * inch))
-        if layout == "place_value":
-            story.append(Paragraph(title, title_style))
-            story.append(Paragraph("Write the missing place-value form.", instruction_style))
-            story.append(Spacer(1, 0.14 * inch))
-        if layout == "fraction":
-            story.append(Paragraph(title, title_style))
-            story.append(Paragraph("Write the missing fraction answer.", instruction_style))
-            story.append(Spacer(1, 0.14 * inch))
-        if layout == "number_line":
-            story.append(Paragraph(title, title_style))
-            story.append(Paragraph("Fill in the missing numbers on each number line.", instruction_style))
-            story.append(Spacer(1, 0.14 * inch))
-        if layout == "clock":
-            story.append(Paragraph(title, title_style))
-            story.append(Paragraph("Read the clock or draw the clock hands.", instruction_style))
-            story.append(Spacer(1, 0.14 * inch))
-        if layout == "hundred_chart":
-            story.append(Paragraph(title, title_style))
-            story.append(Paragraph("Fill in the missing numbers on the chart.", instruction_style))
-            story.append(Spacer(1, 0.14 * inch))
-        story.append(_problem_table(page_problems, worksheet_style, layout))
+    for version_number, version_problems in enumerate(version_chunks, start=1):
+        for page_start, page_problems in _problem_page_chunks(version_problems, problems_per_page):
+            if has_problem_page:
+                story.append(PageBreak())
+            has_problem_page = True
+            if include_name_date or include_class_period or memo_text:
+                story.append(_worksheet_info_table(include_name_date, include_class_period, memo_text))
+                story.append(Spacer(1, 0.12 * inch))
+            if version_count > 1:
+                story.append(Paragraph(f"Version {version_number}", version_style))
+                story.append(Spacer(1, 0.08 * inch))
+            if layout == "breaking_parentheses":
+                story.append(Paragraph(title, title_style))
+                story.append(Paragraph("Rewrite each expression without parentheses. Do not solve.", instruction_style))
+                story.append(Spacer(1, 0.14 * inch))
+            if layout == "chicken_rabbit":
+                story.append(Paragraph(title, title_style))
+                story.append(Paragraph("Use drawing, guess-and-check, or equations. Show your work.", instruction_style))
+                story.append(Spacer(1, 0.12 * inch))
+            if layout == "place_value":
+                story.append(Paragraph(title, title_style))
+                story.append(Paragraph("Write the missing place-value form.", instruction_style))
+                story.append(Spacer(1, 0.14 * inch))
+            if layout == "fraction":
+                story.append(Paragraph(title, title_style))
+                story.append(Paragraph("Write the missing fraction answer.", instruction_style))
+                story.append(Spacer(1, 0.14 * inch))
+            if layout == "number_line":
+                story.append(Paragraph(title, title_style))
+                story.append(Paragraph("Fill in the missing numbers on each number line.", instruction_style))
+                story.append(Spacer(1, 0.14 * inch))
+            if layout == "clock":
+                story.append(Paragraph(title, title_style))
+                story.append(Paragraph("Read the clock or draw the clock hands.", instruction_style))
+                story.append(Spacer(1, 0.14 * inch))
+            if layout == "hundred_chart":
+                story.append(Paragraph(title, title_style))
+                story.append(Paragraph("Fill in the missing numbers on the chart.", instruction_style))
+                story.append(Spacer(1, 0.14 * inch))
+            story.append(_problem_table(page_problems, worksheet_style, layout, start_number=page_start + 1))
 
     if include_answer_key:
         for page_number, page_problems in enumerate(version_chunks, start=1):
@@ -192,6 +193,20 @@ def _worksheet_info_table(include_name_date: bool, include_class_period: bool, m
     )
     table.setStyle(TableStyle(table_style_commands))
     return table
+
+
+def _chunk_problems(problems: list[Problem], chunk_size: int) -> list[list[Problem]]:
+    return [
+        problems[start:start + chunk_size]
+        for start in range(0, len(problems), chunk_size)
+    ]
+
+
+def _problem_page_chunks(problems: list[Problem], page_size: int) -> list[tuple[int, list[Problem]]]:
+    return [
+        (start, problems[start:start + page_size])
+        for start in range(0, len(problems), page_size)
+    ]
 
 
 class FractionAnswer(Flowable):
