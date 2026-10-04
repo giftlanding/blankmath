@@ -23,6 +23,7 @@ WORKSHEETS: dict[str, WorksheetDefinition] = {
     "add_three_numbers_mn": WorksheetDefinition("Add Three Numbers Missing Number", option_profile="digits"),
     "multiplication": WorksheetDefinition("Multiplication", option_profile="digits_layout"),
     "division": WorksheetDefinition("Division", option_profile="division"),
+    "decimal_division": WorksheetDefinition("Decimal Division", option_profile="decimal_division"),
     "mixed_times_divide": WorksheetDefinition("Mixed Multiplication and Division", option_profile="digits_layout"),
     "multiplicationmn": WorksheetDefinition("Multiplication Missing Number", option_profile="digits_layout"),
     "division_mn": WorksheetDefinition("Division Missing Number", option_profile="digits_layout"),

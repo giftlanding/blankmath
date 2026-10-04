@@ -25,6 +25,7 @@ BREAKING_PARENTHESES_SHEET_COUNT_MAX = 10
 RANGE_MIN = 0
 RANGE_MAX = 10000
 DIGIT_OPTIONS = {"1d", "2d", "3d", "l12", "l20"}
+DECIMAL_PLACES_OPTIONS = {1, 2, 3, 4}
 DIFFICULTY_PRESET_OPTIONS = {"custom", "easy", "medium", "hard"}
 FOCUS_FACTOR_OPTIONS = {"any", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}
 FOCUS_NUMBER_OPTIONS = {"any", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"}
@@ -149,6 +150,7 @@ RANGE_OPTIONS = {
 }
 DIGIT_OPTIONS_KEYS = {"digits"}
 FACT_PRACTICE_OPTIONS = {"focusFactor"}
+DECIMAL_DIVISION_OPTIONS = {"decimalPlaces"}
 LAYOUT_OPTIONS_KEYS = {"layout"}
 DISTRIBUTIVE_PROPERTY_OPTIONS = {"base", "direction", "difficulty"}
 CHICKEN_RABBIT_OPTIONS = {"numberSize"}
@@ -283,6 +285,10 @@ def normalize_options(worksheet_type: str, options: dict[str, Any]) -> dict[str,
     digits = normalized.get("digits")
     if digits is not None and digits not in DIGIT_OPTIONS:
         raise ValidationError("Digits must be one of 1d, 2d, 3d, l12, or l20.")
+
+    decimal_places = int_option(normalized, "decimalPlaces")
+    if decimal_places is not None and decimal_places not in DECIMAL_PLACES_OPTIONS:
+        raise ValidationError("Decimal places must be 1, 2, 3, or 4.")
 
     difficulty_preset = normalized.get("difficultyPreset")
     if difficulty_preset is not None and difficulty_preset not in DIFFICULTY_PRESET_OPTIONS:
@@ -433,6 +439,8 @@ def allowed_options_for(worksheet_type: str) -> set[str]:
         options.update(LAYOUT_OPTIONS_KEYS)
     if profile in {"digits", "digits_layout", "division"}:
         options.update(DIGIT_OPTIONS_KEYS)
+    if profile == "decimal_division":
+        options.update(DECIMAL_DIVISION_OPTIONS)
     if worksheet_type in FACT_PRACTICE_WORKSHEET_TYPES:
         options.update(FACT_PRACTICE_OPTIONS)
     if profile in {"digits_layout", "division"}:

@@ -2,6 +2,7 @@ import sys
 import unittest
 import re
 import math
+from decimal import Decimal, ROUND_HALF_UP
 from fractions import Fraction
 from pathlib import Path
 from unittest.mock import patch
@@ -175,6 +176,27 @@ class GeneratorTest(unittest.TestCase):
         for problem in problems:
             _dividend, divisor = _binary_terms(problem.prompt, "/")
             self.assertEqual(divisor, 5)
+
+    def test_generates_decimal_division_rounded_to_requested_places(self):
+        problems = generate_problems("decimal_division", {
+            "problemCount": 20,
+            "sheetCount": 1,
+            "decimalPlaces": 3,
+        })
+
+        for problem in problems:
+            left, right = problem.prompt.removesuffix(" = ?").split(" / ")
+            expected = (Decimal(left) / Decimal(right)).quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
+            self.assertEqual(problem.answer, f"{expected:.3f}")
+
+    @patch("blankmath.generators.random.randint", side_effect=[15, 124])
+    def test_decimal_division_matches_example(self, _randint):
+        from blankmath.generators import _decimal_division
+
+        problem = _decimal_division({"decimalPlaces": 2})
+
+        self.assertEqual(problem.prompt, "12.4 / 1.5 = ?")
+        self.assertEqual(problem.answer, "8.27")
 
     def test_generates_distributive_property_near_number_problems(self):
         problems = generate_problems("distributive_property_near_numbers", {

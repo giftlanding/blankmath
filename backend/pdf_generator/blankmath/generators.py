@@ -1,5 +1,6 @@
 import random
 from dataclasses import dataclass
+from decimal import Decimal, ROUND_HALF_UP
 from typing import Any
 
 from blankmath.worksheets.chicken_rabbit import generate_chicken_rabbit_problem
@@ -69,6 +70,7 @@ def _generator_for(worksheet_type: str):
         "add_three_numbers_mn": _add_three_numbers_missing_number,
         "multiplication": _multiplication,
         "division": _division,
+        "decimal_division": _decimal_division,
         "mixed_times_divide": _mixed_multiply_divide,
         "multiplicationmn": _multiplication_missing_number,
         "division_mn": _division_missing_number,
@@ -266,6 +268,21 @@ def _multiplication(options: dict[str, Any]) -> Problem:
 def _division(options: dict[str, Any]) -> Problem:
     dividend, divisor, quotient = _division_terms(options)
     return Problem(f"{dividend} / {divisor} = ?", str(quotient))
+
+
+def _decimal_division(options: dict[str, Any]) -> Problem:
+    decimal_places = int(options.get("decimalPlaces", 2))
+    divisor = random.randint(5, 99)
+    dividend = random.randint(10, 999)
+    divisor_value = Decimal(divisor) / Decimal(10)
+    dividend_value = Decimal(dividend) / Decimal(10)
+    answer = (dividend_value / divisor_value).quantize(
+        Decimal(1).scaleb(-decimal_places), rounding=ROUND_HALF_UP
+    )
+    return Problem(
+        f"{dividend_value:.1f} / {divisor_value:.1f} = ?",
+        f"{answer:.{decimal_places}f}",
+    )
 
 
 def _mixed_multiply_divide(options: dict[str, Any]) -> Problem:

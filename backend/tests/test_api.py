@@ -112,6 +112,22 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 201)
 
+    def test_accepts_decimal_division_request(self):
+        with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
+            result = handle_event({
+                "headers": {"x-blankmath-internal-token": "test-token"},
+                "body": json.dumps({
+                    "worksheetType": "decimal_division",
+                    "options": {
+                        "problemCount": 10,
+                        "sheetCount": 1,
+                        "decimalPlaces": 3,
+                    },
+                }),
+            })
+
+        self.assertEqual(result["statusCode"], 201)
+
     def test_accepts_focused_fact_options(self):
         with patch("blankmath.api.generate_worksheet_pdf", return_value="https://example.com/worksheet.pdf"):
             result = handle_event({

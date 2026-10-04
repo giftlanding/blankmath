@@ -8,6 +8,7 @@ export const focusFactorOptions = ["any", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 export const focusNumberOptions = ["any", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] as const;
 export const layoutOptions = ["horizontal", "vertical"] as const;
 export const divisionLayoutOptions = ["equation", "long_division"] as const;
+export const decimalPlacesOptions = [1, 2, 3, 4] as const;
 export const distributiveBaseOptions = ["near_10", "near_100", "mixed"] as const;
 export const distributiveDirectionOptions = ["subtraction", "addition", "mixed"] as const;
 export const distributiveDifficultyOptions = ["multiples_of_10", "one_digit", "two_digit", "mixed"] as const;
@@ -298,6 +299,28 @@ const divisionWorksheetControls = (): WorksheetControl[] => [
   focusFactorControl(),
   duplicateProblemsControl(),
   divisionLayout(),
+  answerKeyControl(),
+  nameDateControl(),
+  classPeriodControl(),
+  memoTextControl(),
+];
+
+const decimalDivisionControls = (): WorksheetControl[] => [
+  problemCount(),
+  sheetCount(),
+  {
+    id: "decimalPlaces",
+    label: "Round to",
+    type: "select",
+    options: decimalPlacesOptions,
+    defaultValue: 2,
+    optionLabels: {
+      "1": "1 decimal place",
+      "2": "2 decimal places",
+      "3": "3 decimal places",
+      "4": "4 decimal places",
+    },
+  },
   answerKeyControl(),
   nameDateControl(),
   classPeriodControl(),
@@ -848,6 +871,14 @@ export const worksheets: WorksheetDefinition[] = [
     category: "Multiplication & Division",
     examples: ["8 / 2 = ?"],
     controls: divisionWorksheetControls(),
+  },
+  {
+    id: "decimal_division",
+    path: "/decimal_division",
+    title: "Decimal Division",
+    category: "Multiplication & Division",
+    examples: ["12.4 ÷ 1.5 = ?", "8.7 ÷ 2.3 = ?"],
+    controls: decimalDivisionControls(),
   },
   {
     id: "mixed_times_divide",

@@ -13,6 +13,7 @@ const existingWorksheetIds = [
   "add_three_numbers_mn",
   "multiplication",
   "division",
+  "decimal_division",
   "mixed_times_divide",
   "multiplicationmn",
   "division_mn",
